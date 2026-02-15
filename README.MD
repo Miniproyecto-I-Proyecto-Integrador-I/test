@@ -55,6 +55,10 @@ npm run dev
 
 ```
 
+La aplicacion estara disponible en: http://localhost:5173
+
+---
+
 ## Calidad de Codigo y Estandares
 
 Para mantener un codigo limpio y consistente, utilizamos ESLint en el frontend.
@@ -63,7 +67,7 @@ Para mantener un codigo limpio y consistente, utilizamos ESLint en el frontend.
 
 npm run lint
 
-La aplicacion estara disponible en: http://localhost:5173
+
 
 ---
 
