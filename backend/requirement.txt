@@ -1,0 +1,23 @@
+Django>=5.0,<6.0
+djangorestframework>=3.15.0
+
+# CORS para conectar React
+django-cors-headers>=4.3.0
+
+# Variables de entorno
+python-decouple>=3.8
+
+# Base de datos PostgreSQL
+psycopg2-binary>=2.9.9
+
+# Manejo de imágenes
+Pillow>=10.0.0
+
+# Autenticación con JWT
+djangorestframework-simplejwt>=5.3.0
+
+# Servidor para producción
+gunicorn>=21.2.0
+
+# Utilidades
+django-filter>=24.0
