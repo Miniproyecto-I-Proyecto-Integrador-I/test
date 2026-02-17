@@ -1,21 +1,25 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.conf import settings # Importante para referenciar al CustomUser
 
 class Task(models.Model):
 
     class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        IN_PROGRESS = "in_progress", "In Progress"
-        COMPLETED = "completed", "Completed"
+        PENDING = "pending", "Pendiente"
+        IN_PROGRESS = "in_progress", "En Progreso"
+        COMPLETED = "completed", "Completada"
 
     class Priority(models.TextChoices):
-        LOW = "low", "Low"
-        MEDIUM = "medium", "Medium"
-        HIGH = "high", "High"
+        LOW = "low", "Baja"
+        MEDIUM = "medium", "Media"
+        HIGH = "high", "Alta"
 
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    subject = models.CharField(max_length=100, blank=True)
+    type = models.CharField(max_length=100, blank=True)
+    progress = models.FloatField(default=0.0)
+    total_hours = models.FloatField(default=0.0)
 
     status = models.CharField(
         max_length=20,
@@ -32,7 +36,7 @@ class Task(models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="tasks"
     )
