@@ -1,13 +1,9 @@
 
 import './App.css'
+import AppRoutes from './App/Routes'
 
 function App() {
-
-  return (
-    <>
-     <h1>Prueba 2</h1>
-    </>
-  )
+  return <AppRoutes />
 }
 
 export default App
