@@ -4,11 +4,10 @@ const ActivityPage = () => {
 	const { id } = useParams<{ id: string }>()
 
 	return (
-		<div>
-			<h1>Activity Page</h1>
+		<section className="page">
+			<h2>Activity Page</h2>
 			<p>El id de la actividad es: {id}</p>
-		</div>
+		</section>
 	)
 }
-
 export default ActivityPage
