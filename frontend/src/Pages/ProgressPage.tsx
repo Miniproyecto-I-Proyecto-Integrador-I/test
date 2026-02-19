@@ -1,10 +1,10 @@
-const TodayPage = () => {
+const ProgressPage = () => {
 	return (
 		<section className="page">
-			<h2>Hoy</h2>
+			<h2>Progreso</h2>
 			<p>Esta pantalla es temporal mientras añadimos funcionalidad</p>
 		</section>
 	)
 }
 
-export default TodayPage
+export default ProgressPage
