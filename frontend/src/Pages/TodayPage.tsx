@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { todayService } from '../Feature/ManageTodayPage/Services/TodayService';
+import { todayService } from '../Feature/ManageTodayPage/Services/todayService';
 import type { Task } from '../Feature/ManageTodayPage/Types/models';
 
 const TodayPage: React.FC = () => {
-    // Definimos que el estado es un array de Task
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -22,15 +21,31 @@ const TodayPage: React.FC = () => {
         fetchTasks();
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    if (loading) return <div>Loading...</div>;
 
     return (
-        <div>
+        <div style={styles.container}>
             {tasks.map(task => (
-                <div key={task.id}>
-                    <h3>{task.title}</h3>
+                <div key={task.id} style={styles.card}>
+                    <h3 style={styles.title}>{task.title}</h3>
+
+                    {task.description && (
+                        <p style={styles.description}>
+                            {task.description}
+                        </p>
+                    )}
+
+                    <div style={styles.footer}>
+                        {task.due_date && (
+                            <span>📅 {new Date(task.due_date).toLocaleString()}</span>
+                        )}
+
+                        {task.completed !== undefined && (
+                            <span>
+                                {task.completed ? "✅ Done" : "⏳ Pending"}
+                            </span>
+                        )}
+                    </div>
                 </div>
             ))}
         </div>
@@ -38,3 +53,36 @@ const TodayPage: React.FC = () => {
 };
 
 export default TodayPage;
+
+const styles = {
+    container: {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+        gap: "16px",
+        padding: "20px"
+    },
+
+    card: {
+        background: "#ffffff",
+        borderRadius: "12px",
+        padding: "16px",
+        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+        transition: "0.2s",
+    },
+
+    title: {
+        margin: "0 0 8px 0"
+    },
+
+    description: {
+        color: "#555"
+    },
+
+    footer: {
+        marginTop: "12px",
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: "0.9rem",
+        color: "#777"
+    }
+};
