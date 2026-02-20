@@ -198,10 +198,9 @@ Dentro de cada aplicación (como `task`), respetamos la estructura estándar de 
 
 ###  Estándares de Desarrollo Backend
 
-1.  **Modularidad:** Cada funcionalidad nueva debe crearse como una aplicación independiente dentro de la carpeta `Apps/`.
-2.  **Entorno Virtual:** Siempre se debe trabajar dentro de `venv` para evitar conflictos de versiones.
-3.  **Dependencias:** Cualquier librería nueva instalada debe registrarse inmediatamente con `pip freeze > requirements.txt`.
-4.  **Base de Datos:** Los cambios en los modelos deben ir acompañados de sus respectivas migraciones (`makemigrations` y `migrate`).
+1.  **Entorno Virtual:** Siempre se debe trabajar dentro de `venv` para evitar conflictos de versiones.
+2.  **Dependencias:** Cualquier librería nueva instalada debe registrarse inmediatamente con `pip freeze > requirements.txt`.
+3.  **Base de Datos:** Los cambios en los modelos deben ir acompañados de sus respectivas migraciones (`makemigrations` y `migrate`).
 
 > [!TIP]
 > Al igual que en el Frontend, se recomienda mantener las funciones dentro de `views.py` lo más concisas posible, delegando lógica compleja a archivos de utilidad si es necesario.
