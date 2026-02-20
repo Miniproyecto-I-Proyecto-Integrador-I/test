@@ -19,6 +19,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Diagnóstico del PAT (comprobar secret y permisos)
+        run: |
+          echo "Comprobando secret REPO_PAT (no se mostrará el token)..."
+          # quién es el token (si el secret está bien configurado)
+          curl -s -H "Authorization: token ${{ secrets.REPO_PAT }}" https://api.github.com/user || true
+          # comprobar acceso al repo destino (ls-remote) — no imprime el token
+          git ls-remote https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git || true
 
       - name: Push frontend -> crear rama y PR si main está protegida
         run: |
