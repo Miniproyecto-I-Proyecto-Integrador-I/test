@@ -20,6 +20,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Push frontend -> crear rama y PR si main está protegida
+        run: |
+          git subtree split --prefix frontend -b frontend-split
+          BRANCH="auto/frontend-sync-$(date +%s)"
+          git push https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:refs/heads/${BRANCH}
+          curl -s -X POST -H "Authorization: token ${{ secrets.REPO_PAT }}" -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/Miniproyecto-I-Proyecto-Integrador-I/frontend/pulls \
+            -d "{\"title\":\"Sync from test\",\"head\":\"${BRANCH}\",\"base\":\"main\",\"body\":\"Sincronización automática desde repo test\"}"
+          git branch -D frontend-split || true
+
       - name: Push frontend subtree to frontend repo
         run: |
           # crea una rama temporal con el historial de frontend
@@ -34,3 +44,5 @@ jobs:
           git subtree split --prefix backend -b backend-split
           git push https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main --force
           git branch -D backend-split || true
+
+      
