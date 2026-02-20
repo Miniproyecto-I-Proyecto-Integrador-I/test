@@ -21,3 +21,9 @@ gunicorn>=21.2.0
 
 # Utilidades
 django-filter>=24.0
+
+# Necesario para usar postgres
+psycopg2-binary
+
+# Para que Django pueda servir sus propios archivos estaticos
+whitenoise
