@@ -27,17 +27,17 @@ jobs:
           echo "ls-remote frontend (prueba lectura):"
           git ls-remote https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git || true
 
-      - name: Push frontend subtree using extraheader
+      - name: Push frontend
+        env:
+          PAT: ${{ secrets.REPO_PAT }}
         run: |
           git subtree split --prefix frontend -b frontend-split
-          # FORZAR uso del header Authorization con el PAT (evita que se use GITHUB_TOKEN)
-          git -c http.extraheader="Authorization: Bearer ${{ secrets.REPO_PAT }}" push https://github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:main --force || \
-            (echo "Push frontend falló, salida:" && git -c http.extraheader="Authorization: Bearer ${{ secrets.REPO_PAT }}" push https://github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:main) 
-          git branch -D frontend-split || true
+          git push https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:main --force
 
-      - name: Push backend subtree using extraheader
+
+      - name: Push backend
+        env:
+          PAT: ${{ secrets.REPO_PAT }}
         run: |
           git subtree split --prefix backend -b backend-split
-          git -c http.extraheader="Authorization: Bearer ${{ secrets.REPO_PAT }}" push https://github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main --force || \
-            (echo "Push backend falló, salida:" && git -c http.extraheader="Authorization: Bearer ${{ secrets.REPO_PAT }}" push https://github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main)
-          git branch -D backend-split || true
+          git push https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main --force
