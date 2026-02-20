@@ -27,6 +27,7 @@ const TodayPage: React.FC = () => {
         <div style={styles.container}>
             {tasks.map(task => (
                 <div key={task.id} style={styles.card}>
+
                     <h3 style={styles.title}>{task.title}</h3>
 
                     {task.description && (
@@ -35,21 +36,42 @@ const TodayPage: React.FC = () => {
                         </p>
                     )}
 
+                    {/* 🔵 SUBTAREAS */}
+                    {task.subtasks && task.subtasks.length > 0 && (
+                        <div style={{ marginTop: 10 }}>
+                            <strong>Subtasks</strong>
+
+                            {task.subtasks.map(sub => (
+                                <div key={sub.id} style={styles.subtask}>
+                                    • {sub.description}
+                                    <span style={{ marginLeft: 8 }}>
+                                        ({sub.status})
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <div style={styles.footer}>
                         {task.due_date && (
-                            <span>📅 {new Date(task.due_date).toLocaleString()}</span>
-                        )}
-
-                        {task.completed !== undefined && (
                             <span>
-                                {task.completed ? "✅ Done" : "⏳ Pending"}
+                                📅 {new Date(task.due_date).toLocaleString()}
                             </span>
                         )}
+
+                        {/* 🔵 STATUS REAL */}
+                        <span>
+                            {task.status === "completed"
+                                ? "✅ Done"
+                                : "⏳ Pending"}
+                        </span>
+
                     </div>
                 </div>
             ))}
         </div>
     );
+
 };
 
 export default TodayPage;
@@ -84,5 +106,11 @@ const styles = {
         justifyContent: "space-between",
         fontSize: "0.9rem",
         color: "#777"
+    },
+    subtask: {
+        fontSize: "0.9rem",
+        marginTop: "4px",
+        color: "#444"
     }
+
 };
