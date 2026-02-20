@@ -4,6 +4,17 @@ export interface Subtask {
     status: string;
     planification_date: string;
     needed_hours: number;
+    task?: {
+        id: number;
+        title: string;
+        status: string;
+        due_date?: string;
+        description?: string;
+        priority?: string;
+        subject?: string;
+        type?: string;
+        total_hours?: number;
+    };
 }
 
 export interface Task {

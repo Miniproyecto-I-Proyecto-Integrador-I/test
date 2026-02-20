@@ -1,10 +1,22 @@
 import apiClient from '../../../Services/ApiClient';
-import type { Task } from '../Types/models';
+import type { Subtask } from '../Types/models';
 
 export const todayService = {
-    // Obtener todas las tareas y subtareas del día
-    getTodayTasks: async (): Promise<Task[]> => {
-        const response = await apiClient.get<Task[]>('/task/');
+    // Obtener todas las subtareas del día filtradas por fecha, usuario y estado
+    getTodaySubtasks: async (): Promise<Subtask[]> => {
+        const now = new Date();
+        const colombia = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+        const fecha = colombia.toISOString().split('T')[0];
+
+        const params = new URLSearchParams({
+            fecha,
+            usuario: '1',
+            status: 'pending',
+        });
+
+        const response = await apiClient.get<Subtask[]>(`/subtasks/?${params.toString()}`);
         return response.data;
     },
+
+    
 }
