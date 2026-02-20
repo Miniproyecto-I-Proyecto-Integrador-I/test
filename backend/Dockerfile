@@ -14,7 +14,9 @@ RUN apt-get update && apt-get install -y libpq-dev gcc && rm -rf /var/lib/apt/li
 # 5. Instalar dependencias de Python
 COPY requirements.txt /code/
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install gunicorn  # Asegúrate de tener gunicorn para producción
 
 # 6. Copiar el proyecto
 COPY . /code/
+
+# 7. Recopilar archivos estáticos
+RUN python manage.py collectstatic --noinput
