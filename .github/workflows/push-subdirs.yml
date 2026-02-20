@@ -1,0 +1,35 @@
+name: Push subdirs to frontend/backend repos
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read   # checkout necesita leer; los pushes usan REPO_PAT
+
+jobs:
+  push-subdirs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Push frontend subtree to frontend repo
+        env:
+          PAT: ${{ secrets.REPO_PAT }}
+        run: |
+          git remote add frontend-target https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git
+          git subtree push --prefix frontend frontend-target main || echo "No hay cambios en frontend o push fallido"
+
+      - name: Push backend subtree to backend repo
+        env:
+          PAT: ${{ secrets.REPO_PAT }}
+        run: |
+          git remote add backend-target https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git
+          git subtree push --prefix backend backend-target main || echo "No hay cambios en backend o push fallido"
