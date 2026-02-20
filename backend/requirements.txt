@@ -27,3 +27,5 @@ psycopg2-binary
 
 # Para que Django pueda servir sus propios archivos estaticos
 whitenoise
+
+python-decouple==3.8

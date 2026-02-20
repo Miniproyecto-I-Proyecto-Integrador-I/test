@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
-from decouple import config # Necesitas tener python-decouple instalado
+from decouple import config 
 from pathlib import Path
 
 

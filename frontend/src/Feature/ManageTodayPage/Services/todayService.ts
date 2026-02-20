@@ -14,7 +14,7 @@ export const todayService = {
             status: 'pending',
         });
 
-        const response = await apiClient.get<Subtask[]>(`/subtasks/?${params.toString()}`);
+        const response = await apiClient.get<Subtask[]>(`api/subtasks/?${params.toString()}`);
         return response.data;
     },
 
