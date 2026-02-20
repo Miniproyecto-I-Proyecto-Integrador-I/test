@@ -3,6 +3,8 @@ on:
   push:
     branches: ["main"]
 
+# Ya no es estrictamente necesario el block 'permissions' si usas un PAT, 
+# pero no hace daño dejarlo para el repo actual.
 permissions:
   contents: write
 
@@ -14,30 +16,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # 👇 MAGIA AQUÍ: Le decimos al checkout que use tu PAT desde el principio
+          token: ${{ secrets.REPO_PAT }} 
 
       - name: Configure git user
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Diagnóstico breve (confirmar token puede listar refs)
-        run: |
-          echo "Usuario desde token:"
-          curl -s -H "Authorization: token ${{ secrets.REPO_PAT }}" https://api.github.com/user
-          echo "ls-remote frontend (prueba lectura):"
-          git ls-remote https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git || true
-
       - name: Push frontend
-        env:
-          PAT: ${{ secrets.REPO_PAT }}
         run: |
           git subtree split --prefix frontend -b frontend-split
-          git push https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:main --force
-
+          # 👇 Como ya configuramos el PAT arriba, la URL puede ser limpia y normal
+          git push https://github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:main --force
 
       - name: Push backend
-        env:
-          PAT: ${{ secrets.REPO_PAT }}
         run: |
           git subtree split --prefix backend -b backend-split
-          git push https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main --force
+          # 👇 Misma simplificación aquí
+          git push https://github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main --force
