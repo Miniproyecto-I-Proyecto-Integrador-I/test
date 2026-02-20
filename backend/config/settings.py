@@ -14,6 +14,11 @@ import os
 from decouple import config 
 from pathlib import Path
 
+#Para usar en supabase
+from dotenv import load_dotenv
+import dj_database_url
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,14 +30,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-ti#%)(ufg@zxsr71z7%p+#cav!+cmnqo8pmfp^4_wa3utk+s=m')
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
-IS_DOCKER = os.environ.get('RUNNING_IN_DOCKER', 'False') == 'True'
 
 # Application definition
 
@@ -113,18 +116,19 @@ CORS_ALLOWED_ORIGINS = [
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if IS_DOCKER:
+# Si existe DATABASE_URL (Supabase en producción), usarla, sino SQLite para desarrollo local
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('POSTGRES_DB', default='mibasedatos'),
-            'USER': config('POSTGRES_USER', default='usuario'),
-            'PASSWORD': config('POSTGRES_PASSWORD', default='contrasena'),
-            'HOST': 'db',
-            'PORT': '5432',
-        }
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,  # fuerza sslmode=require
+        )
     }
 else:
+    # Fallback a SQLite para desarrollo local
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

@@ -27,3 +27,12 @@ psycopg2-binary
 
 # Para que Django pueda servir sus propios archivos estaticos
 whitenoise
+
+# Cargar variables de entorno desde archivos .env
+python-dotenv>=1.0.0
+
+# Configuración de base de datos desde URL
+dj-database-url>=2.1.0
+
+# Driver PostgreSQL moderno (versión 3)
+psycopg[binary]>=3.1.0
