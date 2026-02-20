@@ -4,7 +4,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  contents: read   # checkout necesita leer; los pushes usan REPO_PAT
+  contents: write
 
 jobs:
   push-subdirs:
@@ -21,15 +21,16 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Push frontend subtree to frontend repo
-        env:
-          PAT: ${{ secrets.REPO_PAT }}
         run: |
-          git remote add frontend-target https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git
-          git subtree push --prefix frontend frontend-target main || echo "No hay cambios en frontend o push fallido"
+          # crea una rama temporal con el historial de frontend
+          git subtree split --prefix frontend -b frontend-split
+          # empuja esa rama al repo frontend usando el PAT del secret (forzando para sincronizar)
+          git push https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/frontend.git frontend-split:main --force
+          # limpiar la rama temporal
+          git branch -D frontend-split || true
 
       - name: Push backend subtree to backend repo
-        env:
-          PAT: ${{ secrets.REPO_PAT }}
         run: |
-          git remote add backend-target https://x-access-token:${PAT}@github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git
-          git subtree push --prefix backend backend-target main || echo "No hay cambios en backend o push fallido"
+          git subtree split --prefix backend -b backend-split
+          git push https://x-access-token:${{ secrets.REPO_PAT }}@github.com/Miniproyecto-I-Proyecto-Integrador-I/backend.git backend-split:main --force
+          git branch -D backend-split || true
