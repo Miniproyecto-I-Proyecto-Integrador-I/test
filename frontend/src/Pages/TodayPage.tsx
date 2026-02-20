@@ -21,7 +21,7 @@ const TodayPage: React.FC = () => {
         fetch();
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div>Cargando...</div>;
 
     if (subtasks.length === 0) {
         return (
