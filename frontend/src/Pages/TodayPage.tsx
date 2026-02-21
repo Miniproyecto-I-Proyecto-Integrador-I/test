@@ -55,7 +55,7 @@ const TodayPage: React.FC = () => {
                                         </div>
                                     )}
                                     {sub.task.description && (
-                                        <div>Description: {sub.task.description}</div>
+                                        <div>Descripcion: {sub.task.description}</div>
                                     )}
                                     {sub.task.priority && (
                                         <div>Prioridad: {sub.task.priority}</div>
