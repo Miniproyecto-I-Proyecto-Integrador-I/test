@@ -35,7 +35,11 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [
+    'backend-kj4u.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Application definition
 
