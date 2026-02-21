@@ -16,7 +16,8 @@ const AppRoutes = () => {
 					<Route path="/today" element={<TodayPage />} />
 					<Route path="/progress" element={<ProgressPage />} />
 					<Route path="/create" element={<CreatePage />} />
-                    <Route path="/activity/:id" element={<ActivityPage />} />					<Route path="/login" element={<LoginPage />} />
+                    <Route path="/activity/:id" element={<ActivityPage />} />					
+					<Route path="/login" element={<LoginPage />} />
 				</Route>
 				<Route path="*" element={<Navigate to="/today" replace />} />
 			</Routes>
