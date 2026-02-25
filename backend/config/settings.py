@@ -34,11 +34,7 @@ SECRET_KEY = config("DJANGO_SECRET_KEY", default="dev-secret")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = [
-    'backend-kj4u.onrender.com',
-    'localhost',
-    '127.0.0.1',
-]
+ALLOWED_HOSTS = [host.strip() for host in config('ALLOWED_HOSTS', default='backend-kj4u.onrender.com,localhost,127.0.0.1,ckancord33.online').split(',')]
 
 # Application definition
 
@@ -96,11 +92,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-# En desarrollo local (localhost), esto DEBE ser False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
