@@ -10,8 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os
-from decouple import config 
+from decouple import config
 from pathlib import Path
 
 #Para usar en supabase
@@ -30,16 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret")
+SECRET_KEY = config("DJANGO_SECRET_KEY", default="dev-secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
+DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = [
-    'backend-kj4u.onrender.com',
-    'localhost',
-    '127.0.0.1',
-]
+ALLOWED_HOSTS = [host.strip() for host in config('ALLOWED_HOSTS', default='backend-kj4u.onrender.com,localhost,127.0.0.1,ckancord33.online').split(',')]
 
 # Application definition
 
@@ -97,11 +92,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-# En desarrollo local (localhost), esto DEBE ser False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -121,8 +113,9 @@ CORS_ALLOWED_ORIGINS = [
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# Si existe DATABASE_URL (Supabase en producción), usarla, sino SQLite para desarrollo local
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Si existe DATABASE_URL (Supabase en produccion), usarla; si no, permitir Postgres local; si no, SQLite
+DATABASE_URL = config("DATABASE_URL", default=None)
+USE_LOCAL_POSTGRES = config("USE_LOCAL_POSTGRES", default=False, cast=bool)
 
 if DATABASE_URL:
     DATABASES = {
@@ -132,12 +125,23 @@ if DATABASE_URL:
             ssl_require=True,  # fuerza sslmode=require
         )
     }
+elif USE_LOCAL_POSTGRES:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config("POSTGRES_DB", default="mibasedatos"),
+            "USER": config("POSTGRES_USER", default="usuario"),
+            "PASSWORD": config("POSTGRES_PASSWORD", default="contrasena"),
+            "HOST": config("POSTGRES_HOST", default="db"),
+            "PORT": config("POSTGRES_PORT", default="5432"),
+        }
+    }
 else:
     # Fallback a SQLite para desarrollo local
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
@@ -185,3 +189,5 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Prueba de que si esta acutalizando automaticamente el deploy
