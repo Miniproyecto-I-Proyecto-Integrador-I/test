@@ -70,7 +70,9 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
     };
 
     const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
+        // Parsear la fecha manualmente para evitar problemas de zona horaria
+        const [year, month, day] = dateString.split('-').map(Number);
+        const date = new Date(year, month - 1, day, 0, 0, 0, 0);
         return date.toLocaleDateString('es-ES', { 
             day: '2-digit', 
             month: 'short' 

@@ -6,7 +6,10 @@ import type { SubtaskFormData, ValidationErrors } from '../Types/subtask.types';
 export const validateDate = (date: string): boolean => {
     if (!date) return false;
     
-    const selectedDate = new Date(date);
+    // Parsear la fecha manualmente para evitar problemas de zona horaria
+    const [year, month, day] = date.split('-').map(Number);
+    const selectedDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
     
