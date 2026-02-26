@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { todayService} from '../Feature/ManageTodayPage/Services/todayService';
+import { todayService } from '../Feature/ManageTodayPage/Services/todayService';
 import type { Subtask } from '../Feature/ManageTodayPage/Types/models';
 
 const TodayPage: React.FC = () => {
@@ -10,7 +10,8 @@ const TodayPage: React.FC = () => {
         const fetch = async () => {
             try {
                 const data = await todayService.getTodaySubtasks();
-                setSubtasks(data);
+                console.log("DATA:", data);
+                setSubtasks(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error('Error:', error);
             } finally {
@@ -32,7 +33,7 @@ const TodayPage: React.FC = () => {
         );
     }
 
-    const now = new Date(); 
+    const now = new Date();
     const colombia = new Date(now.getTime() - 5 * 60 * 60 * 1000);
     const fecha = colombia.toISOString().split('T')[0];
 
