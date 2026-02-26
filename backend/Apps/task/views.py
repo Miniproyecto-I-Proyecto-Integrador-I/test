@@ -15,7 +15,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         queryset = Task.objects.all()
 
         return queryset.distinct()
-    @action(detail=True, methods=['post'], url_path='subtareas')
+    @action(detail=True, methods=['post'], url_path='subtasks')
     def crear_subtarea(self, request, pk=None):
         
         #Crea una subtarea vinculada a una actividad específica (ID en la URL).
