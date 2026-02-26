@@ -1,0 +1,607 @@
+/* ==========================================
+   AddSubtask Component Styles
+   ========================================== */
+
+/* Main Container */
+.subtask-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  width: 800px;
+  max-width: 100%;
+  padding: 0;
+}
+
+/* ==========================================
+   Header Section
+   ========================================== */
+.subtask-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  gap: 24px;
+
+  width: 100%;
+  height: auto;
+  min-height: 76px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.subtask-header__content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.subtask-header__icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px;
+
+  width: 32px;
+  height: 36px;
+
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 8px;
+}
+
+.subtask-header__icon {
+  width: 16px;
+  height: 20px;
+  background: #10b981;
+}
+
+.subtask-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.subtask-header__label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.subtask-header__title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: #111827;
+}
+
+.subtask-header__time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.subtask-header__time-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #6b7280;
+  text-align: right;
+}
+
+.subtask-header__time-value {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: right;
+  color: #111827;
+}
+
+/* ==========================================
+   Main Content Section
+   ========================================== */
+.subtask-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px;
+
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+/* ==========================================
+   Section Title
+   ========================================== */
+.subtask-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.subtask-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.subtask-section__title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 30px;
+  color: #111827;
+}
+
+.subtask-section__description {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #4b5563;
+}
+
+/* ==========================================
+   Form Fields Section
+   ========================================== */
+.subtask-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.subtask-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subtask-form__label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 21px;
+  color: #4b5563;
+}
+
+.subtask-form__input {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 11px 14px 12px;
+
+  width: 100%;
+  min-height: 42px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #111827;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.subtask-form__input:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.subtask-form__input::placeholder {
+  color: #6b7280;
+}
+
+.subtask-form__input-help {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #9ca3af;
+  position: relative;
+  top: 6px;
+}
+
+.subtask-form__input-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.subtask-form__error-message {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+/* Two-column layout for date and time */
+.subtask-form__row {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  width: 100%;
+}
+
+.subtask-form__column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subtask-form__textarea {
+  resize: vertical;
+  min-height: 42px;
+  max-height: 120px;
+}
+
+/* ==========================================
+   Add Button
+   ========================================== */
+.subtask-form__add-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 24px;
+  gap: 8px;
+
+  width: fit-content;
+  height: 44px;
+
+  background: #10b981;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #ffffff;
+
+  transition: background-color 0.2s ease, transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.subtask-form__add-button:hover {
+  background-color: #059669;
+  box-shadow: 0px 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.subtask-form__add-button:active {
+  transform: scale(0.98);
+}
+
+.subtask-form__add-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.subtask-form__add-icon {
+  width: 10.5px;
+  height: 10.5px;
+  background: #ffffff;
+}
+
+/* ==========================================
+   Subtasks List Section
+   ========================================== */
+.subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.subtask-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12px;
+  gap: 16px;
+
+  width: 100%;
+  min-height: 52px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.subtask-item:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.subtask-item__drag-handle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 10px;
+  height: 16px;
+
+  cursor: grab;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.subtask-item__drag-handle:active {
+  cursor: grabbing;
+}
+
+.subtask-item__content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.subtask-item__description {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #111827;
+}
+
+.subtask-item__meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtask-item__badge {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  gap: 4px;
+
+  height: 26px;
+
+  background: #f3f4f6;
+  border-radius: 9999px;
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 18px;
+  color: #4b5563;
+}
+
+.subtask-item__badge-icon {
+  width: 10.5px;
+  height: 11.67px;
+}
+
+.subtask-item__delete-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+
+  width: 24px;
+  height: 24px;
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 20px;
+  line-height: 1;
+
+  transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.subtask-item__delete-button:hover {
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+.subtask-item__delete-button:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================
+   Footer / Submit Section
+   ========================================== */
+.subtask-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: 16px;
+}
+
+.subtask-submit-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 32px;
+
+  height: 48px;
+  min-width: 200px;
+
+  background: #10b981;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: #ffffff;
+  text-align: center;
+
+  transition: background-color 0.2s ease, transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.subtask-submit-button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.002);
+  box-shadow: 0px 10px 15px -3px rgba(16, 185, 129, 0.2),
+    0px 4px 6px -4px rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  z-index: 0;
+}
+
+.subtask-submit-button:hover {
+  background-color: #059669;
+  box-shadow: 0px 10px 15px -3px rgba(16, 185, 129, 0.3),
+    0px 4px 6px -4px rgba(16, 185, 129, 0.3);
+}
+
+.subtask-submit-button:active {
+  transform: scale(0.98);
+}
+
+.subtask-submit-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.subtask-submit-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================
+   Empty State
+   ========================================== */
+.subtask-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 32px;
+  gap: 16px;
+
+  width: 100%;
+  min-height: 200px;
+
+  background: #f9fafb;
+  border: 2px dashed #e5e7eb;
+  border-radius: 8px;
+
+  text-align: center;
+}
+
+.subtask-empty__icon {
+  font-size: 48px;
+  color: #d1d5db;
+}
+
+.subtask-empty__text {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  color: #9ca3af;
+}
+
+/* ==========================================
+   Responsive Design
+   ========================================== */
+@media (max-width: 820px) {
+  .subtask-container {
+    width: 100%;
+  }
+
+  .subtask-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .subtask-content {
+    padding: 24px;
+  }
+
+  .subtask-form__row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .subtask-form__column {
+    width: 100%;
+  }
+
+  .subtask-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .subtask-item__content {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .subtask-item__meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .subtask-header__content {
+    gap: 8px;
+  }
+
+  .subtask-form__add-button {
+    width: 100%;
+  }
+
+  .subtask-submit-button {
+    width: 100%;
+    min-width: auto;
+  }
+}
