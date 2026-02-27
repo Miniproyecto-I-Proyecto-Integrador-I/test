@@ -2,20 +2,40 @@ from rest_framework import serializers
 from .models import Subtask
 from Apps.task.models import Task
 
-
 class TaskMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        # ajustar campos según lo que desees mostrar
-        fields = ['id', 'title', 'status', 'due_date','description','priority','subject','type','total_hours']
-
+        fields = [
+            'id',
+            'title',
+            'status',
+            'due_date',
+            'description',
+            'priority',
+            'subject',
+            'type',
+            'total_hours'
+        ]
 
 class SubtaskSerializer(serializers.ModelSerializer):
-    # incluir datos de la tarea padre
-    task = TaskMiniSerializer(read_only=True)
+    # Dejamos esto exactamente igual para que React pueda enviar el ID
+    # al crear una nueva subtarea (POST)
+    task = serializers.PrimaryKeyRelatedField(
+        queryset=Task.objects.all()
+    )
 
     class Meta:
         model = Subtask
-        fields = '__all__' 
+        fields = '__all__'
 
-
+    # Agregamos esta función para modificar cómo se ENVÍAN los datos (GET)
+    def to_representation(self, instance):
+        # Obtenemos el diccionario original (donde 'task' es solo el ID)
+        representation = super().to_representation(instance)
+        
+        # Si la subtarea tiene una tarea asociada, usamos tu TaskMiniSerializer
+        # para empaquetar toda la info y sobreescribimos el campo 'task'
+        if instance.task:
+            representation['task'] = TaskMiniSerializer(instance.task).data
+            
+        return representation

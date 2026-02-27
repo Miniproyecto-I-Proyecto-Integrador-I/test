@@ -1,0 +1,118 @@
+/* La Tarjeta Flotante */
+.floating-navbar {
+    width: 120px;
+    /* Más delgada y minimalista */
+    margin: 24px;
+    /* Esto crea el efecto flotante */
+    background: #ffffff;
+    border-radius: 32px;
+    /* Bordes muy redondeados */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    /* Sombra suave y amplia */
+    display: flex;
+    flex-direction: column;
+    padding: 32px 20px;
+    box-sizing: border-box;
+    height: calc(100vh - 48px);
+    /* Ajustamos el alto para respetar el margen */
+    align-items: center;
+    /* Centramos todo */
+}
+
+/* Logo Cuadrado con Degradado */
+.nav-brand {
+    margin-bottom: 48px;
+}
+
+.logo-box {
+    background: linear-gradient(135deg, #00b87c, #007a53);
+    color: white;
+    font-weight: 900;
+    font-size: 1.2rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0, 184, 124, 0.25);
+}
+
+/* Enlaces (Estilo minimalista) */
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 12px 0;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto al pasar el mouse */
+.nav-item:hover {
+    color: #1e293b;
+    background-color: #f1f5f9;
+    transform: translateY(-2px);
+    /* Pequeño salto hacia arriba */
+}
+
+/* Elemento Activo (Contraste oscuro y elegante) */
+.nav-item.is-active {
+    background-color: #1e293b;
+    /* Píldora gris oscuro/negro */
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+}
+
+/* Footer y Avatar */
+.nav-footer {
+    padding-top: 24px;
+    border-top: 2px solid #f1f5f9;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    /* Forma de "squircle" (cuadrado redondeado) en vez de círculo */
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.avatar-img:hover {
+    transform: scale(1.1) rotate(5deg);
+    /* Interacción juguetona al hacer hover */
+}
+
+.nav-brand {
+    margin-bottom: 48px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.brand-logo-img {
+    width: 56px;
+    /* Puedes ajustar este tamaño si lo ves muy grande o pequeño */
+    height: 56px;
+    object-fit: cover;
+    /* Asegura que la imagen no se deforme */
+    border-radius: 16px;
+    /* Mantiene el estilo moderno con bordes redondeados */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    /* Sombra sutil para que resalte */
+}
