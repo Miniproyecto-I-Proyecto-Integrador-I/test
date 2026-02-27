@@ -13,7 +13,9 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Task.objects.all()
-
+        usuario_id = self.request.query_params.get('usuario', None)
+        if usuario_id is not None:
+            queryset = queryset.filter(user_id=usuario_id)
         return queryset.distinct()
     @action(detail=True, methods=['post'], url_path='subtasks')
     def crear_subtarea(self, request, pk=None):
