@@ -12,8 +12,7 @@ class TaskMiniSerializer(serializers.ModelSerializer):
 
 class SubtaskSerializer(serializers.ModelSerializer):
     # incluir datos de la tarea padre
-    task = TaskMiniSerializer(read_only=True)
-
+    task_detail = TaskMiniSerializer(source='task', read_only=True)
     class Meta:
         model = Subtask
         fields = '__all__' 
