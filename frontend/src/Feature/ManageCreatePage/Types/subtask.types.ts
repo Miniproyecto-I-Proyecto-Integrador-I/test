@@ -12,7 +12,7 @@ export interface SubtaskPayload {
     description: string;
     planification_date: string;
     needed_hours: number;
-    task: number;
+    task_id: number;
 }
 
 export interface ValidationErrors {

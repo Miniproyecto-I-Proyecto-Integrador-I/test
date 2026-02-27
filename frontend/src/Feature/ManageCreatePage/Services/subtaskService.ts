@@ -4,9 +4,9 @@ import type { SubtaskPayload } from '../Types/subtask.types';
 /**
  * Crea una subtarea asociada a una tarea
  */
-export const createSubtask = async (subtaskData: SubtaskPayload) => {
+export const createSubtask = async (taskId: number, subtaskData: SubtaskPayload) => {
 	try {
-		const response = await apiClient.post('api/subtasks/', subtaskData);
+		const response = await apiClient.post(`api/task/${taskId}/subtasks/`, subtaskData);
 		return response.data;
 	} catch (error) {
 		console.error('Error al crear subtarea:', error);
@@ -19,13 +19,13 @@ export const createSubtask = async (subtaskData: SubtaskPayload) => {
  */
 export const createMultipleSubtasks = async (
 	taskId: number,
-	subtasks: Omit<SubtaskPayload, 'task'>[]
+	subtasks: Omit<SubtaskPayload, 'task_id'>[]
 ) => {
 	try {
 		const promises = subtasks.map((subtask) =>
-			createSubtask({
+			createSubtask(taskId, {
 				...subtask,
-				task: taskId,
+				task_id: taskId,
 			})
 		);
 		const results = await Promise.all(promises);
