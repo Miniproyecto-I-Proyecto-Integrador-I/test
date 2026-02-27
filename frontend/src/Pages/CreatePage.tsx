@@ -13,16 +13,13 @@ const CreatePage = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [formStatus, setFormStatus] = useState<'idle' | 'success'>('idle');
 
-	// === ESTADOS DE TASK ===
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [status, setStatus] = useState('pending');
 	const [priority, setPriority] = useState('medium');
 	const [dueDate, setDueDate] = useState('');
 
-	// === ESTADOS DE SUBTASK ===
 	const [subtasks, setSubtasks] = useState<SubtaskForm[]>([]);
-
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
 	const handleAddSubtask = () => {
@@ -71,8 +68,7 @@ const CreatePage = () => {
 		};
 
 		try {
-			// AQUÍ ESTÁ EL CAMBIO 1: Agregamos /api/ explícitamente a la ruta de la tarea
-			const taskResponse = await apiClient.post('/api/tasks/', taskPayload);
+			const taskResponse = await apiClient.post('/api/task/', taskPayload);
 			const createdTaskId = taskResponse.data.id;
 
 			if (subtasks.length > 0) {
@@ -84,7 +80,6 @@ const CreatePage = () => {
 						needed_hours: Number(st.needed_hours),
 						task: createdTaskId
 					};
-					// AQUÍ ESTÁ EL CAMBIO 2: Agregamos /api/ a la ruta de las subtareas
 					return apiClient.post('/api/subtasks/', subtaskPayload);
 				});
 
@@ -100,7 +95,6 @@ const CreatePage = () => {
 
 		} catch (error: any) {
 			console.error("Error al guardar en Django:", error);
-			// Mostrar los errores reales de Django en consola te ayudará a depurar
 			if (error.response) {
 				console.error("Detalle del error:", error.response.data);
 			}
