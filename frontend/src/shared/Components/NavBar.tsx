@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import './NavBar.css';
-import Logo from '../Utils/LogoXD.jpeg';
+import Logo from '../../assets/Logo StaskM.png';
+import {User} from 'lucide-react';
 
 const NavBar = () => {
     return (
@@ -34,11 +35,7 @@ const NavBar = () => {
 
             {/* Perfil en la parte inferior */}
             <div className="nav-footer">
-                <img
-                    src="https://i.pravatar.cc/150?img=11"
-                    alt="Perfil"
-                    className="avatar-img"
-                />
+                <User color='#4B5563'></User>
             </div>
         </nav>
     );
