@@ -21,6 +21,8 @@ gunicorn>=21.2.0
 
 # Utilidades
 django-filter>=24.0
+pytest>=8.0.0
+pytest-django>=4.8.0
 
 # Necesario para usar postgres
 psycopg2-binary
