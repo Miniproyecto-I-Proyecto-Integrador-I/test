@@ -1,3 +1,5 @@
+@import '../../../shared/Styles/Variables.css';
+
 .subtask-form-wrapper {
     display: flex;
     flex-direction: column;
@@ -14,11 +16,11 @@
     justify-content: space-between;
     gap: 16px;
     padding: 18px 22px;
-    background: #ffffff;
-    border: 1px solid #e4e7ee;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     box-shadow: 0 6px 16px rgba(28, 31, 36, 0.06);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-family);
     width: 100%;
     box-sizing: border-box;
 }
@@ -34,7 +36,7 @@
     height: 34px;
     border-radius: 10px;
     background: #ecfdf3;
-    color: #10b981;
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,14 +58,14 @@
     letter-spacing: 0.06em;
     font-size: 11px;
     font-weight: 600;
-    color: #9aa0a6;
+    color: var(--text-tertiary);
 }
 
 .task-summary-title {
     display: block;
     font-size: 17px;
     font-weight: 600;
-    color: #1f2933;
+    color: var(--text-main);
 }
 
 .task-summary-right {
@@ -74,33 +76,33 @@
     display: block;
     font-size: 17px;
     font-weight: 600;
-    color: #1f2933;
+    color: var(--text-main);
 }
 
 .subtask-form-container {
     width: 100%;
     margin: 0;
     padding: 36px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-base);
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-family);
     box-sizing: border-box;
 }
 
 .subtask-form-title {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-family);
     font-size: 22px;
     font-weight: 600;
-    color: #111827;
+    color: var(--text-main);
     margin: 0 0 4px 0;
     line-height: 32px;
 }
 
 .subtask-form-subtitle {
     font-size: 15px;
-    color: #4b5563;
+    color: var(--text-secondary);
     margin: 0 0 24px 0;
     line-height: 22px;
     font-weight: 400;
@@ -128,38 +130,38 @@
     padding: 0px;
     font-size: 15px;
     font-weight: 500;
-    color: #4b5563;
+    color: var(--text-secondary);
     line-height: 22px;
     letter-spacing: 0px;
 }
 
 .subtask-form-input {
     width: 100%;
-    padding: 11px 14px;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
+    padding: var(--padding-input);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius-base);
     font-size: 15px;
     font-weight: 400;
-    color: #111827;
-    font-family: 'Inter', sans-serif;
+    color: var(--text-main);
+    font-family: var(--font-family);
     transition: border-color 0.2s, background-color 0.2s;
     box-sizing: border-box;
-    background: #ffffff;
+    background: var(--surface);
     line-height: 22px;
 }
 
 .subtask-form-input::placeholder {
-    color: #6b7280;
+    color: var(--text-tertiary);
 }
 
 .subtask-form-input:focus {
     outline: none;
-    border-color: #10b981;
-    background: #ffffff;
+    border-color: var(--primary-color);
+    background: var(--surface);
 }
 
 .subtask-form-input.error {
-    border: 2px solid #ef4444;
+    border: 2px solid var(--error-color);
     background: #fef2f2;
 }
 
@@ -167,7 +169,7 @@
     display: flex;
     justify-content: flex-end;
     font-size: 13px;
-    color: #9ca3af;
+    color: var(--text-tertiary);
     margin-top: 0px;
 }
 
@@ -176,7 +178,7 @@
     align-items: center;
     gap: 4px;
     font-size: 13px;
-    color: #ef4444;
+    color: var(--error-color);
     font-weight: 600;
     line-height: 19px;
 }
@@ -202,10 +204,10 @@
 .subtask-form-add-btn {
     width: auto;
     padding: 12px 26px;
-    background: #10b981;
+    background: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--border-radius-base);
     font-size: 17px;
     font-weight: 500;
     cursor: pointer;
@@ -219,7 +221,7 @@
 }
 
 .subtask-form-add-btn:hover {
-    background: #059669;
+    background: var(--primary-hover);
 }
 
 .subtask-form-add-btn:active {
@@ -246,15 +248,15 @@
     justify-content: space-between;
     gap: 16px;
     padding: 14px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-base);
     transition: box-shadow 0.2s, background-color 0.2s;
     box-sizing: border-box;
 }
 
 .subtask-form-item.is-drop-target {
-    border-color: #10b981;
+    border-color: var(--primary-color);
     box-shadow: 0px 1px 4px rgba(16, 185, 129, 0.2);
 }
 
@@ -264,7 +266,7 @@
 
 .subtask-form-item:hover {
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-    background: #ffffff;
+    background: var(--surface);
 }
 
 .subtask-form-item-left {
@@ -277,7 +279,7 @@
 
 .subtask-form-item-drag-handle {
     cursor: grab;
-    color: #9ca3af;
+    color: var(--text-tertiary);
     user-select: none;
     flex-shrink: 0;
     display: flex;
@@ -286,8 +288,8 @@
     width: 28px;
     height: 28px;
     border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    background: #f9fafb;
+    border: 1px solid var(--border-color);
+    background: var(--bg-base);
     padding: 0;
 }
 
@@ -304,7 +306,7 @@
 .subtask-form-item-description {
     font-size: 15px;
     font-weight: 400;
-    color: #111827;
+    color: var(--text-main);
     margin: 0;
     line-height: 22px;
     word-break: break-word;
@@ -321,7 +323,7 @@
     display: flex;
     gap: 8px;
     font-size: 13px;
-    color: #4b5563;
+    color: var(--text-secondary);
     font-weight: 500;
     align-items: center;
 }
@@ -332,7 +334,7 @@
     align-items: center;
     gap: 4px;
     padding: 5px 12px;
-    background: #f3f4f6;
+    background: var(--btn-sec-hover);
     border-radius: 9999px;
     font-weight: 500;
     font-size: 13px;
@@ -344,7 +346,7 @@
     width: 15px;
     height: 15px;
     fill: none;
-    stroke: #6b7280;
+    stroke: var(--text-tertiary);
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -368,14 +370,14 @@
 
 .subtask-form-item-delete:hover {
     opacity: 1;
-    background: #f3f4f6;
+    background: var(--btn-sec-hover);
 }
 
 .subtask-form-item-delete svg {
     width: 16px;
     height: 16px;
     fill: none;
-    stroke: #6b7280;
+    stroke: var(--text-tertiary);
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -389,36 +391,36 @@
 
 .subtask-form-submit {
     padding: 14px 32px;
-    background: #10b981;
-    color: #ffffff;
+    background: var(--primary-color);
+    color: var(--surface);
     border: none;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: var(--font-size-h3);
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-family);
     cursor: pointer;
     transition: background-color 0.2s, box-shadow 0.2s;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .subtask-form-submit:hover:not(:disabled) {
-    background: #059669;
+    background: var(--primary-hover);
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 .subtask-form-submit:disabled {
-    background: #94a3b8;
+    background: var(--text-tertiary);
     cursor: not-allowed;
     box-shadow: 0 4px 12px rgba(148, 163, 184, 0.2);
 }
 
 .subtask-form-back-btn {
     padding: 10px 18px;
-    background: #d1fae5;
-    color: #10b981;
-    border: 1px solid #10b981;
-    border-radius: 8px;
-    font-size: 14px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius-base);
+    font-size: var(--font-size-body);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -429,9 +431,9 @@
 }
 
 .subtask-form-back-btn:hover {
-    background: #10b981;
-    color: #ffffff;
-    border-color: #059669;
+    background: var(--primary-color);
+    color: var(--surface);
+    border-color: var(--primary-hover);
 }
 
 .subtask-form-back-btn:active {
