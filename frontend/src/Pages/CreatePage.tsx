@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../Services/ApiClient';
 import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
 import './CreatePage.css';
@@ -7,12 +8,14 @@ interface Task {
 	id: number;
 	title: string;
 	description: string;
+	subject?: string;
 	status: string;
 	priority: string;
 	due_date: string | null;
 }
 
 const CreatePage = () => {
+	const navigate = useNavigate();
 	const [tasks, setTasks] = useState<Task[]>([]);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -20,9 +23,9 @@ const CreatePage = () => {
 	const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
 	const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
 
+	const [subject, setSubject] = useState('');
 	const [formStatus, setFormStatus] = useState<'idle' | 'success'>('idle');
 	const [title, setTitle] = useState('');
-	const [description, setDescription] = useState('');
 	const [status, setStatus] = useState('pending');
 	const [priority, setPriority] = useState('medium');
 	const [dueDate, setDueDate] = useState('');
@@ -59,7 +62,7 @@ const CreatePage = () => {
 		const newErrors: { [key: string]: string } = {};
 
 		if (!title.trim()) newErrors.title = "El título es obligatorio.";
-		if (!description.trim()) newErrors.description = "La descripción es obligatoria.";
+		if (!subject.trim()) newErrors.subject = "La materia es obligatoria.";
 
 		if (Object.keys(newErrors).length > 0) {
 			setErrors(newErrors);
@@ -68,7 +71,7 @@ const CreatePage = () => {
 
 		const taskPayload = {
 			title,
-			description,
+			subject,
 			status,
 			priority,
 			due_date: dueDate ? `${dueDate}T23:59:59Z` : null,
@@ -80,13 +83,15 @@ const CreatePage = () => {
 			const newTask: Task = taskResponse.data;
 
 			setTasks([...tasks, newTask]);
+			setSelectedTask(newTask);
 
 			setErrors({});
 			setFormStatus('success');
 
-			setTimeout(() => {
-				handleCloseTaskModal();
-			}, 2000);
+			// Limpiar los campos del formulario tras creación exitosa
+			setTitle('');
+			setSubject('');
+			setDueDate('');
 
 		} catch (error: any) {
 			console.error("Error al guardar en Django:", error);
@@ -99,7 +104,7 @@ const CreatePage = () => {
 		setFormStatus('idle');
 		setErrors({});
 		setTitle('');
-		setDescription('');
+		setSubject('');
 		setStatus('pending');
 		setPriority('medium');
 		setDueDate('');
@@ -137,6 +142,12 @@ const CreatePage = () => {
 	};
 
 	const errorCount = Object.keys(errors).filter(k => k !== 'general').length;
+
+	const formatSpanishDate = (dateString: string) => {
+		if (!dateString) return "Sin fecha";
+		const date = new Date(dateString + 'T12:00:00');
+		return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+	};
 
 	if (isLoading) {
 		return (
@@ -193,8 +204,8 @@ const CreatePage = () => {
 						{formStatus === 'idle' && (
 							<>
 								<div className="modal-header">
-									<h2>Nueva Tarea</h2>
-									<p>Define el objetivo general.</p>
+									<h2>Crear Nueva Tarea</h2>
+									<p>Organiza tus objetivos académicos con facilidad.</p>
 								</div>
 
 								{errorCount > 0 && (
@@ -209,10 +220,11 @@ const CreatePage = () => {
 								)}
 
 								<form onSubmit={handleCreateTask} className="task-form" noValidate>
+									<h3>Información General de la Tarea</h3>
 									<div className="form-group">
-										<label>Título</label>
+										<label>Nombre descriptivo de la tarea</label>
 										<input
-											type="text" placeholder="Ej. Proyecto Final"
+											type="text" placeholder="Ej. Ensayo sobre la Revolución Francesa"
 											value={title} onChange={(e) => setTitle(e.target.value)}
 											className={errors.title ? 'has-error' : ''}
 										/>
@@ -220,13 +232,13 @@ const CreatePage = () => {
 									</div>
 
 									<div className="form-group">
-										<label>Descripción</label>
+										<label>Materia o asignatura</label>
 										<input
-											type="text" placeholder="Detalles de la tarea..."
-											value={description} onChange={(e) => setDescription(e.target.value)}
-											className={errors.description ? 'has-error' : ''}
+											type="text" placeholder="Ej. Historia Universal"
+											value={subject} onChange={(e) => setSubject(e.target.value)}
+											className={errors.subject ? 'has-error' : ''}
 										/>
-										{errors.description && <span className="error-text">{errors.description}</span>}
+										{errors.subject && <span className="error-text">{errors.subject}</span>}
 									</div>
 
 									<div className="form-row">
@@ -265,16 +277,44 @@ const CreatePage = () => {
 
 						{formStatus === 'success' && (
 							<div className="success-state">
-								<div className="success-icon">✓</div>
-								<h2>¡Tarea creada!</h2>
-								<p>Tu tarea "{title}" ha sido guardada. Ahora haz clic en ella para agregarle actividades.</p>
+								<div className="success-icon-wrapper">
+									<div className="success-icon">
+										<svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+										</svg>
+									</div>
+								</div>
+								<h2 className="success-title">¡Tarea creada exitosamente!</h2>
+								<p className="success-subtitle">Tu tarea ha sido guardada y añadida a tu plan de estudio.</p>
+
+								<div className="success-summary-list">
+									<div className="summary-item">
+										Materia: {selectedTask?.subject || 'Sin asignar'}
+									</div>
+									<div className="summary-item">
+										Fecha: {formatSpanishDate(selectedTask?.due_date || '')}
+									</div>
+								</div>
+
+								<div className="success-footer-actions">
+									<button className="btn-secondary" onClick={() => navigate('/today')}>
+										Volver al panel principal
+									</button>
+									<button className="btn-primary" onClick={() => {
+										setIsCreateTaskModalOpen(false);
+										setFormStatus('idle');
+										setIsSubtaskModalOpen(true);
+									}}>
+										Añadir subtareas a esta actividad
+									</button>
+								</div>
 							</div>
 						)}
 					</div>
 				</div>
 			)}
 
-			{selectedTask && !isSubtaskModalOpen && (
+			{selectedTask && !isSubtaskModalOpen && !isCreateTaskModalOpen && (
 				<div className="modal-overlay" onClick={() => setSelectedTask(null)}>
 					<div className="modal-card" onClick={(e) => e.stopPropagation()}>
 						<div className="modal-header">
@@ -300,9 +340,15 @@ const CreatePage = () => {
 			)}
 
 			{selectedTask && isSubtaskModalOpen && (
-				<div className="modal-overlay" onClick={() => setIsSubtaskModalOpen(false)}>
+				<div className="modal-overlay" onClick={() => {
+					setIsSubtaskModalOpen(false);
+					setSelectedTask(null);
+				}}>
 					<div className="subtask-modal-card" onClick={(e) => e.stopPropagation()}>
-						<button className="btn-close-corner" onClick={() => setIsSubtaskModalOpen(false)}>✕</button>
+						<button className="btn-close-corner" onClick={() => {
+							setIsSubtaskModalOpen(false);
+							setSelectedTask(null);
+						}}>✕</button>
 						<SubtaskForm
 							taskTitle={selectedTask.title}
 							onFinalize={handleFinalizeSubtasks}
