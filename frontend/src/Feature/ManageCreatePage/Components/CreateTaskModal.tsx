@@ -27,6 +27,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 	const [title, setTitle] = useState('');
 	const [subject, setSubject] = useState('');
 	const [evaluationType, setEvaluationType] = useState('');
+	const [description, setDescription] = useState('');
 	const [priority, setPriority] = useState('medium');
 	const [dueDate, setDueDate] = useState('');
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -50,6 +51,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 			user: 1, // ID de usuario por defecto
 			...(subject && { subject }),
 			...(evaluationType && { type: evaluationType }),
+			...(description && { description }),
 			priority,
 		};
 
@@ -61,6 +63,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 			setTitle('');
 			setSubject('');
 			setEvaluationType('');
+			setDescription('');
 			setPriority('medium');
 			setDueDate('');
 		} catch (error: any) {
@@ -75,6 +78,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 		setTitle('');
 		setSubject('');
 		setEvaluationType('');
+		setDescription('');
 		setPriority('medium');
 		setDueDate('');
 		onClose();
@@ -150,6 +154,18 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                                     </select>
                                 </div>
                             </div>
+                            
+                            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                <label>Descripción detallada</label>
+                                <textarea
+                                    className="form-textarea"
+                                    placeholder="Añade detalles, instrucciones o notas importantes sobre esta tarea..."
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    rows={3}
+                                    style={{ width: '100%', boxSizing: 'border-box', padding: 'var(--padding-input)', border: '1px solid var(--border-secondary)', borderRadius: 'var(--border-radius-base)', fontSize: '0.95rem', color: 'var(--text-main)', transition: 'all 0.2s ease', backgroundColor: 'var(--surface)', fontFamily: 'var(--font-family)', resize: 'none', minHeight: '80px' }}
+                                />
+                            </div>
 
                             <h3 className="section-title">Planificación y Tiempos</h3>
 
@@ -200,7 +216,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 				{formStatus === 'success' && createdTask && (
 					<SuccessTaskModal
 						task={createdTask}
-						onNavigateToPanel={() => navigate('/today')}
+						onNavigateToPanel={() => navigate('/create')}
 						onAddSubtasks={() => onAddSubtasks(createdTask)}
 					/>
 				)}

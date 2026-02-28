@@ -19,4 +19,5 @@ export interface TaskPayload {
 	subject?: string;
 	type?: string;
 	priority?: string;
+	description?: string;
 }

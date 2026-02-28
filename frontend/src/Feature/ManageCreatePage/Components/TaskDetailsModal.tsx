@@ -24,6 +24,11 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 					</span>
 				</div>
 				<div className="task-details-content">
+					{task.description && (
+						<p>
+							<strong>Descripción:</strong> {task.description}
+						</p>
+					)}
 					{task.subject && (
 						<p>
 							<strong>Materia:</strong> {task.subject}

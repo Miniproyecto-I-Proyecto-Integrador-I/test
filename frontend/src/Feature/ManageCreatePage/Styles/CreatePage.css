@@ -544,4 +544,7 @@
 .toast-error {
     background-color: var(--error-color);
     /* Rojo de error */
-}
+}.form-group textarea.form-textarea { width: 100%; box-sizing: border-box; padding: var(--padding-input); border: 1px solid var(--border-secondary); border-radius: var(--border-radius-base); font-size: 0.95rem; color: var(--text-main); transition: all 0.2s ease; background-color: var(--surface); font-family: var(--font-family); resize: vertical; min-height: 80px; }
+.form-group textarea.form-textarea::placeholder { color: var(--text-tertiary); }
+.form-group textarea.form-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light); }
+.task-card-description { font-size: var(--font-size-body); color: var(--text-secondary); margin: -16px 0 0 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
