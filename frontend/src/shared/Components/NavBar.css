@@ -68,7 +68,7 @@
 
 /* Elemento Activo (Contraste oscuro y elegante) */
 .nav-item.is-active {
-    background-color: #1e293b;
+    background-color: #10B981;
     /* Píldora gris oscuro/negro */
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
