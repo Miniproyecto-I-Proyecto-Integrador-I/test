@@ -120,6 +120,41 @@
     gap: 14px;
 }
 
+.subtask-edit-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.subtask-edit-empty-icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+    fill: none;
+    stroke: #d1d5db;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.subtask-edit-empty-text {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.subtask-edit-empty-hint {
+    margin: 0;
+    font-size: 14px;
+    color: #9ca3af;
+    max-width: 400px;
+}
+
 .subtask-edit-item {
     display: flex;
     align-items: center;
