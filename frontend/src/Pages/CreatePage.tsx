@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../Services/ApiClient';
 import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
+import SubtaskEdit from '../Feature/ManageCreatePage/Components/SubtaskEdit';
+import type { EditableSubtask } from '../Feature/ManageCreatePage/Components/SubtaskEdit';
+import { deleteSubtask, updateSubtask } from '../Feature/ManageCreatePage/Services/subtaskService';
 import './CreatePage.css';
 
 interface Task {
@@ -11,6 +14,7 @@ interface Task {
 	status: string;
 	priority: string;
 	due_date: string | null;
+	subtasks?: EditableSubtask[];
 }
 
 const CreatePage = () => {
@@ -21,6 +25,7 @@ const CreatePage = () => {
 
 	const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
 	const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
+	const [isEditSubtaskModalOpen, setIsEditSubtaskModalOpen] = useState(false);
 
 	const [formStatus, setFormStatus] = useState<'idle' | 'success'>('idle');
 	const [title, setTitle] = useState('');
@@ -143,6 +148,64 @@ const CreatePage = () => {
 		}
 	};
 
+	const handleOpenEditSubtasks = async () => {
+		if (!selectedTask) return;
+
+		try {
+			const response = await apiClient.get(`/api/task/${selectedTask.id}/`);
+			setSelectedTask(response.data);
+			setIsEditSubtaskModalOpen(true);
+		} catch (error) {
+			console.error('Error al cargar tarea para edición:', error);
+			showNotification('No se pudo abrir la edición de subtareas.', 'error');
+		}
+	};
+
+	const handleSaveSubtasks = async (updatedSubtasks: EditableSubtask[]) => {
+		if (!selectedTask) return;
+
+		try {
+			const updatePromises = updatedSubtasks.map((subtask) => {
+				if (typeof subtask.id !== 'number') return Promise.resolve(null);
+				return updateSubtask(subtask.id, {
+					description: subtask.description,
+					planification_date: subtask.planification_date,
+					needed_hours: subtask.needed_hours,
+					task_id: selectedTask.id,
+				});
+			});
+
+			await Promise.all(updatePromises);
+			setIsEditSubtaskModalOpen(false);
+			setSelectedTask(null);
+			showNotification('Subtareas actualizadas correctamente.', 'success');
+		} catch (error) {
+			console.error('Error al actualizar subtareas:', error);
+			showNotification('No se pudieron guardar los cambios.', 'error');
+		}
+	};
+
+	const handleDeleteEditedSubtask = async (subtask: EditableSubtask) => {
+		if (typeof subtask.id !== 'number') return;
+
+		try {
+			await deleteSubtask(subtask.id);
+		} catch (error) {
+			console.error('Error al eliminar subtarea:', error);
+			showNotification('No se pudo eliminar la subtarea.', 'error');
+			throw error;
+		}
+	};
+
+	const handleTaskDeleted = async () => {
+		if (!selectedTask) return;
+
+		setTasks((prev) => prev.filter((task) => task.id !== selectedTask.id));
+		setIsEditSubtaskModalOpen(false);
+		setSelectedTask(null);
+		showNotification('Tarea eliminada correctamente.', 'success');
+	};
+
 	const errorCount = Object.keys(errors).filter((k) => k !== 'general').length;
 
 	const formatSpanishDate = (dateString: string) => {
@@ -175,6 +238,34 @@ const CreatePage = () => {
 						onFinalize={handleFinalizeSubtasks}
 						onBack={() => {
 							setIsSubtaskModalOpen(false);
+							setSelectedTask(null);
+						}}
+					/>
+				</div>
+			</div>
+		);
+	}
+
+	if (isEditSubtaskModalOpen && selectedTask) {
+		return (
+			<div className="create-page">
+				{notification && (
+					<div className={`custom-toast toast-${notification.type}`}>
+						{notification.message}
+					</div>
+				)}
+				<div className="subtask-fullscreen">
+					<SubtaskEdit
+						taskId={selectedTask.id}
+						initialSubtasks={selectedTask.subtasks ?? []}
+						taskTitle={selectedTask.title}
+						taskCategory={selectedTask.priority.toUpperCase()}
+						taskDueDate={selectedTask.due_date ?? undefined}
+						onSaveChanges={handleSaveSubtasks}
+						onDeleteSubtask={handleDeleteEditedSubtask}
+						onTaskDeleted={handleTaskDeleted}
+						onClose={() => {
+							setIsEditSubtaskModalOpen(false);
 							setSelectedTask(null);
 						}}
 					/>
@@ -376,7 +467,7 @@ const CreatePage = () => {
 				</div>
 			)}
 
-			{selectedTask && !isSubtaskModalOpen && !isCreateTaskModalOpen && (
+			{selectedTask && !isSubtaskModalOpen && !isEditSubtaskModalOpen && !isCreateTaskModalOpen && (
 				<div className="modal-overlay" onClick={() => setSelectedTask(null)}>
 					<div className="modal-card" onClick={(e) => e.stopPropagation()}>
 						<div className="modal-header">
@@ -406,6 +497,12 @@ const CreatePage = () => {
 								onClick={() => setSelectedTask(null)}
 							>
 								Cerrar
+							</button>
+							<button
+								className="btn-primary"
+								onClick={handleOpenEditSubtasks}
+							>
+								+ Editar subtareas
 							</button>
 							<button
 								className="btn-primary"

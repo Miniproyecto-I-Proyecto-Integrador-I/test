@@ -7,7 +7,7 @@ Este es el repositorio central de desarrollo para la organizacion. Contiene tant
 ## Estructura del Repositorio
 
 /test (Monorepo)
-├── backend/     # API construida con Django
+├── backend/     # API de Django
 ├── frontend/    # Aplicacion SPA construida con React
 ├── .github/     # Configuraciones de flujos y plantillas
 └── README.md    # Documentacion principal
