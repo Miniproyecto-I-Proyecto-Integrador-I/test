@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.conf import settings # Importante para referenciar al CustomUser
+from django.conf import settings 
+from django.core.validators import MinValueValidator
+from django.db.models import Sum 
 
 class Task(models.Model):
 
@@ -18,8 +20,8 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     subject = models.CharField(max_length=100, blank=True)
     type = models.CharField(max_length=100, blank=True)
-    progress = models.FloatField(default=0.0)
-    total_hours = models.FloatField(default=0.0)
+    progress = models.FloatField(default=0.0,validators=[MinValueValidator(0.0)])
+    total_hours = models.FloatField(default=0.0, validators=[MinValueValidator(0.0)])
 
     status = models.CharField(
         max_length=20,
@@ -52,6 +54,23 @@ class Task(models.Model):
             models.Index(fields=["status"]),
             models.Index(fields=["priority"]),
         ]
+
+    def update_metrics(self):
+        """Calcula horas totales y progreso basado en subtareas."""
+        # 1. Suma de horas necesarias de todas las subtareas
+        total = self.subtasks.aggregate(Sum('needed_hours'))['needed_hours__sum'] or 0.0
+        self.total_hours = total
+
+        # 2. Cálculo de progreso por cantidad de subtareas completadas
+        total_subtasks = self.subtasks.count()
+        if total_subtasks > 0:
+            completed = self.subtasks.filter(status="completed").count()
+            self.progress = (completed / total_subtasks) * 100
+        else:
+            self.progress = 0.0
+
+        # Guardamos solo los campos afectados para no disparar señales innecesarias
+        self.save(update_fields=['total_hours', 'progress'])
 
     def __str__(self):
         return f"{self.title} - {self.status}"
