@@ -7,6 +7,14 @@ import {
 import { deleteTask } from '../Services/subtaskService';
 import '../Styles/SubtaskEdit.css';
 
+const getTodayDateStr = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export interface EditableSubtask {
   id: string | number;
   description: string;
@@ -248,25 +256,24 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   return (
     <div className="subtask-edit-wrapper">
       <div className="subtask-edit-container">
-        <header className="subtask-edit-header">
-          <button
-            type="button"
-            className="subtask-edit-delete-main"
-            onClick={openDeleteMainTaskModal}
-          >
-            <svg viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M4 6h12" />
-              <path d="M7 6v9M10 6v9M13 6v9" />
-              <path d="M7 6l1-2h4l1 2" />
-              <rect x="5" y="6" width="10" height="11" rx="1.5" />
-            </svg>
-            Eliminar Tarea Principal
-          </button>
-        </header>
-
         <div className="subtask-edit-task-row">
           <div>
-            <h2 className="subtask-edit-title">{taskTitle}</h2>
+            <div className="subtask-edit-task-header-row">
+              <h2 className="subtask-edit-title">{taskTitle}</h2>
+              <button
+                type="button"
+                className="subtask-edit-delete-main"
+                onClick={openDeleteMainTaskModal}
+              >
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M4 6h12" />
+                  <path d="M7 6v9M10 6v9M13 6v9" />
+                  <path d="M7 6l1-2h4l1 2" />
+                  <rect x="5" y="6" width="10" height="11" rx="1.5" />
+                </svg>
+                Eliminar Tarea Principal
+              </button>
+            </div>
             <div className="subtask-edit-meta">
               <span className="subtask-edit-category">{taskCategory}</span>
               <span className="subtask-edit-meta-item">
@@ -289,7 +296,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         </div>
 
         <section className="subtask-edit-list-section">
-          <h3 className="subtask-edit-section-title">Pasos de la tarea</h3>
+          <h3 className="subtask-edit-section-title">Actividades de la tarea</h3>
 
           <div className="subtask-edit-list">
             {subtasks.length === 0 ? (
@@ -400,6 +407,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                           <label>Fecha</label>
                           <input
                             type="date"
+                            min={getTodayDateStr()}
                             value={editData.planification_date}
                             onChange={(event) =>
                               handleEditFieldChange(

@@ -3,6 +3,14 @@ import { useSubtaskForm } from '../Hooks/useSubtaskForm';
 import type { SubtaskItem } from '../Types/subtask.types';
 import '../Styles/SubtaskForm.css';
 
+const getTodayDateStr = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 interface SubtaskFormProps {
   onSubtasksChange?: (subtasks: any[]) => void;
   taskTitle?: string;
@@ -167,6 +175,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
               <input
                 id="planification_date"
                 type="date"
+                min={getTodayDateStr()}
                 className={`subtask-form-input ${errors.planification_date ? 'error' : ''}`}
                 value={formData.planification_date}
                 onChange={(e) =>
@@ -210,7 +219,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
             className="subtask-form-add-btn"
             onClick={handleAddSubtask}
           >
-            Añadir este paso
+            Añadir esta actividad
           </button>
         </div>
 

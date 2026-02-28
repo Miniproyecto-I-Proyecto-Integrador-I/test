@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import type { Task, TaskPayload } from '../Types/taskTypes';
 import SuccessTaskModal from './SuccessTaskModal';
 
+const getTodayDateStr = () => {
+	const today = new Date();
+	const year = today.getFullYear();
+	const month = String(today.getMonth() + 1).padStart(2, '0');
+	const day = String(today.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+};
+
 interface CreateTaskModalProps {
 	onClose: () => void;
 	onSubmit: (payload: TaskPayload) => Promise<Task>;
@@ -150,6 +158,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
                                     <label>Fecha límite de entrega</label>
                                     <input
                                         type="date"
+                                        min={getTodayDateStr()}
                                         value={dueDate}
                                         onChange={(e) => setDueDate(e.target.value)}
                                         placeholder="mm/dd/yyyy"

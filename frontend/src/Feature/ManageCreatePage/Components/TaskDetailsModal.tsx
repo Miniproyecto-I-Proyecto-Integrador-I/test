@@ -24,9 +24,16 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 					</span>
 				</div>
 				<div className="task-details-content">
-					<p>
-						<strong>Descripción:</strong> {task.description}
-					</p>
+					{task.subject && (
+						<p>
+							<strong>Materia:</strong> {task.subject}
+						</p>
+					)}
+					{task.type && (
+						<p>
+							<strong>Tipo de evaluación:</strong> {task.type}
+						</p>
+					)}
 					<p>
 						<strong>Prioridad:</strong> {task.priority}
 					</p>
