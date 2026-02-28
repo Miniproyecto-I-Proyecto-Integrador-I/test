@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { SubtaskFormData, SubtaskItem, ValidationErrors } from '../Types/subtask.types';
 import { validateSubtaskForm, hasValidationErrors } from '../Utils/subtaskValidator';
 
-export const useSubtaskForm = () => {
-    const [subtasks, setSubtasks] = useState<SubtaskItem[]>([]);
+export const useSubtaskForm = (initialSubtasks: SubtaskItem[] = []) => {
+    const [subtasks, setSubtasks] = useState<SubtaskItem[]>(initialSubtasks);
     const [formData, setFormData] = useState<SubtaskFormData>({
         description: '',
         planification_date: '',
         needed_hours: 0,
     });
     const [errors, setErrors] = useState<ValidationErrors>({});
+
+    useEffect(() => {
+        if (initialSubtasks.length > 0) {
+            setSubtasks(initialSubtasks);
+        }
+    }, [initialSubtasks]);
+
+    const totalNeededHours = subtasks.reduce((total, subtask) => {
+        return total + (Number(subtask.needed_hours) || 0);
+    }, 0);
 
     /**
      * Actualiza un campo del formulario
@@ -19,7 +29,7 @@ export const useSubtaskForm = () => {
             ...prev,
             [field]: value
         }));
-        
+
         // Limpiar error del campo cuando el usuario empieza a escribir
         if (errors[field]) {
             setErrors(prev => {
@@ -35,7 +45,7 @@ export const useSubtaskForm = () => {
      */
     const addSubtask = (): boolean => {
         const validationErrors = validateSubtaskForm(formData);
-        
+
         if (hasValidationErrors(validationErrors)) {
             setErrors(validationErrors);
             return false;
@@ -47,7 +57,7 @@ export const useSubtaskForm = () => {
         };
 
         setSubtasks(prev => [...prev, newSubtask]);
-        
+
         // Limpiar el formulario
         setFormData({
             description: '',
@@ -55,7 +65,7 @@ export const useSubtaskForm = () => {
             needed_hours: 0,
         });
         setErrors({});
-        
+
         return true;
     };
 
@@ -89,7 +99,7 @@ export const useSubtaskForm = () => {
      * Limpia todas las subtareas y el formulario
      */
     const resetForm = () => {
-        setSubtasks([]);
+        setSubtasks(initialSubtasks);
         setFormData({
             description: '',
             planification_date: '',
@@ -102,6 +112,7 @@ export const useSubtaskForm = () => {
         subtasks,
         formData,
         errors,
+        totalNeededHours,
         handleFieldChange,
         addSubtask,
         removeSubtask,

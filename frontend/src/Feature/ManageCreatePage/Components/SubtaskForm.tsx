@@ -1,29 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useSubtaskForm } from '../Hooks/useSubtaskForm';
+import type { SubtaskItem } from '../Types/subtask.types';
 import '../Styles/SubtaskForm.css';
 
 interface SubtaskFormProps {
     onSubtasksChange?: (subtasks: any[]) => void;
     taskTitle?: string;
-    totalHours?: number;
+    initialSubtasks?: SubtaskItem[];
     onFinalize?: (subtasks: any[]) => Promise<void>;
 }
 
-const SubtaskForm: React.FC<SubtaskFormProps> = ({ 
-    onSubtasksChange, 
+const SubtaskForm: React.FC<SubtaskFormProps> = ({
+    onSubtasksChange,
     taskTitle = 'Ensayo sobre la Revolucion Francesa',
-    totalHours = 0,
+    initialSubtasks = [],
     onFinalize
 }) => {
     const {
         subtasks,
         formData,
         errors,
+        totalNeededHours,
         handleFieldChange,
         addSubtask,
         removeSubtask,
         reorderSubtasks,
-    } = useSubtaskForm();
+    } = useSubtaskForm(initialSubtasks);
+
     const [draggingId, setDraggingId] = useState<string | null>(null);
     const [dropTargetId, setDropTargetId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,9 +76,9 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
         // Parsear la fecha manualmente para evitar problemas de zona horaria
         const [year, month, day] = dateString.split('-').map(Number);
         const date = new Date(year, month - 1, day, 0, 0, 0, 0);
-        return date.toLocaleDateString('es-ES', { 
-            day: '2-digit', 
-            month: 'short' 
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short'
         });
     };
 
@@ -94,8 +97,6 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
         }
     };
 
-    const calculatedTotalHours = subtasks.reduce((sum, subtask) => sum + subtask.needed_hours, 0);
-
     return (
         <div className="subtask-form-wrapper">
             <div className="task-summary-card">
@@ -113,12 +114,12 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
                 </div>
                 <div className="task-summary-right">
                     <span className="task-summary-label">Tiempo total</span>
-                    <span className="task-summary-value">{(calculatedTotalHours || totalHours).toFixed(1)} horas</span>
+                    <span className="task-summary-value">{totalNeededHours.toFixed(1)} horas</span>
                 </div>
             </div>
 
             <div className="subtask-form-container">
-                <h2 className="subtask-form-title">Desglose de Subtareas</h2>
+                <h2 className="subtask-form-title">Actividades de la Tarea</h2>
                 <p className="subtask-form-subtitle">
                     Divide tu tarea principal en pasos manejables. Asigna una fecha y el tiempo necesario a cada uno.
                 </p>
@@ -176,8 +177,8 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
                         </div>
                     </div>
 
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="subtask-form-add-btn"
                         onClick={handleAddSubtask}
                     >
@@ -190,9 +191,8 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
                         {subtasks.map((subtask) => (
                             <div
                                 key={subtask.id}
-                                className={`subtask-form-item${
-                                    dropTargetId === subtask.id ? ' is-drop-target' : ''
-                                }${draggingId === subtask.id ? ' is-dragging' : ''}`}
+                                className={`subtask-form-item${dropTargetId === subtask.id ? ' is-drop-target' : ''
+                                    }${draggingId === subtask.id ? ' is-dragging' : ''}`}
                                 onDragOver={handleDragOver(subtask.id)}
                                 onDrop={handleDrop(subtask.id)}
                             >
