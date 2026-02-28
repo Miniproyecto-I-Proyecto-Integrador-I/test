@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../Services/ApiClient';
 import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
+import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
 import './CreatePage.css';
 
 interface Task {
@@ -114,31 +115,18 @@ const CreatePage = () => {
     if (!selectedTask) return;
 
     try {
-      const subtaskPromises = subtasksData.map((st) => {
-        const subtaskPayload = {
-          description: st.description,
-          status: 'pending',
-          planification_date: st.planification_date,
-          needed_hours: Number(st.needed_hours),
-          task: selectedTask.id,
-        };
-        return apiClient.post('/api/subtasks/', subtaskPayload);
-      });
-
-      await Promise.all(subtaskPromises);
+      await createMultipleSubtasks(selectedTask.id, subtasksData);
 
       setIsSubtaskModalOpen(false);
       setSelectedTask(null);
 
-      // Usamos nuestra notificación en lugar del alert()
       showNotification(
         '¡Listo! Las actividades se han añadido a tu tarea exitosamente.',
         'success',
       );
     } catch (error: any) {
-      console.error('Error al guardar subtareas en Django:', error);
+      console.error('Error al guardar subtareas:', error);
 
-      // Usamos nuestra notificación para el error
       showNotification(
         'Hubo un problema al intentar guardar las actividades.',
         'error',
