@@ -3,6 +3,7 @@ import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
 import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
 import SubtaskEdit from '../Feature/ManageCreatePage/Components/SubtaskEdit';
 import { deleteSubtask, updateSubtask } from '../Feature/ManageCreatePage/Services/subtaskService';
+import { updateTask } from '../Feature/ManageCreatePage/Services/taskService';
 import '../Feature/ManageCreatePage/Styles/CreatePage.css';
 import apiClient from '../Services/ApiClient';
 import type { EditableSubtask } from '../Feature/ManageCreatePage/Components/SubtaskEdit';
@@ -105,6 +106,43 @@ const CreatePage = () => {
 		showNotification('Tarea eliminada correctamente.', 'success');
 	};
 
+	const handleSaveTask = async (taskData: any) => {
+		if (!selectedTask) return;
+
+		try {
+			await updateTask(selectedTask.id, {
+				title: taskData.title,
+				description: taskData.description,
+				subject: taskData.subject,
+				type: taskData.type,
+				priority: taskData.priority,
+				due_date: taskData.due_date,
+				user: 1, // ID del usuario (actualmente hardcoded)
+			});
+
+			// Actualizar el estado de la tarea seleccionada
+			setSelectedTask((prev) =>
+				prev
+					? {
+							...prev,
+							title: taskData.title,
+							description: taskData.description,
+							subject: taskData.subject,
+							type: taskData.type,
+							priority: taskData.priority,
+							due_date: taskData.due_date,
+						}
+					: null,
+			);
+
+			showNotification('Tarea actualizada correctamente.', 'success');
+		} catch (error) {
+			console.error('Error al actualizar tarea:', error);
+			showNotification('No se pudo actualizar la tarea.', 'error');
+			throw error;
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<div className="empty-state">
@@ -150,9 +188,10 @@ const CreatePage = () => {
 						taskId={selectedTask.id}
 						initialSubtasks={selectedTask.subtasks ?? []}
 						taskTitle={selectedTask.title}
-						taskCategory={selectedTask.priority.toUpperCase()}
 						taskDueDate={selectedTask.due_date ?? undefined}
+						task={selectedTask}
 						onSaveChanges={handleSaveSubtasks}
+						onSaveTask={handleSaveTask}
 						onDeleteSubtask={handleDeleteEditedSubtask}
 						onTaskDeleted={handleTaskDeleted}
 						onClose={() => {

@@ -6,6 +6,15 @@ interface TaskGridProps {
 	onTaskClick: (task: Task) => void;
 }
 
+const getStatusLabel = (status: string): string => {
+	const labels: Record<string, string> = {
+		pending: 'Pendiente',
+		in_progress: 'En Progreso',
+		completed: 'Completada',
+	};
+	return labels[status] || status;
+};
+
 const TaskGrid: React.FC<TaskGridProps> = ({ tasks, onTaskClick }) => {
 	if (tasks.length === 0) return null;
 
@@ -23,7 +32,7 @@ const TaskGrid: React.FC<TaskGridProps> = ({ tasks, onTaskClick }) => {
 					)}
 					<div className={`status-badge ${task.status}`}>
 						<span className="status-dot"></span>
-						<span>{task.status}</span>
+						<span>{getStatusLabel(task.status)}</span>
 					</div>
 				</div>
 			))}

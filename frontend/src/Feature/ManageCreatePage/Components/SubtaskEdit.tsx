@@ -32,10 +32,19 @@ interface SubtaskEditProps {
   onTaskDeleted?: () => void;
   onClose?: () => void;
   onAddNewSubtask?: () => void;
+  onSaveTask?: (taskData: any) => Promise<void> | void;
   taskTitle?: string;
-  taskCategory?: string;
   taskDueDate?: string;
   totalHours?: number;
+  task?: {
+    id: number;
+    title: string;
+    description?: string;
+    subject?: string;
+    type?: string;
+    priority?: string;
+    due_date?: string;
+  };
 }
 
 type DeleteTarget =
@@ -51,10 +60,11 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   onTaskDeleted,
   onClose,
   onAddNewSubtask,
+  onSaveTask,
   taskTitle = 'Ensayo sobre la Revolución Francesa',
-  taskCategory = 'HISTORIA',
   taskDueDate,
   totalHours,
+  task,
 }) => {
   const [subtasks, setSubtasks] = useState<EditableSubtask[]>(
     initialSubtasks ?? [],
@@ -69,6 +79,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditingTask, setIsEditingTask] = useState(false);
+  const [taskEditData, setTaskEditData] = useState({
+    title: task?.title || taskTitle || '',
+    description: task?.description || '',
+    subject: task?.subject || '',
+    type: task?.type || '',
+    priority: task?.priority || 'medium', // Default a 'medium'
+    due_date: task?.due_date || taskDueDate || '',
+  });
 
   useEffect(() => {
     setSubtasks(initialSubtasks ?? []);
@@ -133,6 +152,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
   const formatHours = (hours: number) => {
     return `${hours} ${hours === 1 ? 'Hour' : 'Hours'}`;
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    const labels: Record<string, string> = {
+      high: 'Alta',
+      medium: 'Media',
+      low: 'Baja',
+    };
+    return labels[priority] || priority;
   };
 
   const startEditing = (subtask: EditableSubtask) => {
@@ -253,95 +281,152 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     }
   };
 
+  const handleTaskEditFieldChange = (field: string, value: string) => {
+    setTaskEditData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSaveTaskChanges = async () => {
+    if (!onSaveTask) return;
+    setIsSaving(true);
+    try {
+      // Formatear la fecha si es necesario
+      let formattedDate = taskEditData.due_date;
+      if (formattedDate && !formattedDate.includes('T')) {
+        // Si es una fecha YYYY-MM-DD, agregar hora
+        formattedDate = `${formattedDate}T23:59:59Z`;
+      }
+
+      await onSaveTask({
+        ...taskEditData,
+        due_date: formattedDate,
+      });
+      setIsEditingTask(false);
+    } catch (error) {
+      console.error('Error al guardar cambios de la tarea:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelTaskEdit = () => {
+    setIsEditingTask(false);
+    setTaskEditData({
+      title: task?.title || taskTitle || '',
+      description: task?.description || '',
+      subject: task?.subject || '',
+      type: task?.type || '',
+      priority: task?.priority || 'medium',
+      due_date: task?.due_date || taskDueDate || '',
+    });
+  };
+
   return (
     <div className="subtask-edit-wrapper">
       <div className="subtask-edit-container">
-        <div className="subtask-edit-task-row">
-          <div>
-            <div className="subtask-edit-task-header-row">
-              <h2 className="subtask-edit-title">{taskTitle}</h2>
-              <button
-                type="button"
-                className="subtask-edit-delete-main"
-                onClick={openDeleteMainTaskModal}
-              >
-                <svg viewBox="0 0 20 20" aria-hidden="true">
-                  <path d="M4 6h12" />
-                  <path d="M7 6v9M10 6v9M13 6v9" />
-                  <path d="M7 6l1-2h4l1 2" />
-                  <rect x="5" y="6" width="10" height="11" rx="1.5" />
-                </svg>
-                Eliminar Tarea Principal
-              </button>
-            </div>
-            <div className="subtask-edit-meta">
-              <span className="subtask-edit-category">{taskCategory}</span>
-              <span className="subtask-edit-meta-item">
-                <svg viewBox="0 0 20 20" aria-hidden="true">
-                  <rect x="3" y="5" width="14" height="12" rx="2" />
-                  <path d="M3 8h14" />
-                  <path d="M7 3v4M13 3v4" />
-                </svg>
-                Fecha: {formatTaskDueDate(taskDueDate)}
-              </span>
-              <span className="subtask-edit-meta-item">
-                <svg viewBox="0 0 20 20" aria-hidden="true">
-                  <circle cx="10" cy="10" r="7" />
-                  <path d="M10 6v4l3 2" />
-                </svg>
-                {computedTotalHours.toFixed(1)} Horas totales
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <section className="subtask-edit-list-section">
-          <h3 className="subtask-edit-section-title">Actividades de la tarea</h3>
-
-          <div className="subtask-edit-list">
-            {subtasks.length === 0 ? (
-              <div className="subtask-edit-empty-state">
-                <svg
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                  className="subtask-edit-empty-icon"
-                >
-                  <rect x="3" y="5" width="14" height="12" rx="2" />
-                  <path d="M10 8v5M10 15h.01" />
-                </svg>
-                <p className="subtask-edit-empty-text">
-                  No hay subtareas creadas
-                </p>
-                <p className="subtask-edit-empty-hint">
-                  Agrega un nuevo paso para comenzar a organizar tu tarea
-                </p>
+        {!isEditingTask ? (
+          <>
+            <div className="subtask-edit-task-row">
+              <div>
+                <div className="subtask-edit-task-header-row">
+                  <h2 className="subtask-edit-title">{taskEditData.title}</h2>
+                  <div className="subtask-edit-buttons-group">
+                    <button
+                      type="button"
+                      className="subtask-edit-delete-main"
+                      onClick={openDeleteMainTaskModal}
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M4 6h12" />
+                        <path d="M7 6v9M10 6v9M13 6v9" />
+                        <path d="M7 6l1-2h4l1 2" />
+                        <rect x="5" y="6" width="10" height="11" rx="1.5" />
+                      </svg>
+                      Eliminar Tarea Principal
+                    </button>
+                    <button
+                      type="button"
+                      className="subtask-edit-edit-main"
+                      onClick={() => setIsEditingTask(true)}
+                    >
+                      <svg viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M4 13.5V16h2.5L15 7.5 12.5 5 4 13.5z" />
+                        <path d="M11.8 5.7l2.5 2.5" />
+                      </svg>
+                      Editar Tarea
+                    </button>
+                  </div>
+                </div>
+                <div className="subtask-edit-meta">
+                  <span className="subtask-edit-category">{getPriorityLabel(taskEditData.priority)}</span>
+                  <span className="subtask-edit-meta-item">
+                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                      <rect x="3" y="5" width="14" height="12" rx="2" />
+                      <path d="M3 8h14" />
+                      <path d="M7 3v4M13 3v4" />
+                    </svg>
+                    Fecha: {formatTaskDueDate(taskEditData.due_date)}
+                  </span>
+                  <span className="subtask-edit-meta-item">
+                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                      <circle cx="10" cy="10" r="7" />
+                      <path d="M10 6v4l3 2" />
+                    </svg>
+                    {computedTotalHours.toFixed(1)} Horas totales
+                  </span>
+                </div>
               </div>
-            ) : (
-              subtasks.map((subtask) => {
-                const isEditing = editingId === subtask.id;
-                return (
-                  <div
-                    key={subtask.id}
-                    className={`subtask-edit-item ${isEditing ? 'is-editing' : ''}`}
-                  >
-                    {!isEditing ? (
-                      <>
-                        <div className="subtask-edit-item-left">
-                          <span
-                            className="subtask-edit-item-circle"
-                            aria-hidden="true"
-                          />
-                          <div className="subtask-edit-item-content">
-                            <p className="subtask-edit-item-title">
-                              {subtask.description}
-                            </p>
-                            <p className="subtask-edit-item-meta">
-                              Due: {formatShortDate(subtask.planification_date)}{' '}
-                              • {formatHours(subtask.needed_hours)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="subtask-edit-item-actions">
+            </div>
+
+            <section className="subtask-edit-list-section">
+              <h3 className="subtask-edit-section-title">Actividades de la tarea</h3>
+
+              <div className="subtask-edit-list">
+                {subtasks.length === 0 ? (
+                  <div className="subtask-edit-empty-state">
+                    <svg
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                      className="subtask-edit-empty-icon"
+                    >
+                      <rect x="3" y="5" width="14" height="12" rx="2" />
+                      <path d="M10 8v5M10 15h.01" />
+                    </svg>
+                    <p className="subtask-edit-empty-text">
+                      No hay subtareas creadas
+                    </p>
+                    <p className="subtask-edit-empty-hint">
+                      Agrega un nuevo paso para comenzar a organizar tu tarea
+                    </p>
+                  </div>
+                ) : (
+                  subtasks.map((subtask) => {
+                    const isEditing = editingId === subtask.id;
+                    return (
+                      <div
+                        key={subtask.id}
+                        className={`subtask-edit-item ${isEditing ? 'is-editing' : ''}`}
+                      >
+                        {!isEditing ? (
+                          <>
+                            <div className="subtask-edit-item-left">
+                              <span
+                                className="subtask-edit-item-circle"
+                                aria-hidden="true"
+                              />
+                              <div className="subtask-edit-item-content">
+                                <p className="subtask-edit-item-title">
+                                  {subtask.description}
+                                </p>
+                                <p className="subtask-edit-item-meta">
+                                  Due: {formatShortDate(subtask.planification_date)}{' '}
+                                  • {formatHours(subtask.needed_hours)}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="subtask-edit-item-actions">
                           <button
                             type="button"
                             className="subtask-edit-icon-btn"
@@ -473,39 +558,139 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                       </div>
                     )}
                   </div>
-                );
-              })
-            )}
+                    );
+                  })
+                )}
+              </div>
+
+              {onAddNewSubtask && (
+                <button
+                  type="button"
+                  className="subtask-edit-add-row"
+                  onClick={onAddNewSubtask}
+                >
+                  + Agregar nuevo paso
+                </button>
+              )}
+            </section>
+
+            <footer className="subtask-edit-footer">
+              <button
+                type="button"
+                className="subtask-edit-cancel"
+                onClick={onClose}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="subtask-edit-save"
+                onClick={handleSaveChanges}
+                disabled={isSaving || !onSaveChanges}
+              >
+                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+              </button>
+            </footer>
+          </>
+        ) : (
+          <div className="subtask-edit-task-edit-form">
+            <div className="subtask-edit-task-edit-header">
+              <h2>Editar Tarea</h2>
+            </div>
+
+            <div className="subtask-edit-task-edit-grid">
+              {/* Título */}
+              <div className="subtask-edit-task-form-group full-width">
+                <label>Título de la tarea</label>
+                <input
+                  type="text"
+                  value={taskEditData.title}
+                  onChange={(e) => handleTaskEditFieldChange('title', e.target.value)}
+                  maxLength={200}
+                />
+              </div>
+
+              {/* Descripción */}
+              <div className="subtask-edit-task-form-group full-width">
+                <label>Descripción</label>
+                <textarea
+                  value={taskEditData.description}
+                  onChange={(e) => handleTaskEditFieldChange('description', e.target.value)}
+                  maxLength={500}
+                  rows={3}
+                />
+              </div>
+
+              {/* Materia */}
+              <div className="subtask-edit-task-form-group">
+                <label>Materia</label>
+                <input
+                  type="text"
+                  value={taskEditData.subject}
+                  onChange={(e) => handleTaskEditFieldChange('subject', e.target.value)}
+                  maxLength={100}
+                />
+              </div>
+
+              {/* Tipo de evaluación */}
+              <div className="subtask-edit-task-form-group">
+                <label>Tipo de evaluación</label>
+                <select
+                  value={taskEditData.type}
+                  onChange={(e) => handleTaskEditFieldChange('type', e.target.value)}
+                >
+                  <option value="">Seleccionar tipo</option>
+                  <option value="ensayo">Ensayo</option>
+                  <option value="examen">Examen</option>
+                  <option value="proyecto">Proyecto</option>
+                  <option value="tarea">Tarea</option>
+                  <option value="lectura">Lectura</option>
+                </select>
+              </div>
+
+              {/* Fecha de entrega */}
+              <div className="subtask-edit-task-form-group">
+                <label>Fecha de entrega</label>
+                <input
+                  type="date"
+                  value={taskEditData.due_date}
+                  onChange={(e) => handleTaskEditFieldChange('due_date', e.target.value)}
+                />
+              </div>
+
+              {/* Nivel de prioridad */}
+              <div className="subtask-edit-task-form-group">
+                <label>Nivel de prioridad</label>
+                <select
+                  value={taskEditData.priority}
+                  onChange={(e) => handleTaskEditFieldChange('priority', e.target.value)}
+                >
+                  <option value="high">Alta</option>
+                  <option value="medium">Media</option>
+                  <option value="low">Baja</option>
+                </select>
+              </div>
+            </div>
+
+            <footer className="subtask-edit-footer">
+              <button
+                type="button"
+                className="subtask-edit-cancel"
+                onClick={handleCancelTaskEdit}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="subtask-edit-save"
+                onClick={handleSaveTaskChanges}
+                disabled={isSaving || !onSaveTask}
+              >
+                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+              </button>
+            </footer>
           </div>
-
-          {onAddNewSubtask && (
-            <button
-              type="button"
-              className="subtask-edit-add-row"
-              onClick={onAddNewSubtask}
-            >
-              + Agregar nuevo paso
-            </button>
-          )}
-        </section>
-
-        <footer className="subtask-edit-footer">
-          <button
-            type="button"
-            className="subtask-edit-cancel"
-            onClick={onClose}
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            className="subtask-edit-save"
-            onClick={handleSaveChanges}
-            disabled={isSaving || !onSaveChanges}
-          >
-            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
-          </button>
-        </footer>
+        )}
       </div>
 
       {deleteTarget && (
