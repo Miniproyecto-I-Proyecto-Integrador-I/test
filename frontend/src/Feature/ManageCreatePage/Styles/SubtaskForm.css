@@ -1,0 +1,510 @@
+.subtask-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.task-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    background: #ffffff;
+    border: 1px solid #e4e7ee;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(28, 31, 36, 0.06);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.task-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.task-summary-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #ecfdf3;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-summary-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.task-summary-label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9aa0a6;
+}
+
+.task-summary-title {
+    display: block;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1f2933;
+}
+
+.task-summary-right {
+    text-align: right;
+}
+
+.task-summary-value {
+    display: block;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1f2933;
+}
+
+.subtask-form-container {
+    width: 100%;
+    margin: 0;
+    padding: 36px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+}
+
+.subtask-form-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+    line-height: 32px;
+}
+
+.subtask-form-subtitle {
+    font-size: 15px;
+    color: #4b5563;
+    margin: 0 0 24px 0;
+    line-height: 22px;
+    font-weight: 400;
+}
+
+/* Input Section */
+.subtask-form-input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.subtask-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.subtask-form-field label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #4b5563;
+    line-height: 22px;
+    letter-spacing: 0px;
+}
+
+.subtask-form-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 400;
+    color: #111827;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, background-color 0.2s;
+    box-sizing: border-box;
+    background: #ffffff;
+    line-height: 22px;
+}
+
+.subtask-form-input::placeholder {
+    color: #6b7280;
+}
+
+.subtask-form-input:focus {
+    outline: none;
+    border-color: #10b981;
+    background: #ffffff;
+}
+
+.subtask-form-input.error {
+    border: 2px solid #ef4444;
+    background: #fef2f2;
+}
+
+.subtask-form-char-count {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 13px;
+    color: #9ca3af;
+    margin-top: 0px;
+}
+
+.subtask-form-error {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #ef4444;
+    font-weight: 600;
+    line-height: 19px;
+}
+
+.subtask-form-error::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.subtask-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.subtask-form-add-btn {
+    width: auto;
+    padding: 12px 26px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    margin-top: 8px;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 26px;
+}
+
+.subtask-form-add-btn:hover {
+    background: #059669;
+}
+
+.subtask-form-add-btn:active {
+    transform: scale(0.98);
+}
+
+.subtask-form-add-btn::before {
+    content: '+';
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Subtask List */
+.subtask-form-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.subtask-form-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: box-shadow 0.2s, background-color 0.2s;
+    box-sizing: border-box;
+}
+
+.subtask-form-item.is-drop-target {
+    border-color: #10b981;
+    box-shadow: 0px 1px 4px rgba(16, 185, 129, 0.2);
+}
+
+.subtask-form-item.is-dragging {
+    opacity: 0.6;
+}
+
+.subtask-form-item:hover {
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+}
+
+.subtask-form-item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.subtask-form-item-drag-handle {
+    cursor: grab;
+    color: #9ca3af;
+    user-select: none;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    padding: 0;
+}
+
+.subtask-form-item-drag-handle:active {
+    cursor: grabbing;
+}
+
+.subtask-form-item-drag-handle svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.subtask-form-item-description {
+    font-size: 15px;
+    font-weight: 400;
+    color: #111827;
+    margin: 0;
+    line-height: 22px;
+    word-break: break-word;
+}
+
+.subtask-form-item-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.subtask-form-item-metadata {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+    color: #4b5563;
+    font-weight: 500;
+    align-items: center;
+}
+
+.subtask-form-item-date,
+.subtask-form-item-hours {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    background: #f3f4f6;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 19px;
+}
+
+.subtask-form-item-date svg,
+.subtask-form-item-hours svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: #6b7280;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.subtask-form-item-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+}
+
+.subtask-form-item-delete:hover {
+    opacity: 1;
+    background: #f3f4f6;
+}
+
+.subtask-form-item-delete svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #6b7280;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.subtask-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+}
+
+.subtask-form-submit {
+    padding: 14px 32px;
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.subtask-form-submit:hover:not(:disabled) {
+    background: #059669;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.subtask-form-submit:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: 0 4px 12px rgba(148, 163, 184, 0.2);
+}
+
+.subtask-form-back-btn {
+    padding: 10px 18px;
+    background: #d1fae5;
+    color: #10b981;
+    border: 1px solid #10b981;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.subtask-form-back-btn:hover {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #059669;
+}
+
+.subtask-form-back-btn:active {
+    transform: scale(0.98);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .subtask-form-container {
+        padding: 24px;
+        max-width: 100%;
+    }
+
+    .subtask-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .subtask-form-item-metadata {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .subtask-form-title {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 640px) {
+    .task-summary-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-summary-right {
+        text-align: left;
+    }
+}
+
+@media (max-width: 640px) {
+    .subtask-form-container {
+        padding: 16px;
+    }
+
+    .subtask-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .subtask-form-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .subtask-form-item-left,
+    .subtask-form-item-right {
+        width: 100%;
+    }
+
+    .subtask-form-item-right {
+        justify-content: space-between;
+    }
+
+    .subtask-form-item-metadata {
+        width: 100%;
+    }
+
+    .task-summary-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-summary-right {
+        text-align: left;
+    }
+
+}
