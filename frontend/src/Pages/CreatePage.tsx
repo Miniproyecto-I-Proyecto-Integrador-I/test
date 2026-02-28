@@ -118,8 +118,8 @@ const CreatePage = () => {
 	const handleFinalizeSubtasks = async (subtasksData: any[]) => {
 		if (!selectedTask) return;
 
-    try {
-      await createMultipleSubtasks(selectedTask.id, subtasksData);
+		try {
+			await createMultipleSubtasks(selectedTask.id, subtasksData);
 
 			setIsSubtaskModalOpen(false);
 			setSelectedTask(null);
@@ -200,8 +200,8 @@ const CreatePage = () => {
 
 	const formatSpanishDate = (dateString: string) => {
 		if (!dateString) return "Sin fecha";
-		const date = new Date(dateString + 'T12:00:00');
-		return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+		const date = new Date(dateString.includes('T') ? dateString : `${dateString}T12:00:00`);
+		return isNaN(date.getTime()) ? "Fecha inválida" : date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 	};
 
 	if (isLoading) {
