@@ -1,14 +1,16 @@
+@import '../../../shared/Styles/Variables.css';
+
 .subtask-edit-wrapper {
     width: 100%;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-family);
 }
 
 .subtask-edit-container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
@@ -28,8 +30,8 @@
     gap: 6px;
     background: transparent;
     border: none;
-    color: #ef4444;
-    font-size: 14px;
+    color: var(--error-color);
+    font-size: var(--font-size-body);
     cursor: pointer;
 }
 
@@ -45,7 +47,7 @@
 
 .subtask-edit-task-row {
     padding: 16px 26px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .subtask-edit-title {
@@ -53,7 +55,7 @@
     font-size: 36px;
     line-height: 44px;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-main);
 }
 
 .subtask-edit-meta {
@@ -67,8 +69,8 @@
 .subtask-edit-category {
     font-size: 11px;
     font-weight: 700;
-    color: #059669;
-    background: #d1fae5;
+    color: var(--primary-hover);
+    background: var(--primary-light);
     border-radius: 999px;
     padding: 4px 9px;
     letter-spacing: 0.03em;
@@ -76,7 +78,7 @@
 
 .subtask-edit-meta-item {
     font-size: 15px;
-    color: #64748b;
+    color: var(--text-tertiary);
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -98,8 +100,8 @@
 
 .subtask-edit-section-title {
     margin: 0 0 14px;
-    font-size: 28px;
-    color: #111827;
+    font-size: var(--font-size-h1);
+    color: var(--text-main);
     font-weight: 700;
 }
 
@@ -116,7 +118,7 @@
     justify-content: center;
     padding: 48px 24px;
     text-align: center;
-    color: #9ca3af;
+    color: var(--text-tertiary);
 }
 
 .subtask-edit-empty-icon {
@@ -124,7 +126,7 @@
     height: 56px;
     margin-bottom: 16px;
     fill: none;
-    stroke: #d1d5db;
+    stroke: var(--border-secondary);
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -134,13 +136,13 @@
     margin: 0 0 8px;
     font-size: 18px;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--text-tertiary);
 }
 
 .subtask-edit-empty-hint {
     margin: 0;
-    font-size: 14px;
-    color: #9ca3af;
+    font-size: var(--font-size-body);
+    color: var(--text-tertiary);
     max-width: 400px;
 }
 
@@ -157,7 +159,7 @@
 .subtask-edit-item.is-editing {
     border-color: #34d399;
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.18);
-    background: #ffffff;
+    background: var(--surface);
     padding: 20px;
 }
 
@@ -172,7 +174,7 @@
     width: 18px;
     height: 18px;
     border-radius: 999px;
-    border: 1.5px solid #cbd5e1;
+    border: 1.5px solid var(--border-color);
     flex-shrink: 0;
 }
 
@@ -182,9 +184,9 @@
 
 .subtask-edit-item-title {
     margin: 0;
-    font-size: 16px;
+    font-size: var(--font-size-h3);
     line-height: 24px;
-    color: #111827;
+    color: var(--text-main);
     font-weight: 500;
 }
 
@@ -192,7 +194,7 @@
     margin: 2px 0 0;
     font-size: 13px;
     line-height: 20px;
-    color: #94a3b8;
+    color: var(--text-tertiary);
 }
 
 .subtask-edit-item-actions {
@@ -207,7 +209,7 @@
     border-radius: 6px;
     border: none;
     background: transparent;
-    color: #10b981;
+    color: var(--primary-color);
     opacity: 0.9;
     cursor: pointer;
     display: inline-flex;
@@ -216,11 +218,11 @@
 }
 
 .subtask-edit-icon-btn:hover {
-    background: #f3f4f6;
+    background: var(--btn-sec-hover);
 }
 
 .subtask-edit-icon-btn.danger {
-    color: #94a3b8;
+    color: var(--text-tertiary);
 }
 
 .subtask-edit-icon-btn svg {
@@ -252,8 +254,8 @@
 }
 
 .subtask-edit-input-group label {
-    font-size: 12px;
-    color: #64748b;
+    font-size: var(--font-size-small);
+    color: var(--text-tertiary);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -261,30 +263,30 @@
 
 .subtask-edit-input-group input {
     width: 100%;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-secondary);
     border-radius: 6px;
-    padding: 10px 13px;
-    font-size: 14px;
-    color: #111827;
-    background: #f9fafb;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: var(--padding-input);
+    font-size: var(--font-size-body);
+    color: var(--text-main);
+    background: var(--bg-base);
+    font-family: var(--font-family);
 }
 
 .subtask-edit-input-group input:focus {
     outline: none;
-    border-color: #10b981;
-    background: #ffffff;
+    border-color: var(--primary-color);
+    background: var(--surface);
 }
 
 .subtask-edit-input-group input.error {
-    border-color: #ef4444;
+    border-color: var(--error-color);
     background: #fef2f2;
 }
 
 .subtask-edit-error {
-    font-size: 12px;
+    font-size: var(--font-size-small);
     line-height: 16px;
-    color: #ef4444;
+    color: var(--error-color);
     font-weight: 500;
 }
 
@@ -299,9 +301,9 @@
     width: 28px;
     height: 28px;
     border-radius: 999px;
-    border: 1px solid #d1d5db;
-    background: #f8fafc;
-    color: #94a3b8;
+    border: 1px solid var(--border-secondary);
+    background: var(--btn-sec-hover);
+    color: var(--text-tertiary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -309,9 +311,9 @@
 }
 
 .subtask-edit-round-btn.success {
-    border-color: #10b981;
-    color: #ffffff;
-    background: #10b981;
+    border-color: var(--primary-color);
+    color: var(--surface);
+    background: var(--primary-color);
 }
 
 .subtask-edit-round-btn svg {
@@ -327,12 +329,12 @@
 .subtask-edit-add-row {
     margin-top: 12px;
     width: 100%;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--border-color);
     border-radius: 10px;
-    background: #ffffff;
-    color: #10b981;
+    background: var(--surface);
+    color: var(--primary-color);
     font-weight: 600;
-    font-size: 16px;
+    font-size: var(--font-size-h3);
     padding: 12px;
     cursor: pointer;
 }
@@ -341,15 +343,15 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--border-color);
     padding: 16px 26px;
-    background: #ffffff;
+    background: var(--surface);
 }
 
 .subtask-edit-cancel,
 .subtask-edit-save,
 .subtask-edit-delete-confirm {
-    border-radius: 8px;
+    border-radius: var(--border-radius-base);
     border: 1px solid transparent;
     padding: 10px 18px;
     font-size: 15px;
@@ -358,14 +360,14 @@
 }
 
 .subtask-edit-cancel {
-    background: #ffffff;
-    border-color: #d1d5db;
-    color: #64748b;
+    background: var(--surface);
+    border-color: var(--border-secondary);
+    color: var(--text-tertiary);
 }
 
 .subtask-edit-save {
-    background: #10b981;
-    color: #ffffff;
+    background: var(--primary-color);
+    color: var(--surface);
 }
 
 .subtask-edit-save:disabled {
@@ -386,9 +388,9 @@
 .subtask-edit-modal {
     width: 100%;
     max-width: 420px;
-    background: #ffffff;
+    background: var(--surface);
     border-radius: 10px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color);
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
     padding: 20px;
 }
@@ -396,13 +398,13 @@
 .subtask-edit-modal h4 {
     margin: 0;
     font-size: 18px;
-    color: #111827;
+    color: var(--text-main);
 }
 
 .subtask-edit-modal p {
     margin: 10px 0 0;
-    color: #64748b;
-    font-size: 14px;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-body);
     line-height: 20px;
 }
 
@@ -414,8 +416,8 @@
 }
 
 .subtask-edit-delete-confirm {
-    background: #ef4444;
-    color: #ffffff;
+    background: var(--error-color);
+    color: var(--surface);
 }
 
 .subtask-edit-delete-confirm:disabled {
@@ -430,7 +432,7 @@
     }
 
     .subtask-edit-section-title {
-        font-size: 28px;
+        font-size: var(--font-size-h1);
     }
 
     .subtask-edit-item-title {
@@ -440,7 +442,7 @@
 
     .subtask-edit-item-meta,
     .subtask-edit-meta-item {
-        font-size: 16px;
+        font-size: var(--font-size-h3);
         line-height: 24px;
     }
 
