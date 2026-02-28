@@ -174,7 +174,7 @@ const CreatePage = () => {
 			)}
 
 			<header className="page-header">
-				<h1 className="page-title">Gestión de Actividades</h1>
+				<h1 className="page-title">Gestión de Tareas</h1>
 				{tasks.length > 0 && (
 					<button
 						className="btn-primary"

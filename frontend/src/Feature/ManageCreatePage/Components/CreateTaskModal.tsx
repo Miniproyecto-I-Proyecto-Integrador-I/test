@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Task, TaskPayload } from '../Types/taskTypes';
-import { formatSpanishDate } from '../Utils/dateUtils';
+import SuccessTaskModal from './SuccessTaskModal';
 
 interface CreateTaskModalProps {
 	onClose: () => void;
@@ -188,38 +188,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 					</>
 				)}
 
-				{formStatus === 'success' && (
-					<div className="success-state">
-                        <div className="success-icon-wrapper">
-                            <div className="success-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h2 className="success-title">¡Tarea creada exitosamente!</h2>
-                        <p className="success-subtitle">Tu tarea ha sido guardada y añadida a tu plan de estudio.</p>
-
-                        <div className="success-summary-list">
-                            <div className="summary-item">
-                                {createdTask?.subject || createdTask?.title || 'Tarea'}
-                            </div>
-                            <div className="summary-item">
-                                Fecha: {formatSpanishDate(createdTask?.due_date || '')}
-                            </div>
-                        </div>
-
-                        <div className="success-footer-actions">
-                            <button className="btn-secondary" onClick={() => navigate('/today')}>
-                                Volver al panel principal
-                            </button>
-                            <button className="btn-primary" onClick={() => {
-                                if (createdTask) onAddSubtasks(createdTask);
-                            }}>
-                                Añadir subtareas a esta actividad
-                            </button>
-                        </div>
-                    </div>
+				{formStatus === 'success' && createdTask && (
+					<SuccessTaskModal
+						task={createdTask}
+						onNavigateToPanel={() => navigate('/today')}
+						onAddSubtasks={() => onAddSubtasks(createdTask)}
+					/>
 				)}
 			</div>
 		</div>

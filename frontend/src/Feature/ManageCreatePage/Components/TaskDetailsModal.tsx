@@ -43,10 +43,10 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 						Cerrar
 					</button>
 					<button className="btn-primary" onClick={onOpenEditSubtasks}>
-						+ Editar subtareas
+						+ Editar Tarea
 					</button>
 					<button className="btn-primary" onClick={onOpenAddSubtasks}>
-						+ Agregar actividades
+						+ Agregar Actividades
 					</button>
 				</div>
 			</div>

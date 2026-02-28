@@ -18,10 +18,10 @@ const TaskGrid: React.FC<TaskGridProps> = ({ tasks, onTaskClick }) => {
 					onClick={() => onTaskClick(task)}
 				>
 					<h3>{task.title}</h3>
-					<p>{task.description}</p>
-					<span className={`status-badge ${task.status}`}>
-						{task.status}
-					</span>
+					<div className={`status-badge ${task.status}`}>
+						<span className="status-dot"></span>
+						<span>{task.status}</span>
+					</div>
 				</div>
 			))}
 		</div>
