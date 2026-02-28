@@ -18,10 +18,11 @@ class TaskMiniSerializer(serializers.ModelSerializer):
         ]
 
 class SubtaskSerializer(serializers.ModelSerializer):
-    # Dejamos esto exactamente igual para que React pueda enviar el ID
-    # al crear una nueva subtarea (POST)
+    # El campo task no es requerido en la entrada porque se asigna en el backend
+    # desde la URL del endpoint /api/task/{id}/subtasks/
     task = serializers.PrimaryKeyRelatedField(
-        queryset=Task.objects.all()
+        queryset=Task.objects.all(),
+        required=False
     )
 
     class Meta:

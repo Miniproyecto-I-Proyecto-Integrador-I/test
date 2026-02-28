@@ -63,14 +63,53 @@ export const getAllSubtasks = async () => {
 };
 
 /**
+ * Obtiene las subtareas de una tarea específica
+ */
+export const getSubtasksByTask = async (taskId: number) => {
+	try {
+		const response = await apiClient.get(`/api/task/${taskId}/subtasks/`);
+		return response.data;
+	} catch (error) {
+		console.error('Error al obtener subtareas de la tarea:', error);
+		throw error;
+	}
+};
+
+/**
+ * Actualiza una subtarea existente
+ */
+export const updateSubtask = async (subtaskId: number, subtaskData: Partial<SubtaskPayload>) => {
+	try {
+		const response = await apiClient.patch(`/api/subtasks/${subtaskId}/`, subtaskData);
+		return response.data;
+	} catch (error) {
+		console.error('Error al actualizar subtarea:', error);
+		throw error;
+	}
+};
+
+/**
  * Elimina una subtarea
  */
 export const deleteSubtask = async (subtaskId: number) => {
 	try {
-		const response = await apiClient.delete(`/subtasks/${subtaskId}/`);
+		const response = await apiClient.delete(`/api/subtasks/${subtaskId}/`);
 		return response.data;
 	} catch (error) {
 		console.error('Error al eliminar subtarea:', error);
+		throw error;
+	}
+};
+
+/**
+ * Elimina una tarea completa
+ */
+export const deleteTask = async (taskId: number) => {
+	try {
+		const response = await apiClient.delete(`/api/task/${taskId}/`);
+		return response.data;
+	} catch (error) {
+		console.error('Error al eliminar tarea:', error);
 		throw error;
 	}
 };
