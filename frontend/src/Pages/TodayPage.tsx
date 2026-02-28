@@ -39,7 +39,6 @@ const TodayPage: React.FC = () => {
         return (
             <div className="today-empty-state">
                 <div className="empty-content">
-                    <span className="empty-icon">☕</span>
                     <h2>Día libre o todo completado</h2>
                     <p>No tienes tareas planificadas para el día de hoy.</p>
                     <button
