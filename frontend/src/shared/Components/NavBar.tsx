@@ -13,9 +13,6 @@ const NavBar = () => {
 
             {/* Enlaces con estilo píldora */}
             <div className="nav-links">
-                <NavLink to="/dashboard" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
-                    Dashboard
-                </NavLink>
                 <NavLink to="/today" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
                     Hoy
                 </NavLink>

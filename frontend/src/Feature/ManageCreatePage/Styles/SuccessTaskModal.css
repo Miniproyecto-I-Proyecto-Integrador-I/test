@@ -1,0 +1,123 @@
+.success-state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 32px 16px;
+    animation: fadeIn 0.4s ease;
+}
+
+.success-icon-wrapper-large {
+    background-color: #d1fae5;
+    border-radius: 50%;
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.success-icon-large {
+    width: 64px;
+    height: 64px;
+    background-color: #10b981;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.success-title-large {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 16px 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.success-subtitle-large {
+    font-size: 1.1rem;
+    color: #4b5563;
+    max-width: 500px;
+    margin: 0 0 32px 0;
+    line-height: 1.6;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.success-details-pill {
+    background-color: #d1fae5;
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 48px;
+    width: 100%;
+}
+
+.pill-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #059669;
+    font-weight: 600;
+    font-size: 0.95rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.pill-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #34d399;
+    opacity: 0.5;
+}
+
+.success-footer-actions-large {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+}
+
+.btn-secondary-large {
+    background-color: #ffffff;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    padding: 16px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.btn-secondary-large:hover {
+    background-color: #f9fafb;
+    color: #111827;
+    border-color: #9ca3af;
+}
+
+.btn-primary-large {
+    background-color: #10B981;
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.btn-primary-large:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
