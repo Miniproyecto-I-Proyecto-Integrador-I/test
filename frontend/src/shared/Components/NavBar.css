@@ -58,6 +58,21 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.nav-item-button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+    font-family: inherit;
+}
+
+.nav-auth-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: auto;
+}
+
 /* Efecto al pasar el mouse */
 .nav-item:hover {
     color: #1e293b;

@@ -6,17 +6,21 @@ from Apps.subtask.models import Subtask
 from Apps.subtask.serializers import SubtaskSerializer
 from .models import Task
 from .serializers import TaskSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Task.objects.all()
-        usuario_id = self.request.query_params.get('usuario', None)
-        if usuario_id is not None:
-            queryset = queryset.filter(user_id=usuario_id)
-        return queryset.distinct()
+        # Solo devuelve las tareas del usuario autenticado
+        return Task.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Asigna automáticamente el usuario autenticado al crear una tarea
+        serializer.save(user=self.request.user)
+
     @action(detail=True, methods=['post'], url_path='subtasks')
     def crear_subtarea(self, request, pk=None):
         

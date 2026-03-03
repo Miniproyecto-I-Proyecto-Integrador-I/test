@@ -8,6 +8,24 @@ interface TaskDetailsModalProps {
 	onOpenAddSubtasks: () => void;
 }
 
+const getStatusLabel = (status: string): string => {
+	const labels: Record<string, string> = {
+		pending: 'Pendiente',
+		in_progress: 'En Progreso',
+		completed: 'Completada',
+	};
+	return labels[status] || status;
+};
+
+const getPriorityLabel = (priority: string): string => {
+	const labels: Record<string, string> = {
+		high: 'Alta',
+		medium: 'Media',
+		low: 'Baja',
+	};
+	return labels[priority] || priority;
+};
+
 const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 	task,
 	onClose,
@@ -20,7 +38,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 				<div className="modal-header">
 					<h2>{task.title}</h2>
 					<span className={`status-badge ${task.status}`}>
-						{task.status}
+						{getStatusLabel(task.status)}
 					</span>
 				</div>
 				<div className="task-details-content">
@@ -40,7 +58,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 						</p>
 					)}
 					<p>
-						<strong>Prioridad:</strong> {task.priority}
+						<strong>Prioridad:</strong> {getPriorityLabel(task.priority)}
 					</p>
 					{task.due_date && (
 						<p>

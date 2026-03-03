@@ -5,6 +5,7 @@ from Apps.subtask.serializers import SubtaskSerializer # Importa el de subtask
 class TaskSerializer(serializers.ModelSerializer):
     
     subtasks = SubtaskSerializer(many=True, read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Task

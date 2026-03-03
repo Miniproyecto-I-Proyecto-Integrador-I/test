@@ -1,41 +1,91 @@
 import { NavLink } from 'react-router-dom';
 import './NavBar.css';
 import Logo from '../../assets/Logo StaskM.png';
-import {User} from 'lucide-react';
+import { User } from 'lucide-react';
+import { useAuth } from '../../Context/AuthContext';
 
 const NavBar = () => {
-    return (
-        <nav className="floating-navbar">
-            {/* Logo minimalista */}
-            <div className="nav-brand">
-                <img src={Logo} alt="TaskMaster Logo" className="brand-logo-img" />
-            </div>
+  const { isAuthenticated, logout } = useAuth();
 
-            {/* Enlaces con estilo píldora */}
-            <div className="nav-links">
-                <NavLink to="/today" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
-                    Hoy
-                </NavLink>
-                <NavLink to="/progress" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
-                    Progreso
-                </NavLink>
-                <NavLink to="/create" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
-                    Crear
-                </NavLink>
-                <NavLink to="/activity/1" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
-                    Actividad
-                </NavLink>
-                <NavLink to="/login" className={({ isActive }) => `nav-item${isActive ? ' is-active' : ''}`}>
-                    Login
-                </NavLink>
-            </div>
+  return (
+    <nav className="floating-navbar">
+      {/* Logo minimalista */}
+      <div className="nav-brand">
+        <img src={Logo} alt="TaskMaster Logo" className="brand-logo-img" />
+      </div>
 
-            {/* Perfil en la parte inferior */}
-            <div className="nav-footer">
-                <User color='#4B5563'></User>
-            </div>
-        </nav>
-    );
+      {/* Enlaces con estilo píldora */}
+      <div className="nav-links">
+        <NavLink
+          to="/today"
+          className={({ isActive }) =>
+            `nav-item${isActive ? ' is-active' : ''}`
+          }
+        >
+          Hoy
+        </NavLink>
+        <NavLink
+          to="/progress"
+          className={({ isActive }) =>
+            `nav-item${isActive ? ' is-active' : ''}`
+          }
+        >
+          Progreso
+        </NavLink>
+        <NavLink
+          to="/create"
+          className={({ isActive }) =>
+            `nav-item${isActive ? ' is-active' : ''}`
+          }
+        >
+          Crear
+        </NavLink>
+        <NavLink
+          to="/activity/1"
+          className={({ isActive }) =>
+            `nav-item${isActive ? ' is-active' : ''}`
+          }
+        >
+          Actividad
+        </NavLink>
+        <div className="nav-auth-section">
+          {!isAuthenticated ? (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `nav-item${isActive ? ' is-active' : ''}`
+                }
+              >
+                Log in
+              </NavLink>
+              <NavLink
+                to="/register"
+                className={({ isActive }) =>
+                  `nav-item${isActive ? ' is-active' : ''}`
+                }
+              >
+                Sign in
+              </NavLink>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="nav-item nav-item-button"
+              onClick={logout}
+            >
+              Log out
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Perfil en la parte inferior */}
+      <div className="nav-footer">
+        <User color="#4B5563"></User>
+      </div>
+    </nav>
+  );
 };
 
 export default NavBar;
