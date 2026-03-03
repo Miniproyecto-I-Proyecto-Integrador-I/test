@@ -1,28 +1,61 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import CreatePage from '../Pages/CreatePage'
-import LoginPage from '../Pages/LoginPage'
-import ProgressPage from '../Pages/ProgressPage'
-import TodayPage from '../Pages/TodayPage'
-import ActivityPage from '../Pages/ActivityPage'
-import Layout from '../shared/Components/Layout'
-
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import CreatePage from '../Pages/CreatePage';
+import LoginPage from '../Pages/LoginPage';
+import RegisterPage from '../Pages/RegisterPage';
+import ProgressPage from '../Pages/ProgressPage';
+import TodayPage from '../Pages/TodayPage';
+import ActivityPage from '../Pages/ActivityPage';
+import Layout from '../shared/Components/Layout';
+import { AuthProvider } from '../Context/AuthContext';
+import ProtectedRoute from '../shared/Components/Auth/ProtectedRoute';
 
 const AppRoutes = () => {
-	return (
-		<BrowserRouter>
-			<Routes>
-				<Route element={<Layout />}>
-					<Route index element={<Navigate to="/today" replace />} />
-					<Route path="/today" element={<TodayPage />} />
-					<Route path="/progress" element={<ProgressPage />} />
-					<Route path="/create" element={<CreatePage />} />
-                    <Route path="/activity/:id" element={<ActivityPage />} />					
-					<Route path="/login" element={<LoginPage />} />
-				</Route>
-				<Route path="*" element={<Navigate to="/today" replace />} />
-			</Routes>
-		</BrowserRouter>
-	)
-}
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Navigate to="/today" replace />} />
+            <Route
+              path="/today"
+              element={
+                <ProtectedRoute>
+                  <TodayPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/progress"
+              element={
+                <ProtectedRoute>
+                  <ProgressPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <CreatePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/activity/:id"
+              element={
+                <ProtectedRoute>
+                  <ActivityPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/today" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+};
 
-export default AppRoutes
+export default AppRoutes;
