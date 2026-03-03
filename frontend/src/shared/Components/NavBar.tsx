@@ -48,34 +48,36 @@ const NavBar = () => {
         >
           Actividad
         </NavLink>
-        {!isAuthenticated ? (
-          <>
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' is-active' : ''}`
-              }
+        <div className="nav-auth-section">
+          {!isAuthenticated ? (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `nav-item${isActive ? ' is-active' : ''}`
+                }
+              >
+                Log in
+              </NavLink>
+              <NavLink
+                to="/register"
+                className={({ isActive }) =>
+                  `nav-item${isActive ? ' is-active' : ''}`
+                }
+              >
+                Sign in
+              </NavLink>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="nav-item nav-item-button"
+              onClick={logout}
             >
-              Log in
-            </NavLink>
-            <NavLink
-              to="/register"
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' is-active' : ''}`
-              }
-            >
-              Sign in
-            </NavLink>
-          </>
-        ) : (
-          <button
-            type="button"
-            className="nav-item nav-item-button"
-            onClick={logout}
-          >
-            Log out
-          </button>
-        )}
+              Log out
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Perfil en la parte inferior */}

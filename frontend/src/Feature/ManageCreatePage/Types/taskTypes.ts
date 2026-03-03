@@ -15,7 +15,6 @@ export interface Task {
 export interface TaskPayload {
 	title: string;
 	due_date: string;
-	user: number;
 	subject?: string;
 	type?: string;
 	priority?: string;
