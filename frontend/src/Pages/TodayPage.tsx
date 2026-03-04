@@ -9,44 +9,53 @@ const TodayPage: React.FC = () => {
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedSubtask, setSelectedSubtask] = useState<Subtask | null>(null);
+  const [filters, setFilters] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const data = await todayService.getTodaySubtasks();
-        console.log('DATA:', data);
-        setSubtasks(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchSubtasks = async (customFilters?: Record<string, string>) => {
+    setLoading(true);
+    try {
+      const filtersToUse =
+        customFilters !== undefined ? customFilters : filters;
+      const data = await todayService.getTodaySubtasks(filtersToUse);
+      console.log('DATA:', data);
+      setSubtasks(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetch();
+  useEffect(() => {
+    fetchSubtasks();
   }, []);
+
+  const handleFilterChange = (key: string, value: string) => {
+    const newFilters = { ...filters };
+    if (value) {
+      newFilters[key] = value;
+    } else {
+      delete newFilters[key];
+    }
+    setFilters(newFilters);
+  };
+
+  const applyFilters = () => {
+    fetchSubtasks();
+  };
+
+  const clearFilters = () => {
+    setFilters({});
+    fetchSubtasks({});
+  };
 
   if (loading) {
     return (
       <div className="today-loading-state">
         <div className="spinner"></div>
         <p>Cargando tus tareas de hoy...</p>
-      </div>
-    );
-  }
-
-  if (subtasks.length === 0) {
-    return (
-      <div className="today-empty-state">
-        <div className="empty-content">
-          <h2>Día libre o todo completado</h2>
-          <p>No tienes tareas planificadas para el día de hoy.</p>
-          <button className="btn-primary" onClick={() => navigate('/create')}>
-            Crear actividad
-          </button>
-        </div>
       </div>
     );
   }
@@ -72,30 +81,131 @@ const TodayPage: React.FC = () => {
         </p>
       </header>
 
-      <div className="today-grid">
-        {subtasks.map((sub) => (
-          <div
-            key={sub.id}
-            className="today-card"
-            onClick={() => setSelectedSubtask(sub)}
-          >
-            <div className="card-top">
-              {sub.task && (
-                <span className="parent-badge">{sub.task.title}</span>
-              )}
-              <span className={`status-dot ${sub.status}`}></span>
-            </div>
-
-            <h4 className="card-title">{sub.description}</h4>
-
-            <div className="card-bottom">
-              <span className="time-badge">⏱ {sub.needed_hours} hrs</span>
-              <span className="view-more">Ver detalles ➔</span>
-            </div>
-          </div>
-        ))}
+      <div
+        style={{
+          marginBottom: '20px',
+          display: 'flex',
+          gap: '10px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
+        <label>Después de:</label>
+        <input
+          type="date"
+          value={filters.planification_date_gte || ''}
+          onChange={(e) =>
+            handleFilterChange('planification_date_gte', e.target.value)
+          }
+        />
+        <label>Antes de:</label>
+        <input
+          type="date"
+          value={filters.planification_date_lte || ''}
+          onChange={(e) =>
+            handleFilterChange('planification_date_lte', e.target.value)
+          }
+        />
+        <select
+          value={filters.status || ''}
+          onChange={(e) => handleFilterChange('status', e.target.value)}
+        >
+          <option value="">Todos los estados</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+        <input
+          type="number"
+          placeholder="ID Tarea"
+          value={filters.task || ''}
+          onChange={(e) => handleFilterChange('task', e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Título Tarea"
+          value={filters.task_title || ''}
+          onChange={(e) => handleFilterChange('task_title', e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Materia"
+          value={filters.subject || ''}
+          onChange={(e) => handleFilterChange('subject', e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Tipo"
+          value={filters.type || ''}
+          onChange={(e) => handleFilterChange('type', e.target.value)}
+        />
+        <select
+          value={filters.priority || ''}
+          onChange={(e) => handleFilterChange('priority', e.target.value)}
+        >
+          <option value="">Todas las prioridades</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <input
+          type="number"
+          placeholder="Horas min"
+          value={filters.needed_hours_min || ''}
+          onChange={(e) =>
+            handleFilterChange('needed_hours_min', e.target.value)
+          }
+        />
+        <input
+          type="number"
+          placeholder="Horas max"
+          value={filters.needed_hours_max || ''}
+          onChange={(e) =>
+            handleFilterChange('needed_hours_max', e.target.value)
+          }
+        />
+        <button onClick={applyFilters}>Filtrar</button>
+        <button onClick={clearFilters}>Limpiar</button>
       </div>
 
+      {subtasks.length === 0 ? (
+        <div className="today-empty-state">
+          <div className="empty-content">
+            <h2>No hay resultados</h2>
+            <p>No se encontraron tareas con los filtros aplicados.</p>
+            <button className="btn-primary" onClick={() => navigate('/create')}>
+              Crear actividad
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="today-grid">
+          {subtasks.map((sub) => (
+            <div
+              key={sub.id}
+              className="today-card"
+              onClick={() => setSelectedSubtask(sub)}
+            >
+              <div className="card-top">
+                {sub.task && (
+                  <span className="parent-badge">{sub.task.title}</span>
+                )}
+                <span className={`status-dot ${sub.status}`}></span>
+              </div>
+
+              <h4 className="card-title">{sub.description}</h4>
+
+              <div className="card-bottom">
+                <span className="time-badge">⏱ {sub.needed_hours} hrs</span>
+                <span className="time-badge">
+                  Para {new Date(sub.planification_date).toLocaleDateString()}
+                </span>
+                <span className="view-more">Ver detalles ➔</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
       {selectedSubtask && (
         <div className="modal-overlay" onClick={() => setSelectedSubtask(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
