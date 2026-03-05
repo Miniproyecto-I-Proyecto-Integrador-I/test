@@ -20,7 +20,7 @@ const EmptyState: React.FC = () => {
             
             <h2 className="empty-state-title">¡Estás al día!</h2>
             <p className="empty-state-text">
-                No tienes tareas pendientes para estas categorías. Aprovecha para<br />
+                No tienes tareas pendientes . Aprovecha para<br />
                 descansar o planificar tu próxima meta.
             </p>
             

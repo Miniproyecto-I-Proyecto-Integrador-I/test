@@ -7,6 +7,7 @@ import SelectedSubtask from '../Feature/ManageTodayPage/Components/SelectedSubta
 import CardsGrid from '@/Feature/ManageTodayPage/Components/CardsGrid';
 import SelectedFilter from '@/Feature/ManageTodayPage/Components/SelectedFilter';
 import { fecha } from '../Feature/ManageTodayPage/Utils/DateFormatted';
+import { useGroupedSubtasks } from '../Feature/ManageTodayPage/Hooks/useGroupedSubtasks';
 import StatusCardGrid from '@/Feature/ManageTodayPage/Components/StatusCardGrid';
 
 const TodayPage: React.FC = () => {
@@ -17,6 +18,7 @@ const TodayPage: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const { user } = useAuth();
+  const { overdue, today, upcoming, loading } = useGroupedSubtasks(filters);
 
   /* ── Filter handlers ──────────────────────────────────── */
 
@@ -49,7 +51,12 @@ const TodayPage: React.FC = () => {
         </div>
       </header>
 
-      <StatusCardGrid />
+      <StatusCardGrid 
+        defeatedSubTask={overdue[0]} 
+        todaySubTask={today[0]} 
+        nextSubTask={upcoming[0]} 
+        loading={loading} 
+      />
 
       <SelectedFilter
         handleFilterChange={handleFilterChange}
@@ -60,7 +67,10 @@ const TodayPage: React.FC = () => {
 
       <CardsGrid
         setSelectedSubtask={setSelectedSubtask}
-        filters={filters}
+        overdue={overdue}
+        today={today}
+        upcoming={upcoming}
+        loading={loading}
       />
 
       {selectedSubtask && (

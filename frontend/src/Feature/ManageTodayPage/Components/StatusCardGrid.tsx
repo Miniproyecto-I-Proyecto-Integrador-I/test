@@ -1,16 +1,21 @@
 import React from 'react'
-import { useStatusCard } from '../Hooks/useStatusCard'
-import StatusCard from './StatusCard'
-import '../Styles/StatusCardStyles.css'
+import type { Subtask } from '../Types/models';
+import StatusCard from './StatusCard';
+import '../Styles/StatusCardStyles.css';
 
-const StatusCardGrid: React.FC = () => {
-  const {
-    defeatedSubTask,
-    todaySubTask,
-    nextSubTask,
-    loading,
-  } = useStatusCard()
+interface StatusCardGridProps {
+  defeatedSubTask?: Subtask;
+  todaySubTask?: Subtask;
+  nextSubTask?: Subtask;
+  loading: boolean;
+}
 
+const StatusCardGrid: React.FC<StatusCardGridProps> = ({
+  defeatedSubTask,
+  todaySubTask,
+  nextSubTask,
+  loading,
+}) => {
   if (loading) {
     return (
       <div className="status-card-loading">

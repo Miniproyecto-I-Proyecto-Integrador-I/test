@@ -3,13 +3,15 @@ import { AlertCircle, CalendarCheck, CalendarClock } from 'lucide-react'
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
 import EmptyState from './EmptyState'
-import { useGroupedSubtasks } from '../Hooks/useGroupedSubtasks'
+
 import '../Styles/CardTasks.css'
 
 interface CardsGridProps {
   setSelectedSubtask: (sub: Subtask) => void
-  /** Filters forwarded from TodayPage (e.g. from SelectedFilter) */
-  filters?: Record<string, string>
+  overdue: Subtask[]
+  today: Subtask[]
+  upcoming: Subtask[]
+  loading: boolean
 }
 
 /* ── Section header ─────────────────────────────────────── */
@@ -29,9 +31,13 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, label, count }) => 
 
 /* ── Main component ─────────────────────────────────────── */
 
-const CardsGrid: React.FC<CardsGridProps> = ({ setSelectedSubtask, filters }) => {
-  const { overdue, today, upcoming, loading } = useGroupedSubtasks(filters)
-
+const CardsGrid: React.FC<CardsGridProps> = ({ 
+  setSelectedSubtask, 
+  overdue, 
+  today, 
+  upcoming, 
+  loading 
+}) => {
   if (loading) {
     return (
       <div className="today-loading-state">
