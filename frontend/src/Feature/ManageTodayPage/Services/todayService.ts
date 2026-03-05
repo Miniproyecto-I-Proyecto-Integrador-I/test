@@ -3,7 +3,7 @@ import type { Subtask } from '../Types/models';
 
 export const todayService = {
     // Obtener todas las subtareas con filtros opcionales
-    getTodaySubtasks: async (filters?: Record<string, string>): Promise<Subtask[]> => {
+    getFilterSubtasks: async (filters?: Record<string, string>): Promise<Subtask[]> => {
         const params = new URLSearchParams(filters || {});
         const queryString = params.toString() ? `?${params.toString()}` : '';
         

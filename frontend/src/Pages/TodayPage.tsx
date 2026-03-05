@@ -9,6 +9,7 @@ import EmptyState from '../Feature/ManageTodayPage/Components/EmptyState';
 import CardsGrid from '@/Feature/ManageTodayPage/Components/CardsGrid';
 import SelectedFilter from '@/Feature/ManageTodayPage/Components/SelectedFilter';
 import {fecha} from '../Feature/ManageTodayPage/Utils/DateFormatted'
+import StatusCardGrid from '@/Feature/ManageTodayPage/Components/StatusCardGrid';
 
 const TodayPage: React.FC = () => {
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
@@ -23,7 +24,7 @@ const TodayPage: React.FC = () => {
     try {
       const filtersToUse =
         customFilters !== undefined ? customFilters : filters;
-      const data = await todayService.getTodaySubtasks(filtersToUse);
+      const data = await todayService.getFilterSubtasks(filtersToUse);
       console.log('DATA:', data);
       setSubtasks(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -45,6 +46,7 @@ const TodayPage: React.FC = () => {
       delete newFilters[key];
     }
     setFilters(newFilters);
+    console.log("asi se ve un filtro: ", filters)
   };
 
   const applyFilters = () => {
@@ -81,6 +83,8 @@ const TodayPage: React.FC = () => {
           {fecha.charAt(0).toUpperCase() + fecha.slice(1)}
         </p>
       </header>
+
+      <StatusCardGrid/>
 
       <SelectedFilter handleFilterChange={handleFilterChange} applyFilters={applyFilters} clearFilters = {clearFilters} filters = {filters} />
 
