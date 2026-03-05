@@ -16,7 +16,6 @@ interface SubtaskFormProps {
   taskTitle?: string;
   initialSubtasks?: SubtaskItem[];
   onFinalize?: (subtasks: any[]) => Promise<void>;
-  onBack?: () => void;
 }
 
 const SubtaskForm: React.FC<SubtaskFormProps> = ({
@@ -24,7 +23,6 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
   taskTitle = 'Ensayo sobre la Revolucion Francesa',
   initialSubtasks = [],
   onFinalize,
-  onBack,
 }) => {
   const {
     subtasks,
@@ -109,16 +107,6 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
 
   return (
     <div className="subtask-form-wrapper">
-      {onBack && (
-        <button
-          type="button"
-          className="subtask-form-back-btn"
-          onClick={onBack}
-          aria-label="Volver"
-        >
-          ← Volver
-        </button>
-      )}
       <div className="task-summary-card">
         <div className="task-summary-left">
           <div className="task-summary-icon" aria-hidden="true">

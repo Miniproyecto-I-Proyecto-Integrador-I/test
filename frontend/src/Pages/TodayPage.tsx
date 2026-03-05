@@ -55,7 +55,6 @@ const TodayPage: React.FC = () => {
         defeatedSubTask={overdue[0]} 
         todaySubTask={today[0]} 
         nextSubTask={upcoming[0]} 
-        loading={loading} 
       />
 
       <SelectedFilter

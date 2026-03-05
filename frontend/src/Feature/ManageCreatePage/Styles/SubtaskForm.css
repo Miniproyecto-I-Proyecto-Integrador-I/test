@@ -5,9 +5,9 @@
     flex-direction: column;
     gap: 20px;
     width: 100%;
-    max-width: 950px;
-    margin: 0 auto;
-    padding: 0 40px;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 0 40px 0;
 }
 
 .task-summary-card {

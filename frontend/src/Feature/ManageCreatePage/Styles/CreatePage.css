@@ -178,6 +178,29 @@
     overflow-y: auto;
 }
 
+.subtask-fullscreen {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.modal-card.inline-form-card {
+    max-width: 100%;
+    max-height: none;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--border-color) !important;
+    overflow-y: visible;
+    background: var(--surface);
+    border-radius: 16px;
+    flex: 1;
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
 .subtask-modal-card {
     background: var(--surface);
     width: 100%;

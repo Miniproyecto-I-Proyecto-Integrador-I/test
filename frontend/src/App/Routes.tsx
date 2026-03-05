@@ -33,7 +33,7 @@ const AppRoutes = () => {
               }
             />
             <Route
-              path="/create"
+              path="/create/*"
               element={
                 <ProtectedRoute>
                   <CreatePage />
