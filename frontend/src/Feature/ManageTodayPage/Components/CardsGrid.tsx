@@ -1,29 +1,114 @@
 import React from 'react'
-import type {Subtask} from '../Types/models'
+import { AlertCircle, CalendarCheck, CalendarClock } from 'lucide-react'
+import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
+import EmptyState from './EmptyState'
+import { useGroupedSubtasks } from '../Hooks/useGroupedSubtasks'
+import '../Styles/CardTasks.css'
 
-interface CardsGrid {
-    subtasks: Subtask[]
-    setSelectedSubtask: (argo0: Subtask) => void
+interface CardsGridProps {
+  setSelectedSubtask: (sub: Subtask) => void
+  /** Filters forwarded from TodayPage (e.g. from SelectedFilter) */
+  filters?: Record<string, string>
 }
 
-const CardsGrid: React.FC<CardsGrid>= ({
-    subtasks,
-    setSelectedSubtask
-}) => {
+/* ── Section header ─────────────────────────────────────── */
+
+interface SectionHeaderProps {
+  icon: React.ReactNode
+  label: string
+  count: number
+}
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, label, count }) => (
+  <div className="task-section__header">
+    {icon}
+    <span>{label} ({count})</span>
+  </div>
+)
+
+/* ── Main component ─────────────────────────────────────── */
+
+const CardsGrid: React.FC<CardsGridProps> = ({ setSelectedSubtask, filters }) => {
+  const { overdue, today, upcoming, loading } = useGroupedSubtasks(filters)
+
+  if (loading) {
     return (
-        <div className="today-grid">
-            {subtasks.map((sub) => (
-                <div
-                    key={sub.id}
-                    className="today-card"
-                    onClick={() => setSelectedSubtask(sub)}
-                >
-                <CardTask sub={sub}/>
-                </div>
-            ))}
-        </div>
+      <div className="today-loading-state">
+        <div className="spinner" />
+        <p>Cargando tareas…</p>
+      </div>
     )
+  }
+
+  const isEmpty = overdue.length === 0 && today.length === 0 && upcoming.length === 0
+
+  if (isEmpty) {
+    return <EmptyState />
+  }
+
+  return (
+    <div className="grouped-cards">
+
+      {/* ── VENCIDAS ─────────────────────────────────────── */}
+      {overdue.length > 0 && (
+        <section className="task-section task-section--overdue">
+          <SectionHeader
+            icon={<AlertCircle size={14} />}
+            label="Vencidas"
+            count={overdue.length}
+          />
+          {overdue.map(sub => (
+            <CardTask
+              key={sub.id}
+              sub={sub}
+              variant="overdue"
+              onClick={() => setSelectedSubtask(sub)}
+            />
+          ))}
+        </section>
+      )}
+
+      {/* ── PARA HOY ─────────────────────────────────────── */}
+      {today.length > 0 && (
+        <section className="task-section task-section--today">
+          <SectionHeader
+            icon={<CalendarCheck size={14} />}
+            label="Para hoy"
+            count={today.length}
+          />
+          {today.map(sub => (
+            <CardTask
+              key={sub.id}
+              sub={sub}
+              variant="today"
+              onClick={() => setSelectedSubtask(sub)}
+            />
+          ))}
+        </section>
+      )}
+
+      {/* ── PRÓXIMAS ─────────────────────────────────────── */}
+      {upcoming.length > 0 && (
+        <section className="task-section task-section--upcoming">
+          <SectionHeader
+            icon={<CalendarClock size={14} />}
+            label="Próximas"
+            count={upcoming.length}
+          />
+          {upcoming.map(sub => (
+            <CardTask
+              key={sub.id}
+              sub={sub}
+              variant="upcoming"
+              onClick={() => setSelectedSubtask(sub)}
+            />
+          ))}
+        </section>
+      )}
+
+    </div>
+  )
 }
 
 export default CardsGrid

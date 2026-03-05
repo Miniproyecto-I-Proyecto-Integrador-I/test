@@ -1,33 +1,55 @@
-import React from 'react'
-import type {Subtask} from '../Types/models'
+import React, { useState } from 'react'
+import type { Subtask } from '../Types/models'
+import { buildBadgeLabel, type CardVariant } from '../Utils/BadgeLabels'
+import '../Styles/CardTasks.css'
 
-interface CardTask {
-    sub: Subtask
+interface CardTaskProps {
+  sub: Subtask
+  variant: CardVariant
+  onClick: () => void
 }
 
-const CardTask: React.FC<CardTask> = ({
-    sub
-}) => {
-    return (
-        <div>
-            <div className="card-top">
-                {sub.task && (
-                    <span className="parent-badge">{sub.task.title}</span>
-                )}
-                <span className={`status-dot ${sub.status}`}></span>
-            </div>
+/* ── Component ───────────────────────────────────────────── */
 
-            <h4 className="card-title">{sub.description}</h4>
+const CardTask: React.FC<CardTaskProps> = ({ sub, variant, onClick }) => {
+  const [checked, setChecked] = useState(sub.status === 'completed')
 
-            <div className="card-bottom">
-                <span className="time-badge">⏱ {sub.needed_hours} hrs</span>
-                <span className="time-badge">
-                    Para {new Date(sub.planification_date).toLocaleDateString()}
-                </span>
-                <span className="view-more">Ver detalles ➔</span>
-            </div>
-        </div>
-    )
+  const subject = sub.task?.subject === '' || !sub.task?.subject
+    ? 'No asignado'
+    : sub.task.subject
+
+  const badgeLabel = buildBadgeLabel(variant, sub)
+
+  const handleCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation()          // don't bubble to card click
+    setChecked(e.target.checked)
+  }
+
+  return (
+    <div
+      className={`task-card${checked ? ' task-card--done' : ''}`}
+      onClick={onClick}
+    >
+      {/* Checkbox */}
+      <input
+        type="checkbox"
+        className="task-card__check"
+        checked={checked}
+        onChange={handleCheckChange}
+        onClick={e => e.stopPropagation()}
+        aria-label={`Marcar "${sub.description}" como completada`}
+      />
+
+      {/* Title + subject */}
+      <div className="task-card__body">
+        <p className="task-card__title">{sub.description}</p>
+        <p className="task-card__subject">{subject}</p>
+      </div>
+
+      {/* Right-side badge */}
+      <span className="task-card__badge">{badgeLabel}</span>
+    </div>
+  )
 }
 
 export default CardTask

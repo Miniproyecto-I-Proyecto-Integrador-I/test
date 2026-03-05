@@ -17,10 +17,11 @@ const SelectedFilter: React.FC<SelectedFilter> = ({
     <div
         style={{
           marginBottom: '20px',
-          display: 'flex',
+          display: 'none',
           gap: '10px',
           flexWrap: 'wrap',
           alignItems: 'center',
+          
         }}
       >
         <label>Después de:</label>
