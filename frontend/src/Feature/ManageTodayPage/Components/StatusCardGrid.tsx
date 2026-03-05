@@ -1,39 +1,47 @@
-import { useStatusCard } from "../Hooks/useStatusCard"
-import  StatusCard  from './StatusCard'
+import React from 'react'
+import { useStatusCard } from '../Hooks/useStatusCard'
+import StatusCard from './StatusCard'
+import '../Styles/StatusCardStyles.css'
 
 const StatusCardGrid: React.FC = () => {
-
   const {
     defeatedSubTask,
     todaySubTask,
     nextSubTask,
-    loading } = useStatusCard()
+    loading,
+  } = useStatusCard()
 
   if (loading) {
     return (
-      <div className="today-loading-state">
-        <div className="spinner"></div>
-        <p>Cargando cards</p>
+      <div className="status-card-loading">
+        <div className="spinner" />
+        <p>Cargando cards…</p>
       </div>
-    );
+    )
   }
 
-  
- 
-  console.log("Data de statusCard:", defeatedSubTask)
-
   return (
-    <div>
+    <div className="status-card-grid">
+      {/* Column 1 — Most overdue */}
+      <StatusCard
+        subtask={defeatedSubTask}
+        message="Más antigua"
+        variant="overdue"
+      />
 
-      <StatusCard subtask={defeatedSubTask}
-        message={"Mas antigua"} />
+      {/* Column 2 — Today */}
+      <StatusCard
+        subtask={todaySubTask}
+        message="Hoy"
+        variant="today"
+      />
 
-      <StatusCard subtask={todaySubTask}
-        message={"Hoy"} />
-
-      <StatusCard subtask={nextSubTask}
-        message={"Por venir"} />
-
+      {/* Column 3 — Upcoming */}
+      <StatusCard
+        subtask={nextSubTask}
+        message="Por venir"
+        variant="upcoming"
+      />
     </div>
   )
 }
