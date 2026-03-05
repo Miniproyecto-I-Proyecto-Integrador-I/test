@@ -3,25 +3,43 @@
     padding: 32px;
     max-width: 1200px;
     margin: 0 auto;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: #1e293b;
+    font-family: var(--font-family);
+    color: var(--text-main);
 }
 
 .today-header {
     margin-bottom: 32px;
 }
 
-.today-title {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    color: #0f172a;
+.today-greeting {
+    font-size: var(--font-size-h1);
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 8px 0;
+    letter-spacing: -0.03em;
+}
+
+.today-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--font-size-body);
+}
+
+.today-subtitle-title {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.today-subtitle-separator {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-small);
 }
 
 .today-date {
-    font-size: 1rem;
-    color: #64748b;
-    margin-top: 4px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin: 0;
 }
 
 /* --- ESTADOS (CARGANDO Y VACÍO) --- */
@@ -35,17 +53,116 @@
     text-align: center;
 }
 
-.empty-content {
-    background: #f8fafc;
-    padding: 48px;
-    border-radius: 24px;
-    border: 2px dashed #cbd5e1;
+.empty-state-visual {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
 }
 
-.empty-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 16px;
+.empty-state-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+}
+
+.empty-state-bubble-outer {
+    width: 170px;
+    height: 170px;
+    opacity: 0.1;
+    animation: pulse-out 4s infinite linear;
+}
+
+.empty-state-bubble-inner {
+    width: 110px;
+    height: 110px;
+    opacity: 0.15;
+    animation: pulse-in 4s infinite linear;
+}
+
+@keyframes pulse-out {
+    0%   { transform: scale(0.9); opacity: 0.05; }
+    50%  { transform: scale(1); opacity: 0.12; }
+    100% { transform: scale(0.9); opacity: 0.05; }
+}
+
+@keyframes pulse-in {
+    0%   { transform: scale(1); opacity: 0.18; }
+    50%  { transform: scale(0.9); opacity: 0.12; }
+    100% { transform: scale(1); opacity: 0.18; }
+}
+
+.empty-state-icon-wrapper {
+    position: relative;
+    z-index: 10;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 78px;
+    height: 78px;
+    border: 3.5px solid var(--primary-color);
+    border-radius: 50%;
+    background-color: transparent;
+    animation: float 5s ease-in-out infinite;
+}
+
+.empty-state-accent {
+    position: absolute;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    opacity: 0.25;
+    filter: blur(5px);
+    animation: float 6s ease-in-out infinite alternate-reverse;
+}
+
+.accent-top-right {
+    top: 30px;
+    right: 40px;
+    width: 22px;
+    height: 22px;
+}
+
+.accent-bottom-left {
+    bottom: 30px;
+    left: 40px;
+    width: 28px;
+    height: 28px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.empty-state-title {
+    font-size: var(--font-size-h2);
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 12px 0;
+    font-family: var(--font-family);
+    letter-spacing: -0.01em;
+}
+
+.empty-state-text {
+    font-size: var(--font-size-body);
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+    font-family: var(--font-family);
+}
+
+.empty-state-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px !important;
+    font-size: var(--font-size-body) !important;
+    border-radius: var(--border-radius-base) !important;
 }
 
 /* Card/grid styles → moved to CardTasks.css */
@@ -95,20 +212,20 @@
     right: 20px;
     background: none;
     border: none;
-    font-size: 1.5rem;
-    color: #94a3b8;
+    font-size: var(--font-size-h2);
+    color: var(--text-tertiary);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .close-btn:hover {
-    color: #0f172a;
+    color: var(--text-main);
 }
 
 .modal-header h2 {
     margin: 0 0 16px 0;
-    font-size: 1.5rem;
-    color: #0f172a;
+    font-size: var(--font-size-h2);
+    color: var(--text-main);
 }
 
 .modal-tags {
@@ -119,8 +236,8 @@
 
 .tag {
     padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    border-radius: var(--border-radius-base);
+    font-size: var(--font-size-small);
     font-weight: 600;
 }
 
@@ -144,9 +261,9 @@
 
 .parent-task-info h3 {
     margin: 0 0 20px 0;
-    font-size: 1.1rem;
-    color: #334155;
-    border-bottom: 2px solid #e2e8f0;
+    font-size: var(--font-size-h3);
+    color: var(--text-main);
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 8px;
 }
 
@@ -168,16 +285,16 @@
 }
 
 .info-item strong {
-    font-size: 0.8rem;
+    font-size: var(--font-size-small);
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--text-secondary);
     letter-spacing: 0.5px;
 }
 
 .info-item span,
 .info-item p {
-    font-size: 0.95rem;
-    color: #0f172a;
+    font-size: var(--font-size-body);
+    color: var(--text-main);
     margin: 0;
 }
 
@@ -211,5 +328,5 @@
 }
 
 .btn-primary:hover {
-    background-color: #334155;
+    background-color: var(--primary-hover);
 }

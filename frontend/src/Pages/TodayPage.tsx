@@ -39,13 +39,14 @@ const TodayPage: React.FC = () => {
   return (
     <div className="today-page">
       <header className="today-header">
-        <div>
-          <h2 className="today-greeting">Hola, {user?.username}!</h2>
-          <h1 className="today-title">Mi Día</h1>
+        <h1 className="today-greeting">Hola, {user?.username}!</h1>
+        <div className="today-subtitle">
+          <span className="today-subtitle-title">Mi día</span>
+          <span className="today-subtitle-separator">•</span>
+          <span className="today-date">
+            {fecha.charAt(0).toUpperCase() + fecha.slice(1)}
+          </span>
         </div>
-        <p className="today-date">
-          {fecha.charAt(0).toUpperCase() + fecha.slice(1)}
-        </p>
       </header>
 
       <StatusCardGrid />
