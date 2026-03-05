@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import LoadingScreen from '../shared/Components/LoadingScreen';
 import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
 import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
 import SubtaskEdit from '../Feature/ManageCreatePage/Components/SubtaskEdit';
@@ -146,13 +147,7 @@ const CreatePage = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="empty-state">
-        <div className="empty-content">
-          <p className="empty-text">Cargando tus tareas...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Preparando tu espacio de trabajo..." />;
   }
 
   return (

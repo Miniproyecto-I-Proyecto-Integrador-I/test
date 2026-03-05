@@ -3,6 +3,7 @@ import { AlertCircle, CalendarCheck, CalendarClock } from 'lucide-react'
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
 import EmptyState from './EmptyState'
+import LoadingScreen from '../../../shared/Components/LoadingScreen';
 
 import '../Styles/CardTasks.css'
 
@@ -39,12 +40,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   loading 
 }) => {
   if (loading) {
-    return (
-      <div className="today-loading-state">
-        <div className="spinner" />
-        <p>Cargando tareas…</p>
-      </div>
-    )
+    return <LoadingScreen message="Cargando tus actividades del día..." />;
   }
 
   const isEmpty = overdue.length === 0 && today.length === 0 && upcoming.length === 0
