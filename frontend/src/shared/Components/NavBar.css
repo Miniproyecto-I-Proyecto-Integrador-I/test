@@ -96,6 +96,74 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    position: relative;
+}
+
+.profile-icon-wrapper {
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.profile-icon-wrapper.clickable {
+    cursor: pointer;
+}
+
+.profile-icon-wrapper.clickable:hover {
+    background-color: #f1f5f9;
+}
+
+.profile-popover {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    margin-left: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    padding: 8px;
+    min-width: 140px;
+    animation: fadeInPopover 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    z-index: 100;
+}
+
+.popover-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.logout-btn {
+    color: #ef4444;
+}
+
+.logout-btn:hover {
+    background-color: #fef2f2;
+}
+
+@keyframes fadeInPopover {
+    from {
+        opacity: 0;
+        transform: translate(-10px, -50%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(0, -50%);
+    }
 }
 
 .avatar-img {
