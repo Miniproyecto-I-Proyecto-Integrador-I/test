@@ -16,38 +16,42 @@ const NavBar = () => {
 
       {/* Enlaces con estilo píldora */}
       <div className="nav-links">
-        <NavLink
-          to="/today"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Hoy
-        </NavLink>
-        <NavLink
-          to="/progress"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Progreso
-        </NavLink>
-        <NavLink
-          to="/create"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Crear
-        </NavLink>
-        <NavLink
-          to="/activity/1"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Actividad
-        </NavLink>
+        {isAuthenticated && (
+          <>
+            <NavLink
+              to="/today"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Hoy
+            </NavLink>
+            <NavLink
+              to="/progress"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Progreso
+            </NavLink>
+            <NavLink
+              to="/create"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Crear
+            </NavLink>
+            <NavLink
+              to="/activity/1"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Actividad
+            </NavLink>
+          </>
+        )}
         <div className="nav-auth-section">
           {!isAuthenticated ? (
             <>

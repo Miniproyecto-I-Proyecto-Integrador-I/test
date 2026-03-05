@@ -74,3 +74,5 @@ Verifica si un *access token* aún es válido (no ha expirado y no ha sido alter
     "code": "token_not_valid"
   }
   ```
+
+---

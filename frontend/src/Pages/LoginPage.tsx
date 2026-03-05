@@ -4,9 +4,6 @@ import { useLogin } from '../Feature/ManageLogin/Hooks/useLogin';
 import { Eye, EyeOff, Lock, AlertCircle, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
 import './LoginPage.css';
 
-// Usar el logo importado
-import LogoStaskM from '../assets/Logo StaskM.png';
-
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
