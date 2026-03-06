@@ -15,12 +15,14 @@ interface CreateTaskModalProps {
   onClose: () => void;
   onSubmit: (payload: TaskPayload) => Promise<Task>;
   onAddSubtasks: (task: Task) => void;
+  inline?: boolean;
 }
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   onSubmit,
   onAddSubtasks,
+  inline = false,
 }) => {
   const navigate = useNavigate();
   const [formStatus, setFormStatus] = useState<'idle' | 'success'>('idle');
@@ -88,12 +90,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
   const errorCount = Object.keys(errors).filter((k) => k !== 'general').length;
 
-  return (
-    <div className="modal-overlay" onClick={handleCloseTaskModal}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        {formStatus === 'idle' && (
-          <>
-            <div className="modal-header">
+  const content = (
+    <>
+      <div 
+        className={inline ? "modal-card inline-form-card" : "modal-card"} 
+        onClick={!inline ? (e) => e.stopPropagation() : undefined}
+      >
+        <div className="modal-header">
               <h2>Crear Nueva Tarea</h2>
               <p>Organiza tus objetivos académicos con facilidad.</p>
             </div>
@@ -209,29 +212,43 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               </div>
 
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={handleCloseTaskModal}
-                >
-                  Cancelar
-                </button>
+                {!inline && (
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={handleCloseTaskModal}
+                  >
+                    Cancelar
+                  </button>
+                )}
                 <button type="submit" className="btn-primary">
                   Crear Tarea Principal
                 </button>
               </div>
             </form>
-          </>
-        )}
-
-        {formStatus === 'success' && createdTask && (
-          <SuccessTaskModal
-            task={createdTask}
-            onNavigateToPanel={() => navigate('/create')}
-            onAddSubtasks={() => onAddSubtasks(createdTask)}
-          />
-        )}
       </div>
+
+      {formStatus === 'success' && createdTask && (
+        <div className="modal-overlay" style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(248, 250, 252, 0.7)', zIndex: 1100 }}>
+          <div className="modal-card" style={{ boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)' }}>
+            <SuccessTaskModal
+              task={createdTask}
+              onNavigateToPanel={() => navigate('/create')}
+              onAddSubtasks={() => onAddSubtasks(createdTask)}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  if (inline) {
+    return content;
+  }
+
+  return (
+    <div className="modal-overlay" onClick={handleCloseTaskModal}>
+      {content}
     </div>
   );
 };

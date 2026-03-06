@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import './NavBar.css';
 import Logo from '../../assets/Logo StaskM.png';
@@ -6,6 +7,20 @@ import { useAuth } from '../../Context/AuthContext';
 
 const NavBar = () => {
   const { isAuthenticated, logout } = useAuth();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="floating-navbar">
@@ -16,40 +31,44 @@ const NavBar = () => {
 
       {/* Enlaces con estilo píldora */}
       <div className="nav-links">
-        <NavLink
-          to="/today"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Hoy
-        </NavLink>
-        <NavLink
-          to="/progress"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Progreso
-        </NavLink>
-        <NavLink
-          to="/create"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Crear
-        </NavLink>
-        <NavLink
-          to="/activity/1"
-          className={({ isActive }) =>
-            `nav-item${isActive ? ' is-active' : ''}`
-          }
-        >
-          Actividad
-        </NavLink>
+        {isAuthenticated && (
+          <>
+            <NavLink
+              to="/today"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Hoy
+            </NavLink>
+            <NavLink
+              to="/progress"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Progreso
+            </NavLink>
+            <NavLink
+              to="/create"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Crear
+            </NavLink>
+            <NavLink
+              to="/activity/1"
+              className={({ isActive }) =>
+                `nav-item${isActive ? ' is-active' : ''}`
+              }
+            >
+              Actividad
+            </NavLink>
+          </>
+        )}
         <div className="nav-auth-section">
-          {!isAuthenticated ? (
+          {!isAuthenticated && (
             <>
               <NavLink
                 to="/login"
@@ -65,24 +84,40 @@ const NavBar = () => {
                   `nav-item${isActive ? ' is-active' : ''}`
                 }
               >
-                Sign in
+                Sign up
               </NavLink>
             </>
-          ) : (
-            <button
-              type="button"
-              className="nav-item nav-item-button"
-              onClick={logout}
-            >
-              Log out
-            </button>
           )}
         </div>
       </div>
 
       {/* Perfil en la parte inferior */}
-      <div className="nav-footer">
-        <User color="#4B5563"></User>
+      <div className="nav-footer" ref={menuRef}>
+        <div 
+          className={`profile-icon-wrapper ${isAuthenticated ? 'clickable' : ''}`}
+          onClick={() => {
+            if (isAuthenticated) {
+              setIsProfileMenuOpen(!isProfileMenuOpen);
+            }
+          }}
+        >
+          <User color={isAuthenticated ? "#10B981" : "#4B5563"} />
+
+          {isAuthenticated && isProfileMenuOpen && (
+            <div className="profile-popover" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="popover-btn logout-btn"
+                onClick={() => {
+                  setIsProfileMenuOpen(false);
+                  logout();
+                }}
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

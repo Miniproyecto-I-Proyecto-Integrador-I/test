@@ -1,4 +1,5 @@
 import React from 'react';
+import { X, CheckCircle2, Circle } from 'lucide-react';
 import type { Task } from '../Types/taskTypes';
 
 interface TaskDetailsModalProps {
@@ -34,7 +35,15 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 }) => {
 	return (
 		<div className="modal-overlay" onClick={onClose}>
-			<div className="modal-card" onClick={(e) => e.stopPropagation()}>
+			<div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+				<button 
+					type="button" 
+					className="btn-close-corner" 
+					onClick={onClose} 
+					aria-label="Cerrar detalles"
+				>
+					<X size={20} />
+				</button>
 				<div className="modal-header">
 					<h2>{task.title}</h2>
 					<span className={`status-badge ${task.status}`}>
@@ -68,10 +77,32 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 					)}
 				</div>
 
+				{task.subtasks && task.subtasks.length > 0 && (
+					<div style={{ marginTop: '32px', borderTop: '1px solid var(--border-color)', paddingTop: '20px' }}>
+						<h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+							Actividades
+						</h3>
+						<ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+							{task.subtasks.map((st) => (
+								<li key={st.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+									{st.is_completed ? (
+										<CheckCircle2 size={18} color="var(--success-color)" />
+									) : (
+										<Circle size={18} color="var(--text-tertiary)" />
+									)}
+									<span style={{ textDecoration: st.is_completed ? 'line-through' : 'none', flex: 1 }}>
+										{st.description}
+									</span>
+									<span style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>
+										{st.needed_hours}h
+									</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+
 				<div className="modal-footer">
-					<button className="btn-secondary" onClick={onClose}>
-						Cerrar
-					</button>
 					<button className="btn-primary" onClick={onOpenEditSubtasks}>
 						+ Editar Tarea
 					</button>

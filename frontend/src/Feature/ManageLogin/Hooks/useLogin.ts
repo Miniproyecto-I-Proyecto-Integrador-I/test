@@ -9,12 +9,12 @@ export const useLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     setError('');
     setLoading(true);
 
     try {
-      const tokens = await loginUser({ username, password });
+      const tokens = await loginUser({ email, password });
       await loginToContext(tokens.access, tokens.refresh);
       navigate('/today');
     } catch (err) {
