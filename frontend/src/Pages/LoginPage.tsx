@@ -1,11 +1,19 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useLogin } from '../Feature/ManageLogin/Hooks/useLogin';
-import { Eye, EyeOff, Lock, AlertCircle, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  AlertCircle,
+  RefreshCw,
+  ShieldCheck,
+  AlertTriangle,
+} from 'lucide-react';
 import './LoginPage.css';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
@@ -17,13 +25,13 @@ const LoginPage = () => {
     setFormError('');
 
     // Validacion básica
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       setFormError('Por favor completa todos los campos.');
       return;
     }
 
     // El hook useLogin deberia manejar el loading y error en el catch
-    await login(username, password);
+    await login(email, password);
   };
 
   const hasError = !!error || !!formError;
@@ -39,7 +47,11 @@ const LoginPage = () => {
           {hasError && !loading && (
             <div className="login-error-banner">
               <AlertCircle size={18} />
-              <span>{errorMessage === 'Invalid credentials or server error' ? 'Credenciales incorrectas. Por favor, inténtalo de nuevo.' : errorMessage}</span>
+              <span>
+                {errorMessage === 'Invalid credentials or server error'
+                  ? 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
+                  : errorMessage}
+              </span>
             </div>
           )}
 
@@ -47,21 +59,25 @@ const LoginPage = () => {
             <>
               <div className="login-card-content">
                 <h1 className="login-title">Iniciar sesión</h1>
-                <p className="login-subtitle">Ingresa tus datos para acceder a tu cuenta.</p>
+                <p className="login-subtitle">
+                  Ingresa tus datos para acceder a tu cuenta.
+                </p>
 
                 <form onSubmit={handleSubmit} noValidate>
                   <div className="login-form-group">
                     <div className="login-label-row">
-                      <label className="login-label" htmlFor="username">Correo electrónico</label>
+                      <label className="login-label" htmlFor="email">
+                        Correo electrónico
+                      </label>
                     </div>
                     <div className="login-input-container">
                       <input
-                        id="username"
+                        id="email"
                         type="email"
-                        name="username"
+                        name="email"
                         placeholder="nombre@empresa.com"
-                        value={username}
-                        onChange={(event) => setUsername(event.target.value)}
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                         disabled={loading}
                         className={`login-input ${hasError ? 'is-invalid' : ''}`}
                         required
@@ -76,8 +92,12 @@ const LoginPage = () => {
 
                   <div className="login-form-group">
                     <div className="login-label-row">
-                      <label className="login-label" htmlFor="password">Contraseña</label>
-                      <a href="#" className="login-forgot-link">¿Olvidaste tu contraseña?</a>
+                      <label className="login-label" htmlFor="password">
+                        Contraseña
+                      </label>
+                      <a href="#" className="login-forgot-link">
+                        ¿Olvidaste tu contraseña?
+                      </a>
                     </div>
                     <div className="login-input-container">
                       <input
@@ -95,12 +115,20 @@ const LoginPage = () => {
                         className="login-input-icon"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <button type="submit" disabled={loading} className="login-button">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="login-button"
+                  >
                     Entrar
                   </button>
                 </form>
@@ -115,7 +143,9 @@ const LoginPage = () => {
                 <Lock size={28} className="login-loading-icon" />
               </div>
               <h2 className="login-loading-title">Entrando a tu sesión</h2>
-              <p className="login-loading-subtitle">Por favor espera un momento</p>
+              <p className="login-loading-subtitle">
+                Por favor espera un momento
+              </p>
 
               <div className="login-loading-status">
                 <RefreshCw size={16} className="login-loading-status-icon" />

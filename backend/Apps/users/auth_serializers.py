@@ -22,6 +22,39 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(write_only=True, required=True)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Eliminar el campo username heredado
+        self.fields.pop('username', None)
+    
+    def validate(self, attrs):
+        # Obtener email y password del request
+        email = attrs.get('email')
+        password = attrs.get('password')
+        
+        # Buscar usuario por email
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('No existe una cuenta con este correo electrónico.')
+        
+        # Verificar la contraseña
+        if not user.check_password(password):
+            raise serializers.ValidationError('Contraseña incorrecta.')
+        
+        # Crear el token para el usuario autenticado
+        refresh = self.get_token(user)
+        
+        data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
+        
+        return data
+    
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
