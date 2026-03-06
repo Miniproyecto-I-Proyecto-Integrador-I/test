@@ -16,7 +16,7 @@
 
 .today-greeting {
     font-size: var(--font-size-h1);
-    font-weight: 800;
+    font-weight: 600;
     color: var(--text-main);
     margin: 0 0 8px 0;
     letter-spacing: -0.03em;
@@ -143,7 +143,7 @@
 
 .empty-state-title {
     font-size: var(--font-size-h2);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-main);
     margin: 0 0 12px 0;
     font-family: var(--font-family);
@@ -229,6 +229,10 @@
     margin: 0 0 16px 0;
     font-size: var(--font-size-h2);
     color: var(--text-main);
+}
+
+.modal-header {
+    margin-bottom: 0px;
 }
 
 .modal-tags {

@@ -138,7 +138,7 @@
 .task-card__title {
   font-family: var(--font-family);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 500;
   color: #1e293b;
   margin: 0 !important;
   line-height: 1.3;

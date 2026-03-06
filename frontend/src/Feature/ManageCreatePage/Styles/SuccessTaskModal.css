@@ -35,7 +35,7 @@
 
 .success-title-large {
     font-size: var(--font-size-h1);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-main);
     margin: 0 0 16px 0;
     font-family: var(--font-family);
