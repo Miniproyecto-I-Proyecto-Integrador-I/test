@@ -3,6 +3,7 @@ import { AlertCircle, CalendarCheck, CalendarClock, SearchX, CheckCircle2 } from
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
 import EmptyState from './EmptyState'
+import InfoTooltip from './InfoTooltip'
 import LoadingScreen from '../../../shared/Components/LoadingScreen';
 
 import '../Styles/CardTasks.css'
@@ -22,12 +23,14 @@ interface SectionHeaderProps {
   icon: React.ReactNode
   label: string
   count: number
+  tooltipInfo?: string
 }
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, label, count }) => (
+const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, label, count, tooltipInfo }) => (
   <div className="task-section__header">
     {icon}
     <span>{label} ({count})</span>
+    {tooltipInfo && <InfoTooltip content={tooltipInfo} />}
   </div>
 )
 
@@ -70,9 +73,10 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       <div className="grouped-cards">
         <section className="task-section task-section--completed">
           <SectionHeader
-            icon={<CheckCircle2 size={14} />}
+            icon={<CheckCircle2 size={18} />}
             label="Realizadas"
             count={allCompleted.length}
+            tooltipInfo="Todas tus tareas completadas."
           />
           {allCompleted.map(sub => (
             <CardTask
@@ -94,9 +98,10 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       {overdue.length > 0 && (
         <section className="task-section task-section--overdue">
           <SectionHeader
-            icon={<AlertCircle size={14} />}
+            icon={<AlertCircle size={18} />}
             label="Vencidas"
             count={overdue.length}
+            tooltipInfo="Organizadas desde la más antigua a la más reciente."
           />
           {overdue.map(sub => (
             <CardTask
@@ -113,9 +118,10 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       {today.length > 0 && (
         <section className="task-section task-section--today">
           <SectionHeader
-            icon={<CalendarCheck size={14} />}
+            icon={<CalendarCheck size={18} />}
             label="Para hoy"
             count={today.length}
+            tooltipInfo="Organizadas por el menor esfuerzo o tiempo requerido."
           />
           {today.map(sub => (
             <CardTask
@@ -132,9 +138,10 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       {upcoming.length > 0 && (
         <section className="task-section task-section--upcoming">
           <SectionHeader
-            icon={<CalendarClock size={14} />}
+            icon={<CalendarClock size={18} />}
             label="Próximas"
             count={upcoming.length}
+            tooltipInfo="Organizadas para que la más próxima esté primero."
           />
           {upcoming.map(sub => (
             <CardTask

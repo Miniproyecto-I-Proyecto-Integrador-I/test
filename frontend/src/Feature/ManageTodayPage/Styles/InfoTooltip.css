@@ -1,0 +1,65 @@
+@import '../../../shared/Styles/Variables.css';
+
+.info-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  color: inherit;
+  opacity: 0.55;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(1px); /* Optically center it with uppercase text font ascender */
+}
+
+.info-tooltip-wrapper:hover {
+  opacity: 1;
+}
+
+.info-tooltip-icon {
+  flex-shrink: 0;
+}
+
+.info-tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e293b;
+  color: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeInTooltip 0.2s ease forwards;
+  pointer-events: none;
+}
+
+.info-tooltip-arrow {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background-color: #1e293b;
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
