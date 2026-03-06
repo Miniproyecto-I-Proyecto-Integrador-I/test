@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Clock, Calendar } from 'lucide-react'
 import type { Subtask } from '../Types/models'
 import { buildBadgeLabel, type CardVariant } from '../Utils/BadgeLabels'
 import '../Styles/CardTasks.css'
@@ -30,7 +31,15 @@ const CardTask: React.FC<CardTaskProps> = ({ sub, variant, onClick }) => {
       className={`task-card${checked ? ' task-card--done' : ''}`}
       onClick={onClick}
     >
-      {/* Checkbox */}
+      <div className="task-card__body">
+        <p className="task-card__title">{sub.description}</p>
+        <p className="task-card__subject">{subject}</p>
+        <span className="task-card__badge">
+          {variant === 'upcoming' ? <Calendar size={13} /> : <Clock size={13} />}
+          {badgeLabel}
+        </span>
+      </div>
+
       <input
         type="checkbox"
         className="task-card__check"
@@ -39,15 +48,6 @@ const CardTask: React.FC<CardTaskProps> = ({ sub, variant, onClick }) => {
         onClick={e => e.stopPropagation()}
         aria-label={`Marcar "${sub.description}" como completada`}
       />
-
-      {/* Title + subject */}
-      <div className="task-card__body">
-        <p className="task-card__title">{sub.description}</p>
-        <p className="task-card__subject">{subject}</p>
-      </div>
-
-      {/* Right-side badge */}
-      <span className="task-card__badge">{badgeLabel}</span>
     </div>
   )
 }

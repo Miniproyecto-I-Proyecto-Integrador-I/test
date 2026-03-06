@@ -1,106 +1,79 @@
 import React from 'react'
+import { XCircle } from 'lucide-react'
+import '../Styles/SelectedFilter.css'
 
-interface SelectedFilter{
-    handleFilterChange:(key: string, value: string) => void
-    applyFilters: () => void
-    clearFilters: () => void
-    filters: Record<string, string>
+interface SelectedFilterProps {
+  handleFilterChange: (key: string, value: string) => void
+  clearFilters: () => void
+  filters: Record<string, string>
+  allCourses: string[]
 }
 
-const SelectedFilter: React.FC<SelectedFilter> = ({
-    handleFilterChange,
-    applyFilters,
-    clearFilters,
-    filters
+const SelectedFilter: React.FC<SelectedFilterProps> = ({
+  handleFilterChange,
+  clearFilters,
+  filters,
+  allCourses
 }) => {
+  const hasActiveFilters = Object.values(filters).some(val => val !== '')
+
   return (
-    <div
-        style={{
-          marginBottom: '20px',
-          display: 'none',
-          gap: '10px',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          
-        }}
-      >
-        <label>Después de:</label>
-        <input
-          type="date"
-          value={filters.planification_date_gte || ''}
-          onChange={(e) =>
-            handleFilterChange('planification_date_gte', e.target.value)
-          }
-        />
-        <label>Antes de:</label>
-        <input
-          type="date"
-          value={filters.planification_date_lte || ''}
-          onChange={(e) =>
-            handleFilterChange('planification_date_lte', e.target.value)
-          }
-        />
-        <select
-          value={filters.status || ''}
-          onChange={(e) => handleFilterChange('status', e.target.value)}
-        >
-          <option value="">Todos los estados</option>
-          <option value="pending">Pending</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
-        <input
-          type="number"
-          placeholder="ID Tarea"
-          value={filters.task || ''}
-          onChange={(e) => handleFilterChange('task', e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Título Tarea"
-          value={filters.task_title || ''}
-          onChange={(e) => handleFilterChange('task_title', e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Materia"
-          value={filters.subject || ''}
-          onChange={(e) => handleFilterChange('subject', e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Tipo"
-          value={filters.type || ''}
-          onChange={(e) => handleFilterChange('type', e.target.value)}
-        />
-        <select
-          value={filters.priority || ''}
-          onChange={(e) => handleFilterChange('priority', e.target.value)}
-        >
-          <option value="">Todas las prioridades</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-        <input
-          type="number"
-          placeholder="Horas min"
-          value={filters.needed_hours_min || ''}
-          onChange={(e) =>
-            handleFilterChange('needed_hours_min', e.target.value)
-          }
-        />
-        <input
-          type="number"
-          placeholder="Horas max"
-          value={filters.needed_hours_max || ''}
-          onChange={(e) =>
-            handleFilterChange('needed_hours_max', e.target.value)
-          }
-        />
-        <button onClick={applyFilters}>Filtrar</button>
-        <button onClick={clearFilters}>Limpiar</button>
+    <div className="filter-divider-container">
+      <div className="selected-filter-wrapper">
+        <div className="filter-group">
+          <label className="filter-label">Filtrar por Curso</label>
+          <select
+            className="filter-select"
+            value={filters.subject || ''}
+            onChange={(e) => handleFilterChange('subject', e.target.value)}
+          >
+            <option value="">Todos los cursos</option>
+            {allCourses.map((course, idx) => (
+              <option key={idx} value={course}>
+                {course}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label className="filter-label">Filtrar por Estado</label>
+          <select
+            className="filter-select"
+            value={filters.status || ''}
+            onChange={(e) => handleFilterChange('status', e.target.value)}
+          >
+            <option value="">Todos los estados</option>
+            <option value="pending">Pendiente</option>
+            <option value="in_progress">En progreso</option>
+            <option value="postponed">Pospuesto</option>
+            <option value="completed">Completado</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label className="filter-label">Filtrar por Tipo</label>
+          <select
+            className="filter-select"
+            value={filters.type || ''}
+            onChange={(e) => handleFilterChange('type', e.target.value)}
+          >
+            <option value="">Todos los tipos</option>
+            <option value="ensayo">Ensayo</option>
+            <option value="examen">Examen</option>
+            <option value="proyecto">Proyecto</option>
+            <option value="tarea">Tarea</option>
+            <option value="lectura">Lectura</option>
+          </select>
+        </div>
+
+        {hasActiveFilters && (
+          <button className="filter-clear-btn" onClick={clearFilters}>
+            <XCircle size={18} /> Limpiar filtros
+          </button>
+        )}
       </div>
+    </div>
   )
 }
 

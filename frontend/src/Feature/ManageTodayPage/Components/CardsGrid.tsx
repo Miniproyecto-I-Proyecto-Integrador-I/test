@@ -1,5 +1,5 @@
 import React from 'react'
-import { AlertCircle, CalendarCheck, CalendarClock } from 'lucide-react'
+import { AlertCircle, CalendarCheck, CalendarClock, SearchX, CheckCircle2 } from 'lucide-react'
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
 import EmptyState from './EmptyState'
@@ -13,6 +13,7 @@ interface CardsGridProps {
   today: Subtask[]
   upcoming: Subtask[]
   loading: boolean
+  filters?: Record<string, string>
 }
 
 /* ── Section header ─────────────────────────────────────── */
@@ -36,17 +37,54 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   setSelectedSubtask, 
   overdue, 
   today, 
-  upcoming, 
-  loading 
+  upcoming,
+  loading,
+  filters 
 }) => {
   if (loading) {
     return <LoadingScreen message="Cargando tus actividades del día..." />;
   }
 
   const isEmpty = overdue.length === 0 && today.length === 0 && upcoming.length === 0
+  const isFiltered = filters && Object.values(filters).some(val => val !== '')
+  const isCompletedFilter = filters?.status === 'completed'
 
   if (isEmpty) {
+    if (isFiltered) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 20px', color: '#94a3b8', textAlign: 'center' }}>
+          <SearchX size={48} strokeWidth={1} style={{ marginBottom: '16px', opacity: 0.6 }} />
+          <p style={{ fontFamily: 'var(--font-family)', fontSize: '15px', maxWidth: '300px' }}>
+            No se encontraron tareas con las características de los filtros aplicados.
+          </p>
+        </div>
+      )
+    }
     return <EmptyState />
+  }
+
+  // Combined render for completed items
+  if (isCompletedFilter) {
+    const allCompleted = [...overdue, ...today, ...upcoming];
+    return (
+      <div className="grouped-cards">
+        <section className="task-section task-section--completed">
+          <SectionHeader
+            icon={<CheckCircle2 size={14} />}
+            label="Realizadas"
+            count={allCompleted.length}
+          />
+          {allCompleted.map(sub => (
+            <CardTask
+              key={sub.id}
+              sub={sub}
+              variant="today" // Use today variant for standard visualization of completed items (since it shows duration)
+              onClick={() => setSelectedSubtask(sub)}
+            />
+          ))}
+        </section>
+      </div>
+    )
   }
 
   return (

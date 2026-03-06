@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../Context/AuthContext';
 import type { Subtask } from '../Feature/ManageTodayPage/Types/models';
@@ -11,6 +12,7 @@ import { useGroupedSubtasks } from '../Feature/ManageTodayPage/Hooks/useGroupedS
 import StatusCardGrid from '@/Feature/ManageTodayPage/Components/StatusCardGrid';
 
 const TodayPage: React.FC = () => {
+  const navigate = useNavigate();
   /** Which subtask is open in the detail panel */
   const [selectedSubtask, setSelectedSubtask] = useState<Subtask | null>(null);
 
@@ -18,7 +20,11 @@ const TodayPage: React.FC = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const { user } = useAuth();
-  const { overdue, today, upcoming, loading } = useGroupedSubtasks(filters);
+  const { 
+    overdue, today, upcoming, 
+    rawOverdue, rawToday, rawUpcoming, 
+    loading, allCourses 
+  } = useGroupedSubtasks(filters);
 
   /* ── Filter handlers ──────────────────────────────────── */
 
@@ -41,27 +47,36 @@ const TodayPage: React.FC = () => {
   return (
     <div className="today-page">
       <header className="today-header">
-        <h1 className="today-greeting">Hola, {user?.username}!</h1>
-        <div className="today-subtitle">
-          <span className="today-subtitle-title">Mi día</span>
-          <span className="today-subtitle-separator">•</span>
-          <span className="today-date">
-            {fecha.charAt(0).toUpperCase() + fecha.slice(1)}
-          </span>
+        <div>
+          <h1 className="today-greeting">Hola, {user?.username}!</h1>
+          <div className="today-subtitle">
+            <span className="today-subtitle-title">Mi día</span>
+            <span className="today-subtitle-separator">•</span>
+            <span className="today-date">
+              {fecha.charAt(0).toUpperCase() + fecha.slice(1)}
+            </span>
+          </div>
         </div>
+        <button 
+          className="btn-primary"
+          style={{ padding: '8px 16px', fontSize: '14px', borderRadius: '8px' }}
+          onClick={() => navigate('/create/formulario')}
+        >
+          + Nueva Tarea
+        </button>
       </header>
 
       <StatusCardGrid 
-        defeatedSubTask={overdue[0]} 
-        todaySubTask={today[0]} 
-        nextSubTask={upcoming[0]} 
+        defeatedSubTask={rawOverdue[0]} 
+        todaySubTask={rawToday[0]} 
+        nextSubTask={rawUpcoming[0]} 
       />
 
       <SelectedFilter
         handleFilterChange={handleFilterChange}
-        applyFilters={() => {/* filters already reactive via state */}}
         clearFilters={clearFilters}
         filters={filters}
+        allCourses={allCourses}
       />
 
       <CardsGrid
@@ -70,6 +85,7 @@ const TodayPage: React.FC = () => {
         today={today}
         upcoming={upcoming}
         loading={loading}
+        filters={filters}
       />
 
       {selectedSubtask && (
