@@ -105,6 +105,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    # AGREGAMOS ESTA LÍNEA (Asegúrate de que la ruta coincida con tu carpeta Apps)
+    'EXCEPTION_HANDLER': 'Apps.utils.custom_exception_handler',
 }
 
 SIMPLE_JWT = {
