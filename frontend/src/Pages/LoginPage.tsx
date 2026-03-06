@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useLogin } from '../Feature/ManageLogin/Hooks/useLogin';
 import { Eye, EyeOff, Lock, AlertCircle, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
-import './LoginPage.css';
+import '../Feature/ManageLogin/Styles/LoginPage.css';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -46,6 +47,11 @@ const LoginPage = () => {
           {!loading ? (
             <>
               <div className="login-card-content">
+                <div className="auth-tabs-container">
+                  <NavLink to="/login" className={({isActive}) => `auth-tab ${isActive ? 'active' : ''}`}>Iniciar sesión</NavLink>
+                  <NavLink to="/register" className={({isActive}) => `auth-tab ${isActive ? 'active' : ''}`}>Registrarse</NavLink>
+                </div>
+
                 <h1 className="login-title">Iniciar sesión</h1>
                 <p className="login-subtitle">Ingresa tus datos para acceder a tu cuenta.</p>
 
@@ -104,9 +110,6 @@ const LoginPage = () => {
                     Entrar
                   </button>
                 </form>
-              </div>
-              <div className="login-footer">
-                ¿No tienes una cuenta? <a href="#">Regístrate gratis</a>
               </div>
             </>
           ) : (

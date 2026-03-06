@@ -1,0 +1,134 @@
+@import '../../../shared/Styles/Variables.css';
+
+.register-card {
+  margin: 6vh auto;
+  background-color: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+}
+
+.register-title {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.register-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 32px 0;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.natural-language-form {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.nl-paragraph {
+  font-size: 1.125rem;
+  line-height: 2.2;
+  color: var(--text-dark);
+  margin: 0;
+  font-weight: 500;
+}
+
+.nl-input {
+  border: none;
+  border-bottom: 2px dashed var(--border-color);
+  background: transparent;
+  font-size: 1.125rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  padding: 0 4px;
+  margin: 0 6px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.nl-input:focus {
+  border-bottom-color: var(--primary-color);
+  border-bottom-style: solid;
+}
+
+.nl-input::placeholder {
+  color: #D1D5DB;
+  font-weight: 400;
+}
+
+.nl-input.has-error {
+  border-bottom-color: var(--error-color);
+  color: var(--error-color);
+}
+
+.nl-input-name { width: 165px; }
+.nl-input-email { width: 220px; }
+.nl-input-password { width: 140px; padding-right: 32px; }
+
+.nl-password-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nl-eye-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nl-eye-btn:hover {
+  color: var(--text-secondary);
+}
+
+.register-errors-summary {
+  background-color: var(--error-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.register-error-text {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.register-submit-btn {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-base);
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 8px;
+  font-family: var(--font-family);
+}
+
+.register-submit-btn:hover {
+  background-color: var(--primary-hover);
+}
