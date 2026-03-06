@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import LoadingScreen from '../shared/Components/LoadingScreen';
 import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
 import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
 import SubtaskEdit from '../Feature/ManageCreatePage/Components/SubtaskEdit';
@@ -15,6 +17,7 @@ import type { Task } from '../Feature/ManageCreatePage/Types/taskTypes';
 import TaskGrid from '../Feature/ManageCreatePage/Components/TaskGrid';
 import CreateTaskModal from '../Feature/ManageCreatePage/Components/CreateTaskModal';
 import TaskDetailsModal from '../Feature/ManageCreatePage/Components/TaskDetailsModal';
+import BackButton from '../Feature/ManageCreatePage/Components/BackButton';
 import { useTasks } from '../Feature/ManageCreatePage/Hooks/useTasks';
 import { useNotification } from '../Feature/ManageCreatePage/Hooks/useNotification';
 
@@ -22,11 +25,9 @@ const CreatePage = () => {
   const { tasks, isLoading, addTask, removeTask } = useTasks();
   const { notification, showNotification } = useNotification();
 
+  const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
-  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false);
-  const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
-  const [isEditSubtaskModalOpen, setIsEditSubtaskModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const handleFinalizeSubtasks = async (subtasksData: any[]) => {
     if (!selectedTask) return;
@@ -34,8 +35,8 @@ const CreatePage = () => {
     try {
       await createMultipleSubtasks(selectedTask.id, subtasksData);
 
-      setIsSubtaskModalOpen(false);
       setSelectedTask(null);
+      navigate('/create');
 
       showNotification(
         '¡Listo! Las actividades se han añadido a tu tarea exitosamente.',
@@ -57,7 +58,7 @@ const CreatePage = () => {
     try {
       const response = await apiClient.get(`/api/task/${selectedTask.id}/`);
       setSelectedTask(response.data);
-      setIsEditSubtaskModalOpen(true);
+      navigate('/create/edicion');
     } catch (error) {
       console.error('Error al cargar tarea para edición:', error);
       showNotification('No se pudo abrir la edición de subtareas.', 'error');
@@ -79,8 +80,8 @@ const CreatePage = () => {
       });
 
       await Promise.all(updatePromises);
-      setIsEditSubtaskModalOpen(false);
       setSelectedTask(null);
+      navigate('/create');
       showNotification('Subtareas actualizadas correctamente.', 'success');
     } catch (error) {
       console.error('Error al actualizar subtareas:', error);
@@ -104,8 +105,8 @@ const CreatePage = () => {
     if (!selectedTask) return;
 
     removeTask(selectedTask.id);
-    setIsEditSubtaskModalOpen(false);
     setSelectedTask(null);
+    navigate('/create');
     showNotification('Tarea eliminada correctamente.', 'success');
   };
 
@@ -146,64 +147,7 @@ const CreatePage = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="empty-state">
-        <div className="empty-content">
-          <p className="empty-text">Cargando tus tareas...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isSubtaskModalOpen && selectedTask) {
-    return (
-      <div className="create-page">
-        {notification && (
-          <div className={`custom-toast toast-${notification.type}`}>
-            {notification.message}
-          </div>
-        )}
-        <div className="subtask-fullscreen">
-          <SubtaskForm
-            taskTitle={selectedTask.title}
-            onFinalize={handleFinalizeSubtasks}
-            onBack={() => {
-              setIsSubtaskModalOpen(false);
-              setSelectedTask(null);
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (isEditSubtaskModalOpen && selectedTask) {
-    return (
-      <div className="create-page">
-        {notification && (
-          <div className={`custom-toast toast-${notification.type}`}>
-            {notification.message}
-          </div>
-        )}
-        <div className="subtask-fullscreen">
-          <SubtaskEdit
-            taskId={selectedTask.id}
-            initialSubtasks={selectedTask.subtasks ?? []}
-            taskTitle={selectedTask.title}
-            taskDueDate={selectedTask.due_date ?? undefined}
-            task={selectedTask}
-            onSaveChanges={handleSaveSubtasks}
-            onSaveTask={handleSaveTask}
-            onDeleteSubtask={handleDeleteEditedSubtask}
-            onTaskDeleted={handleTaskDeleted}
-            onClose={() => {
-              setIsEditSubtaskModalOpen(false);
-              setSelectedTask(null);
-            }}
-          />
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Preparando tu espacio de trabajo..." />;
   }
 
   return (
@@ -214,57 +158,106 @@ const CreatePage = () => {
         </div>
       )}
 
-      <header className="page-header">
-        <h1 className="page-title">Gestión de Tareas</h1>
-        {tasks.length > 0 && (
-          <button
-            className="btn-primary"
-            onClick={() => setIsCreateTaskModalOpen(true)}
-          >
-            + Crear nueva tarea
-          </button>
-        )}
-      </header>
+      <Routes>
+        <Route path="/" element={
+          <>
+            <header className="page-header">
+              <h1 className="page-title">Gestión de Tareas</h1>
+              {tasks.length > 0 && (
+                <button
+                  className="btn-primary"
+                  onClick={() => navigate('/create/formulario')}
+                >
+                  + Crear nueva tarea
+                </button>
+              )}
+            </header>
 
-      {tasks.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-content">
-            <p className="empty-text">No tienes tareas pendientes para hoy</p>
-            <button
-              className="btn-primary"
-              onClick={() => setIsCreateTaskModalOpen(true)}
-            >
-              Crear tarea
-            </button>
+            {tasks.length === 0 ? (
+              <Navigate to="/create/formulario" replace />
+            ) : (
+              <TaskGrid tasks={tasks} onTaskClick={(t) => {
+                setSelectedTask(t);
+                setIsDetailsModalOpen(true);
+              }} />
+            )}
+
+            {selectedTask && isDetailsModalOpen && (
+              <TaskDetailsModal
+                task={selectedTask}
+                onClose={() => {
+                  setSelectedTask(null);
+                  setIsDetailsModalOpen(false);
+                }}
+                onOpenEditSubtasks={() => {
+                  setIsDetailsModalOpen(false);
+                  handleOpenEditSubtasks();
+                }}
+                onOpenAddSubtasks={() => {
+                  setIsDetailsModalOpen(false);
+                  navigate('/create/formulario/subtarea');
+                }}
+              />
+            )}
+          </>
+        } />
+
+        <Route path="formulario" element={
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {tasks.length > 0 && <BackButton to="/create" />}
+            <CreateTaskModal
+              inline={true}
+              onClose={() => navigate('/create')}
+              onSubmit={async (payload) => {
+                return await addTask(payload);
+              }}
+              onAddSubtasks={(task) => {
+                setSelectedTask(task);
+                navigate('/create/formulario/subtarea');
+              }}
+            />
           </div>
-        </div>
-      ) : (
-        <TaskGrid tasks={tasks} onTaskClick={setSelectedTask} />
-      )}
+        } />
 
-      {isCreateTaskModalOpen && (
-        <CreateTaskModal
-          onClose={() => setIsCreateTaskModalOpen(false)}
-          onSubmit={addTask}
-          onAddSubtasks={(task) => {
-            setIsCreateTaskModalOpen(false);
-            setSelectedTask(task);
-            setIsSubtaskModalOpen(true);
-          }}
-        />
-      )}
+        <Route path="formulario/subtarea" element={
+          <div className="subtask-fullscreen">
+            <BackButton onClick={() => { setSelectedTask(null); navigate('/create'); }} />
+            {selectedTask ? (
+              <SubtaskForm
+                taskTitle={selectedTask.title}
+                onFinalize={handleFinalizeSubtasks}
+              />
+            ) : (
+              <div className="empty-state"><p>No has seleccionado una tarea. Vuelve a inicio.</p></div>
+            )}
+          </div>
+        } />
 
-      {selectedTask &&
-        !isSubtaskModalOpen &&
-        !isEditSubtaskModalOpen &&
-        !isCreateTaskModalOpen && (
-          <TaskDetailsModal
-            task={selectedTask}
-            onClose={() => setSelectedTask(null)}
-            onOpenEditSubtasks={handleOpenEditSubtasks}
-            onOpenAddSubtasks={() => setIsSubtaskModalOpen(true)}
-          />
-        )}
+        <Route path="edicion" element={
+          <div className="subtask-fullscreen">
+            <BackButton onClick={() => { setSelectedTask(null); navigate('/create'); }} />
+            {selectedTask ? (
+              <SubtaskEdit
+                taskId={selectedTask.id}
+                initialSubtasks={selectedTask.subtasks ?? []}
+                taskTitle={selectedTask.title}
+                taskDueDate={selectedTask.due_date ?? undefined}
+                task={selectedTask}
+                onSaveChanges={handleSaveSubtasks}
+                onSaveTask={handleSaveTask}
+                onDeleteSubtask={handleDeleteEditedSubtask}
+                onTaskDeleted={handleTaskDeleted}
+                onClose={() => {
+                  setSelectedTask(null);
+                  navigate('/create');
+                }}
+              />
+            ) : (
+              <div className="empty-state"><p>No has seleccionado una tarea. Vuelve a inicio.</p></div>
+            )}
+          </div>
+        } />
+      </Routes>
     </div>
   );
 };

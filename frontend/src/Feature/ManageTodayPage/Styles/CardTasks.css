@@ -1,0 +1,212 @@
+@import '../../../shared/Styles/Variables.css';
+
+/* =============================================
+   GROUPED CARDS WRAPPER
+   ============================================= */
+
+.grouped-cards {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+/* =============================================
+   SECTION (Vencidas / Para hoy / Próximas)
+   ============================================= */
+
+.task-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.task-section__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.task-section__header svg {
+  flex-shrink: 0;
+}
+
+/* Variant colours — section headers */
+.task-section--overdue  .task-section__header { color: var(--error-color); }
+.task-section--today    .task-section__header { color: var(--primary-color); }
+.task-section--upcoming .task-section__header { color: #3B82F6; }
+
+/* =============================================
+   CARD ROW
+   ============================================= */
+
+.task-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px;
+  background-color: var(--surface);
+  
+  /* default border — overridden per variant below */
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  text-align: left !important;
+}
+
+.task-card:last-child {
+  margin-bottom: 0px;
+}
+
+.task-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+/* Left-border colour per section variant - completely flat style */
+
+
+/* =============================================
+   CHECKBOX
+   ============================================= */
+
+.task-card__check {
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-secondary);
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  margin: 0 !important;
+}
+
+.task-card__check:hover {
+  border-color: var(--primary-color);
+}
+
+.task-card__check:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.task-card__check:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  width: 6px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+/* =============================================
+   TEXT BLOCK
+   ============================================= */
+
+.task-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start !important;
+  gap: 4px;
+}
+
+.task-card__title {
+  font-family: var(--font-family);
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 !important;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.task-card--done .task-card__title {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.task-card__subject {
+  font-family: var(--font-family);
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* =============================================
+   BADGE (right side)
+   ============================================= */
+
+.task-card__badge {
+  flex-shrink: 0;
+  font-family: var(--font-family);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px; /* Push below subject */
+}
+
+/* Overdue badge — red text */
+.task-section--overdue .task-card__badge {
+  color: #ef4444; /* red-500 */
+}
+
+/* Today badge — green text */
+.task-section--today .task-card__badge {
+  color: #10b981; /* emerald-500 */
+}
+
+/* Upcoming badge — blue text */
+.task-section--upcoming .task-card__badge {
+  color: #3b82f6; /* blue-500 */
+}
+
+/* =============================================
+   EMPTY SECTION
+   ============================================= */
+
+.task-section--empty-msg {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  color: var(--text-tertiary);
+  padding: 12px 4px;
+}
+
+@media (max-width: 768px) {
+  .grouped-cards {
+    flex-direction: column;
+  }
+}

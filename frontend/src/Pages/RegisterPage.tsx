@@ -1,9 +1,18 @@
-const RegisterPage = () => {
+import React from 'react';
+import RegisterForm from '../Feature/ManageRegister/Components/RegisterForm';
+import '../Feature/ManageLogin/Styles/LoginPage.css';
+import '../Feature/ManageRegister/Styles/RegisterPage.css';
+
+const RegisterPage: React.FC = () => {
   return (
-    <section className="page">
-      <h2>Sign in</h2>
-      <p>Esta pantalla es temporal mientras añadimos funcionalidad</p>
-    </section>
+    <div className="login-page-container">
+      <div className="login-bg-blob"></div>
+      <div className="login-bg-blob-top"></div>
+
+      <main className="login-main">
+        <RegisterForm />
+      </main>
+    </div>
   );
 };
 

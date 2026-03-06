@@ -33,7 +33,7 @@ const AppRoutes = () => {
               }
             />
             <Route
-              path="/create"
+              path="/create/*"
               element={
                 <ProtectedRoute>
                   <CreatePage />
@@ -48,9 +48,9 @@ const AppRoutes = () => {
                 </ProtectedRoute>
               }
             />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
           </Route>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </AuthProvider>

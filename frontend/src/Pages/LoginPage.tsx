@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { FormEvent } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useLogin } from '../Feature/ManageLogin/Hooks/useLogin';
 import {
   Eye,
@@ -10,7 +11,7 @@ import {
   ShieldCheck,
   AlertTriangle,
 } from 'lucide-react';
-import './LoginPage.css';
+import '../Feature/ManageLogin/Styles/LoginPage.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -20,13 +21,42 @@ const LoginPage = () => {
 
   const { login, loading, error } = useLogin();
 
+  // Refs para los inputs
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus en el campo de email al cargar
+  useEffect(() => {
+    emailRef.current?.focus();
+  }, []);
+
+  // Validar formato de email
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Manejar Enter en el campo de email
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && isValidEmail(email)) {
+      e.preventDefault();
+      passwordRef.current?.focus();
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError('');
 
-    // Validacion básica
+    // Validacion básica de campos vacíos
     if (!email.trim() || !password.trim()) {
       setFormError('Por favor completa todos los campos.');
+      return;
+    }
+
+    // Validación de formato de email
+    if (!isValidEmail(email)) {
+      setFormError('El formato del correo electrónico no es válido.');
       return;
     }
 
@@ -58,6 +88,25 @@ const LoginPage = () => {
           {!loading ? (
             <>
               <div className="login-card-content">
+                <div className="auth-tabs-container">
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) =>
+                      `auth-tab ${isActive ? 'active' : ''}`
+                    }
+                  >
+                    Iniciar sesión
+                  </NavLink>
+                  <NavLink
+                    to="/register"
+                    className={({ isActive }) =>
+                      `auth-tab ${isActive ? 'active' : ''}`
+                    }
+                  >
+                    Registrarse
+                  </NavLink>
+                </div>
+
                 <h1 className="login-title">Iniciar sesión</h1>
                 <p className="login-subtitle">
                   Ingresa tus datos para acceder a tu cuenta.
@@ -73,11 +122,13 @@ const LoginPage = () => {
                     <div className="login-input-container">
                       <input
                         id="email"
+                        ref={emailRef}
                         type="email"
                         name="email"
                         placeholder="nombre@empresa.com"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
+                        onKeyDown={handleEmailKeyDown}
                         disabled={loading}
                         className={`login-input ${hasError ? 'is-invalid' : ''}`}
                         required
@@ -102,6 +153,7 @@ const LoginPage = () => {
                     <div className="login-input-container">
                       <input
                         id="password"
+                        ref={passwordRef}
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         placeholder="••••••••"
@@ -132,9 +184,6 @@ const LoginPage = () => {
                     Entrar
                   </button>
                 </form>
-              </div>
-              <div className="login-footer">
-                ¿No tienes una cuenta? <a href="#">Regístrate gratis</a>
               </div>
             </>
           ) : (

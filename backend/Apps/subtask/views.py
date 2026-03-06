@@ -34,7 +34,4 @@ class SubtaskViewSet(viewsets.ModelViewSet):
     filterset_class = SubtaskFilter
 
     def get_queryset(self):
-        # Solo devuelve las subtareas del usuario autenticado
-        # Orden por fecha de planificación: primero las más antiguas (más vencidas)
-        # y al final las más futuras.
-        return Subtask.objects.filter(task__user=self.request.user).order_by('planification_date', 'created_at')
+        return Subtask.objects.select_related('task').filter(task__user=self.request.user).order_by('planification_date', 'created_at')
