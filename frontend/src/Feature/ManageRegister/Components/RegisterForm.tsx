@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Eye, EyeOff, AlertCircle, RefreshCw, UserPlus, ShieldCheck } from 'lucide-react';
 import { validateEmail, validatePassword, validateFullName } from '../Utils/validators';
+import { useRegister } from '../Hooks/useRegister';
 import '../Styles/RegisterPage.css';
 
 const RegisterForm: React.FC = () => {
-  const navigate = useNavigate();
-  
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { register, loading, error: apiError } = useRegister();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { [key: string]: string } = {};
 
@@ -28,27 +29,35 @@ const RegisterForm: React.FC = () => {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setFormErrors(newErrors);
       return;
     }
 
-    setErrors({});
+    setFormErrors({});
     
-    // Simulate API logic and navigation...
-    console.log('Registering...', { fullName, email, password });
-    navigate('/login');
+    await register({ username: fullName, email, password });
   };
+
+  const hasFormErrors = Object.keys(formErrors).length > 0;
 
   return (
     <div className="login-card">
-      <div className="login-card-content">
-        <div className="auth-tabs-container">
-          <NavLink to="/login" className={({isActive}) => `auth-tab ${isActive ? 'active' : ''}`}>Iniciar sesión</NavLink>
-          <NavLink to="/register" className={({isActive}) => `auth-tab ${isActive ? 'active' : ''}`}>Registrarse</NavLink>
+      {apiError && !loading && (
+        <div className="login-error-banner">
+          <AlertCircle size={18} />
+          <span>{apiError}</span>
         </div>
+      )}
 
-        <h1 className="register-title">Crear cuenta</h1>
-        <p className="register-subtitle">Únete a la mejor herramienta de estudio</p>
+      {!loading ? (
+        <div className="login-card-content">
+          <div className="auth-tabs-container">
+            <NavLink to="/login" className={({isActive}) => `auth-tab ${isActive ? 'active' : ''}`}>Iniciar sesión</NavLink>
+            <NavLink to="/register" className={({isActive}) => `auth-tab ${isActive ? 'active' : ''}`}>Registrarse</NavLink>
+          </div>
+
+          <h1 className="register-title">Crear cuenta</h1>
+          <p className="register-subtitle">Únete a la mejor herramienta de estudio</p>
 
         <form onSubmit={handleSubmit} noValidate className="register-form">
           <div className="natural-language-form">
@@ -57,29 +66,32 @@ const RegisterForm: React.FC = () => {
               <input
                 id="fullName"
                 type="text"
-                className={`nl-input nl-input-name ${errors.fullName ? 'has-error' : ''}`}
+                className={`nl-input nl-input-name ${formErrors.fullName ? 'has-error' : ''}`}
                 placeholder="Escribe tu nombre"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                disabled={loading}
               />
               . Quiero organizar mi vida usando el correo 
               <input
                 id="email"
                 type="email"
-                className={`nl-input nl-input-email ${errors.email ? 'has-error' : ''}`}
+                className={`nl-input nl-input-email ${formErrors.email ? 'has-error' : ''}`}
                 placeholder="correo@ejemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
               y protegeré mi cuenta con una contraseña 
               <span className="nl-password-wrapper">
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  className={`nl-input nl-input-password ${errors.password ? 'has-error' : ''}`}
+                  className={`nl-input nl-input-password ${formErrors.password ? 'has-error' : ''}`}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -94,19 +106,40 @@ const RegisterForm: React.FC = () => {
             </p>
           </div>
 
-          {(errors.fullName || errors.email || errors.password) && (
+          {hasFormErrors && (
             <div className="register-errors-summary">
-              {errors.fullName && <div className="register-error-text">• {errors.fullName}</div>}
-              {errors.email && <div className="register-error-text">• {errors.email}</div>}
-              {errors.password && <div className="register-error-text">• {errors.password}</div>}
+              {formErrors.fullName && <div className="register-error-text">• {formErrors.fullName}</div>}
+              {formErrors.email && <div className="register-error-text">• {formErrors.email}</div>}
+              {formErrors.password && <div className="register-error-text">• {formErrors.password}</div>}
             </div>
           )}
 
-          <button type="submit" className="register-submit-btn">
+          <button type="submit" disabled={loading} className="register-submit-btn">
             Registrarse
           </button>
         </form>
       </div>
+      ) : (
+        <div className="login-loading-container">
+          <div className="login-loading-icon-wrapper">
+            <UserPlus size={28} className="login-loading-icon" />
+          </div>
+          <h2 className="login-loading-title">Creando tu cuenta</h2>
+          <p className="login-loading-subtitle">Por favor espera un momento</p>
+
+          <div className="login-loading-status">
+            <RefreshCw size={16} className="login-loading-status-icon" />
+            <span>Configurando tu espacio de estudio...</span>
+          </div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="login-secure-footer">
+          <ShieldCheck size={14} />
+          <span>STASKM SECURE SIGNUP</span>
+        </div>
+      )}
     </div>
   );
 };
