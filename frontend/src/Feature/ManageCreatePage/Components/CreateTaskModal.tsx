@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Task, TaskPayload } from '../Types/taskTypes';
 import SuccessTaskModal from './SuccessTaskModal';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 
 const getTodayDateStr = () => {
   const today = new Date();
@@ -102,14 +103,30 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             </div>
 
             {errorCount > 0 && (
-              <div className="error-banner">
-                <span className="error-icon">ⓘ</span> Hay {errorCount} errores
-                en el formulario.
+              <div className="error-banner" style={{ margin: '24px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <span className="error-icon" style={{ display: 'flex', alignItems: 'center', marginTop: '2px' }}>
+                    <AlertCircle size={18} />
+                  </span>
+                  <div>
+                    <p style={{ margin: '0 0 4px 0', fontWeight: 500 }}>
+                      Hay {errorCount} {errorCount === 1 ? 'error' : 'errores'} en el formulario:
+                    </p>
+                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9em' }}>
+                      {Object.entries(errors).map(
+                        ([key, msg]) => key !== 'general' && <li key={key}>{msg}</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
             {errors.general && (
               <div className="error-banner">
-                <span className="error-icon">⚠</span> {errors.general}
+                <span className="error-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                  <AlertTriangle size={18} />
+                </span> 
+                {errors.general}
               </div>
             )}
 

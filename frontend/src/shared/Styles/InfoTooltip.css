@@ -1,4 +1,4 @@
-@import '../../../shared/Styles/Variables.css';
+@import './Variables.css';
 
 .info-tooltip-wrapper {
   position: relative;

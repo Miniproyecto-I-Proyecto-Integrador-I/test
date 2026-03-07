@@ -3,7 +3,7 @@ import { AlertCircle, CalendarCheck, CalendarClock, SearchX, CheckCircle2 } from
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
 import EmptyState from './EmptyState'
-import InfoTooltip from './InfoTooltip'
+import InfoTooltip from '../../../shared/Components/InfoTooltip'
 import LoadingScreen from '../../../shared/Components/LoadingScreen';
 
 import '../Styles/CardTasks.css'

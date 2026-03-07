@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useSubtaskForm } from '../Hooks/useSubtaskForm';
 import type { SubtaskItem } from '../Types/subtask.types';
 import '../Styles/SubtaskForm.css';
+import { getTaskById } from '../Services/taskService';
+import { ClipboardList, GripVertical, Calendar, Clock, Trash2 } from 'lucide-react';
+import InfoTooltip from '../../../shared/Components/InfoTooltip';
 
 const getTodayDateStr = () => {
   const today = new Date();
@@ -16,6 +19,7 @@ interface SubtaskFormProps {
   taskTitle?: string;
   initialSubtasks?: SubtaskItem[];
   onFinalize?: (subtasks: any[]) => Promise<void>;
+  taskId?: number;
 }
 
 const SubtaskForm: React.FC<SubtaskFormProps> = ({
@@ -23,6 +27,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
   taskTitle = 'Ensayo sobre la Revolucion Francesa',
   initialSubtasks = [],
   onFinalize,
+  taskId,
 }) => {
   const {
     subtasks,
@@ -38,6 +43,31 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [originalHours, setOriginalHours] = useState(0);
+  const [maxDate, setMaxDate] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchOriginalHours = async () => {
+      if (taskId) {
+        try {
+          const fetchedTask = await getTaskById(taskId);
+          if (fetchedTask.subtasks) {
+            const totalOriginal = fetchedTask.subtasks.reduce(
+              (sum: number, st: any) => sum + (Number(st.needed_hours) || 0),
+              0
+            );
+            setOriginalHours(totalOriginal);
+          }
+          if (fetchedTask.due_date) {
+            setMaxDate(fetchedTask.due_date.split('T')[0]);
+          }
+        } catch (error) {
+          console.error('Error fetching original task:', error);
+        }
+      }
+    };
+    fetchOriginalHours();
+  }, [taskId]);
 
   useEffect(() => {
     if (onSubtasksChange) {
@@ -46,6 +76,10 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
   }, [subtasks, onSubtasksChange]);
 
   const handleAddSubtask = () => {
+    if (maxDate && formData.planification_date > maxDate) {
+      alert(`La fecha del paso no puede superar la fecha límite de la tarea (${formatDate(maxDate)}).`);
+      return;
+    }
     addSubtask();
   };
 
@@ -110,21 +144,25 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
       <div className="task-summary-card">
         <div className="task-summary-left">
           <div className="task-summary-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
-              <path d="M14 3v5h5" />
-            </svg>
+            <ClipboardList size={24} />
           </div>
           <div>
             <span className="task-summary-label">Tarea principal</span>
             <span className="task-summary-title">{taskTitle}</span>
+            {maxDate && (
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', display: 'block', marginTop: '4px' }}>
+                Fecha de entrega: {formatDate(maxDate)}
+              </span>
+            )}
           </div>
         </div>
-        <div className="task-summary-right">
-          <span className="task-summary-label">Tiempo total</span>
-          <span className="task-summary-value">
-            {totalNeededHours.toFixed(1)} horas
-          </span>
+        <div className="task-summary-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+            <span className="task-summary-label">Tiempo total:</span>
+            <span className="task-summary-value">
+              {(totalNeededHours + originalHours).toFixed(1)} horas
+            </span>
+          </div>
         </div>
       </div>
 
@@ -157,13 +195,17 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
 
           <div className="subtask-form-row">
             <div className="subtask-form-field">
-              <label htmlFor="planification_date">
-                ¿Qué día planeas hacer esto?
+              <label htmlFor="planification_date" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexDirection: 'row' }}>
+                <span>¿Qué día planeas hacer esto?</span>
+                {maxDate && (
+                  <InfoTooltip content={`Limitado por la entrega de la tarea principal (${formatDate(maxDate)})`} />
+                )}
               </label>
               <input
                 id="planification_date"
                 type="date"
                 min={getTodayDateStr()}
+                max={maxDate}
                 className={`subtask-form-input ${errors.planification_date ? 'error' : ''}`}
                 value={formData.planification_date}
                 onChange={(e) =>
@@ -231,14 +273,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
                     onDragStart={handleDragStart(subtask.id)}
                     onDragEnd={handleDragEnd}
                   >
-                    <svg viewBox="0 0 16 16" aria-hidden="true">
-                      <circle cx="5" cy="4" r="1.2" />
-                      <circle cx="11" cy="4" r="1.2" />
-                      <circle cx="5" cy="8" r="1.2" />
-                      <circle cx="11" cy="8" r="1.2" />
-                      <circle cx="5" cy="12" r="1.2" />
-                      <circle cx="11" cy="12" r="1.2" />
-                    </svg>
+                    <GripVertical size={16} aria-hidden="true" />
                   </button>
                   <p className="subtask-form-item-description">
                     {subtask.description}
@@ -247,18 +282,11 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
                 <div className="subtask-form-item-right">
                   <div className="subtask-form-item-metadata">
                     <span className="subtask-form-item-date">
-                      <svg viewBox="0 0 20 20" aria-hidden="true">
-                        <rect x="3" y="5" width="14" height="12" rx="2" />
-                        <path d="M3 8h14" />
-                        <path d="M7 3v4M13 3v4" />
-                      </svg>
+                      <Calendar size={16} aria-hidden="true" />
                       {formatDate(subtask.planification_date)}
                     </span>
                     <span className="subtask-form-item-hours">
-                      <svg viewBox="0 0 20 20" aria-hidden="true">
-                        <circle cx="10" cy="10" r="7" />
-                        <path d="M10 6v4l3 2" />
-                      </svg>
+                      <Clock size={16} aria-hidden="true" />
                       {formatHours(subtask.needed_hours)}
                     </span>
                   </div>
@@ -268,12 +296,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
                     onClick={() => handleRemoveSubtask(subtask.id)}
                     aria-label="Eliminar subtarea"
                   >
-                    <svg viewBox="0 0 20 20" aria-hidden="true">
-                      <path d="M4 6h12" />
-                      <path d="M7 6v9M10 6v9M13 6v9" />
-                      <path d="M7 6l1-2h4l1 2" />
-                      <rect x="5" y="6" width="10" height="11" rx="1.5" />
-                    </svg>
+                    <Trash2 size={18} aria-hidden="true" />
                   </button>
                 </div>
               </div>
