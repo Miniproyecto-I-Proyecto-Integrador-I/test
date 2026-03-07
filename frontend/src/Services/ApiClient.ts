@@ -42,11 +42,33 @@ apiClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+// Función para esperar con delay exponencial
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 // Respuesta interceptor para manejar 401 y refrescar token
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config as AxiosRequestConfig & { _retryCount?: number };
+        const originalRequest = error.config as AxiosRequestConfig & { 
+            _retryCount?: number;
+            _networkRetryCount?: number;
+        };
+
+        // Si es error de red (sin respuesta), reintentar infinitamente
+        if (!error.response) {
+            originalRequest._networkRetryCount = (originalRequest._networkRetryCount || 0) + 1;
+            const retryNumber = originalRequest._networkRetryCount;
+            
+            // Delay exponencial: 1s, 2s, 4s, 8s, máximo 30s
+            const delay = Math.min(1000 * Math.pow(2, retryNumber - 1), 30000);
+            
+            console.warn(`Error de red: Backend no responde. Reintento ${retryNumber} en ${delay/1000}s...`);
+            
+            await sleep(delay);
+            
+            // Reintentar la misma request
+            return apiClient(originalRequest);
+        }
 
         // Si 401 y no hemos reintentado aún
         if (error.response?.status === 401 && !originalRequest._retryCount) {
