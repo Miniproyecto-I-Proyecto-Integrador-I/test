@@ -40,11 +40,23 @@ export const authService = {
         const { access, refresh } = response.data as LoginResponse;
         authStorage.setTokens(access, refresh);
         return response.data;
-      } catch (error) {
-        // Refresh falló, limpiar sesión
-        authStorage.clearTokens();
-        // Redirigir a login si es necesario
-        window.location.href = '/login';
+      } catch (error: any) {
+        // Diferenciar entre error de autenticación (401/403) y error de red
+        const status = error.response?.status;
+        
+        if (status === 401 || status === 403) {
+          // Token realmente inválido → Cerrar sesión
+          authStorage.clearTokens();
+          window.location.href = '/login';
+        } else if (!error.response) {
+          // Error de red (sin respuesta del servidor) → NO cerrar sesión
+          console.warn('Error de red al refrescar token. Manteniendo sesión...');
+        } else {
+          // Otro error del servidor → Cerrar sesión por seguridad
+          authStorage.clearTokens();
+          window.location.href = '/login';
+        }
+        
         return null;
       } finally {
         refreshPromise = null;
