@@ -22,9 +22,9 @@ export const useRegister = () => {
       // 3. Redirigir
       window.location.href = '/today';
     } catch (err: any) {
-      if (err.response?.data?.username) {
+      if (err.response?.data?.details?.username) {
           setError('Este nombre de usuario (o nombre completo) ya está en uso. Por favor, intenta usar otro.');
-      } else if (err.response?.data?.email) {
+      } else if (err.response?.data?.details?.email) {
           setError('Este correo electrónico ya está registrado. Por favor inicia sesión.');
       } else {
           setError('Ocurrió un error al intentar crear tu cuenta. Por favor, revisa tus datos e inténtalo de nuevo.');
