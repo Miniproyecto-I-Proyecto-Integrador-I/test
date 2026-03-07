@@ -71,7 +71,61 @@ Verifica si un *access token* aún es válido (no ha expirado y no ha sido alter
   ```json
   {
     "detail": "Token is invalid or expired",
-    "code": "token_not_valid"
+  }
+  ```
+
+---
+
+## Usuarios
+
+### 1. Registrarse como usuario
+
+Crea una nueva cuenta de usuario en el sistema.
+
+- **URL:** `/api/user/register/`
+- **Método:** `POST`
+- **Body Request:**
+  ```json
+  {
+    "username": "Tu Nombre Completo",
+    "email": "tu_correo@ejemplo.com",
+    "password": "Password123!"
+  }
+  ```
+- **Response (201 Created):**
+  Retorna los datos del usuario recién creado.
+  ```json
+  {
+    "id": 1,
+    "username": "Tu Nombre Completo",
+    "email": "tu_correo@ejemplo.com",
+    "daily_hours": 8,
+    "bio": ""
+  }
+  ```
+- **Response (400 Bad Request):**
+  Ocurre cuando hay errores de validación. La API retornará un objeto indicando el o los campos que fallaron, junto a un arreglo con los mensajes de error.
+  
+  Ejemplo de validación Regex fallida:
+  ```json
+  {
+    "email": [
+      "Formato de correo electrónico inválido."
+    ],
+    "password": [
+      "La contraseña debe contener al menos un número."
+    ]
+  }
+  ```
+  Ejemplo de campos duplicados:
+  ```json
+  {
+    "username": [
+      "A user with that username already exists."
+    ],
+    "email": [
+      "custom user with this email already exists."
+    ]
   }
   ```
 

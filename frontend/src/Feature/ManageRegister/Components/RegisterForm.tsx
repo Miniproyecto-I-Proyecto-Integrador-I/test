@@ -21,7 +21,7 @@ const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [formErrors, setFormErrors] = useState<{ [key: string]: React.ReactNode }>({});
 
   const { register, loading, error: apiError } = useRegister();
 
@@ -76,10 +76,21 @@ const RegisterForm: React.FC = () => {
         const { password, ...rest } = prev;
         return rest;
       });
-    } else if (value.length >= 6) {
+    } else if (value.length > 0) {
       setFormErrors((prev) => ({
         ...prev,
-        password: 'La contraseña debe tener al menos 8 caracteres.',
+        password: (
+          <span>
+            La contraseña debe cumplir los siguientes requisitos:
+            <ol style={{ margin: '4px 0 0 20px', padding: 0 }}>
+              <li>Al menos 8 caracteres</li>
+              <li>Una letra mayúscula</li>
+              <li>Una minúscula</li>
+              <li>Un número</li>
+              <li>Un carácter especial</li>
+            </ol>
+          </span>
+        ),
       }));
     }
   };
@@ -101,7 +112,7 @@ const RegisterForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newErrors: { [key: string]: string } = {};
+    const newErrors: { [key: string]: React.ReactNode } = {};
 
     if (!validateFullName(fullName)) {
       newErrors.fullName = 'El nombre completo debe tener mínimo 3 caracteres.';
@@ -109,8 +120,21 @@ const RegisterForm: React.FC = () => {
     if (!validateEmail(email)) {
       newErrors.email = 'El formato del correo electrónico no es válido.';
     }
-    if (!validatePassword(password)) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
+    // Removemos la validación frontal bloqueante de la contraseña aquí
+    // para permitir que el request llegue a Django y traiga el error exacto
+    if (password.length < 8) {
+      newErrors.password = (
+        <span>
+          La contraseña debe cumplir los siguientes requisitos:
+          <ol style={{ margin: '4px 0 0 20px', padding: 0 }}>
+            <li>Al menos 8 caracteres</li>
+            <li>Una letra mayúscula</li>
+            <li>Una minúscula</li>
+            <li>Un número</li>
+            <li>Un carácter especial</li>
+          </ol>
+        </span>
+      ) as any;
     }
 
     if (Object.keys(newErrors).length > 0) {

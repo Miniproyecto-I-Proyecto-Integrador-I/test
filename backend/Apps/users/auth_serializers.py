@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -12,6 +13,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'password', 'daily_hours', 'bio']
         read_only_fields = ['id']
+
+    def validate_email(self, value):
+        # Regex básico para validar formato de correo electrónico
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(email_regex, value):
+            raise serializers.ValidationError("Formato de correo electrónico inválido.")
+        return value
+
+    def validate_password(self, value):
+        # Verificar que tenga al menos una mayúscula, una minúscula, un número y un carácter especial
+        if not re.search(r'[A-Z]', value):
+            raise serializers.ValidationError("La contraseña debe contener al menos una letra mayúscula.")
+        if not re.search(r'[a-z]', value):
+            raise serializers.ValidationError("La contraseña debe contener al menos una letra minúscula.")
+        if not re.search(r'\d', value):
+            raise serializers.ValidationError("La contraseña debe contener al menos un número.")
+        if not re.search(r'[@$!%*?&._-]', value):
+            raise serializers.ValidationError("La contraseña debe contener al menos un carácter especial (@, $, !, %, *, ?, &, ., _, -).")
+        return value
 
     def create(self, validated_data):
         password = validated_data.pop('password')
