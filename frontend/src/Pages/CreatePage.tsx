@@ -11,7 +11,7 @@ import {
 import { updateTask } from '../Feature/ManageCreatePage/Services/taskService';
 import '../Feature/ManageCreatePage/Styles/CreatePage.css';
 import apiClient from '../Services/ApiClient';
-import type { EditableSubtask } from '../Feature/ManageCreatePage/Components/SubtaskEdit';
+import type { EditableSubtask } from '../Feature/ManageCreatePage/Hooks/useSubtaskEdit';
 
 import type { Task } from '../Feature/ManageCreatePage/Types/taskTypes';
 import TaskGrid from '../Feature/ManageCreatePage/Components/TaskGrid';
@@ -224,6 +224,7 @@ const CreatePage = () => {
             <BackButton onClick={() => { setSelectedTask(null); navigate('/create'); }} />
             {selectedTask ? (
               <SubtaskForm
+                taskId={selectedTask.id}
                 taskTitle={selectedTask.title}
                 onFinalize={handleFinalizeSubtasks}
               />
@@ -235,7 +236,6 @@ const CreatePage = () => {
 
         <Route path="edicion" element={
           <div className="subtask-fullscreen">
-            <BackButton onClick={() => { setSelectedTask(null); navigate('/create'); }} />
             {selectedTask ? (
               <SubtaskEdit
                 taskId={selectedTask.id}

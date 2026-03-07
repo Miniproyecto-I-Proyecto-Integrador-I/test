@@ -57,14 +57,14 @@ const NavBar = () => {
             >
               Crear
             </NavLink>
-            <NavLink
+            {/* <NavLink
               to="/activity/1"
               className={({ isActive }) =>
                 `nav-item${isActive ? ' is-active' : ''}`
               }
             >
               Actividad
-            </NavLink>
+            </NavLink> */}
           </>
         )}
         <div className="nav-auth-section">

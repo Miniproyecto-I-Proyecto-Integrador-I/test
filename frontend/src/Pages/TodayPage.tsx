@@ -10,6 +10,7 @@ import SelectedFilter from '@/Feature/ManageTodayPage/Components/SelectedFilter'
 import { fecha } from '../Feature/ManageTodayPage/Utils/DateFormatted';
 import { useGroupedSubtasks } from '../Feature/ManageTodayPage/Hooks/useGroupedSubtasks';
 import StatusCardGrid from '@/Feature/ManageTodayPage/Components/StatusCardGrid';
+import ViewMenu from '@/Feature/ManageTodayPage/Components/ViewMenu';
 
 const TodayPage: React.FC = () => {
   const navigate = useNavigate();
@@ -19,12 +20,21 @@ const TodayPage: React.FC = () => {
   /** Filters driven by SelectedFilter; passed down to CardsGrid → useGroupedSubtasks */
   const [filters, setFilters] = useState<Record<string, string>>({});
 
+  const [viewOptions, setViewOptions] = useState({
+    overdue: true,
+    today: true,
+    upcoming: true
+  });
+  const [showViewMenu, setShowViewMenu] = useState(false);
+
   const { user } = useAuth();
   const { 
     overdue, today, upcoming, 
     rawOverdue, rawToday, rawUpcoming, 
     loading, allCourses 
   } = useGroupedSubtasks(filters);
+
+  const hasAnyTasks = rawOverdue.length > 0 || rawToday.length > 0 || rawUpcoming.length > 0;
 
   /* ── Filter handlers ──────────────────────────────────── */
 
@@ -57,27 +67,38 @@ const TodayPage: React.FC = () => {
             </span>
           </div>
         </div>
-        <button 
-          className="btn-primary"
-          style={{ padding: '8px 16px', fontSize: '14px', borderRadius: '8px' }}
-          onClick={() => navigate('/create/formulario')}
-        >
-          + Nueva Tarea
-        </button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <ViewMenu 
+            viewOptions={viewOptions}
+            setViewOptions={setViewOptions}
+            showViewMenu={showViewMenu}
+            setShowViewMenu={setShowViewMenu}
+          />
+          <button 
+            className="btn-primary"
+            style={{ padding: '8px 16px', fontSize: '14px', borderRadius: '8px' }}
+            onClick={() => navigate('/create/formulario')}
+          >
+            + Nueva Tarea
+          </button>
+        </div>
       </header>
 
       <StatusCardGrid 
         defeatedSubTask={rawOverdue[0]} 
         todaySubTask={rawToday[0]} 
         nextSubTask={rawUpcoming[0]} 
+        viewOptions={viewOptions}
       />
 
-      <SelectedFilter
-        handleFilterChange={handleFilterChange}
-        clearFilters={clearFilters}
-        filters={filters}
-        allCourses={allCourses}
-      />
+      {hasAnyTasks && (
+        <SelectedFilter
+          handleFilterChange={handleFilterChange}
+          clearFilters={clearFilters}
+          filters={filters}
+          allCourses={allCourses}
+        />
+      )}
 
       <CardsGrid
         setSelectedSubtask={setSelectedSubtask}
@@ -86,6 +107,7 @@ const TodayPage: React.FC = () => {
         upcoming={upcoming}
         loading={loading}
         filters={filters}
+        viewOptions={viewOptions}
       />
 
       {selectedSubtask && (

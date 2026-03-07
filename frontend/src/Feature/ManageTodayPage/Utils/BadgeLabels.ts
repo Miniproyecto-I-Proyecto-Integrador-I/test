@@ -60,7 +60,7 @@ export function buildFooterLabel(variant: CardVariant, subtask: Subtask): string
   const d = new Date(date + 'T00:00:00')
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
-  if (d.toDateString() === tomorrow.toDateString()) return 'Mañana, 08:00 AM'
+  if (d.toDateString() === tomorrow.toDateString()) return 'Mañana'
 
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
 }

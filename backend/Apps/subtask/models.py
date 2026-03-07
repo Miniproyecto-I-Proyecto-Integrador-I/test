@@ -1,6 +1,7 @@
 from django.db import models
 from Apps.task.models import Task
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError # <--- IMPORTANTE
 
 class Subtask(models.Model):
     
@@ -9,42 +10,45 @@ class Subtask(models.Model):
         IN_PROGRESS = "in_progress", "En Progreso"
         COMPLETED = "completed", "Completado"
 
-    # Relación 1 a muchos: Cada Subtask pertenece a 1 Task
-    # related_name="subtasks" permite hacer: mi_tarea.subtasks.all()
     task = models.ForeignKey(
         Task, 
         on_delete=models.CASCADE, 
         related_name="subtasks"
     )
 
-    # Atributos solicitados
-    description = models.CharField(max_length=300) # VARCHAR(300)
+    description = models.CharField(max_length=300)
     
     status = models.CharField(
-        max_length=50, # VARCHAR(50)
+        max_length=50,
         choices=Status.choices,
         default=Status.PENDING
     )
 
-    planification_date = models.DateField() # DATE
-    
-    needed_hours = models.FloatField(validators=[MinValueValidator(0.0)]) # FLOAT
-
-    # Metadatos básicos
+    planification_date = models.DateField() 
+    needed_hours = models.FloatField(validators=[MinValueValidator(0.0)])
     created_at = models.DateTimeField(auto_now_add=True)
 
-# --- NUEVA LÓGICA DE ACTUALIZACIÓN AUTOMÁTICA ---
+    # --- NUEVA LÓGICA DE VALIDACIÓN ---
+    def clean(self):
+        """Valida que la fecha de la subtarea no sea mayor a la de la tarea padre."""
+        super().clean()
+        if self.task and self.task.due_date and self.planification_date:
+            # Comparamos solo la parte de la fecha (.date())
+            if self.planification_date > self.task.due_date.date():
+                raise ValidationError({
+                    'planification_date': f"La fecha ({self.planification_date}) no puede ser posterior a la entrega de la tarea ({self.task.due_date.date()})."
+                })
 
     def save(self, *args, **kwargs):
-        """Al guardar una subtarea, recalculamos la tarea padre."""
+        """Ejecuta la validación y luego guarda/actualiza métricas."""
+        self.full_clean() # <--- OBLIGATORIO: Llama a la función clean() definida arriba
         super().save(*args, **kwargs)
-        self.task.update_metrics() # Llama al método que creamos en Task
+        self.task.update_metrics()
 
     def delete(self, *args, **kwargs):
-        """Al eliminar una subtarea, recalculamos antes de que se pierda la relación."""
         task_reference = self.task
         super().delete(*args, **kwargs)
-        task_reference.update_metrics() # Recalcula tras la eliminación
+        task_reference.update_metrics()
 
     def __str__(self):
         return f"Subtask: {self.description[:30]}... (Task: {self.task.title})"
