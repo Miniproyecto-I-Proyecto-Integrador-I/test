@@ -15,6 +15,7 @@ interface CardsGridProps {
   upcoming: Subtask[]
   loading: boolean
   filters?: Record<string, string>
+  viewOptions?: { overdue: boolean; today: boolean; upcoming: boolean }
 }
 
 /* ── Section header ─────────────────────────────────────── */
@@ -42,13 +43,17 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   today, 
   upcoming,
   loading,
-  filters 
+  filters,
+  viewOptions = { overdue: true, today: true, upcoming: true }
 }) => {
   if (loading) {
     return <LoadingScreen message="Cargando tus actividades del día..." />;
   }
 
-  const isEmpty = overdue.length === 0 && today.length === 0 && upcoming.length === 0
+  const isEmpty = 
+    (!viewOptions.overdue || overdue.length === 0) && 
+    (!viewOptions.today || today.length === 0) && 
+    (!viewOptions.upcoming || upcoming.length === 0);
   const isFiltered = filters && Object.values(filters).some(val => val !== '')
   const isCompletedFilter = filters?.status === 'completed'
 
@@ -95,7 +100,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
     <div className="grouped-cards">
 
       {/* ── VENCIDAS ─────────────────────────────────────── */}
-      {overdue.length > 0 && (
+      {viewOptions.overdue && overdue.length > 0 && (
         <section className="task-section task-section--overdue">
           <SectionHeader
             icon={<AlertCircle size={18} />}
@@ -115,7 +120,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       )}
 
       {/* ── PARA HOY ─────────────────────────────────────── */}
-      {today.length > 0 && (
+      {viewOptions.today && today.length > 0 && (
         <section className="task-section task-section--today">
           <SectionHeader
             icon={<CalendarCheck size={18} />}
@@ -135,7 +140,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       )}
 
       {/* ── PRÓXIMAS ─────────────────────────────────────── */}
-      {upcoming.length > 0 && (
+      {viewOptions.upcoming && upcoming.length > 0 && (
         <section className="task-section task-section--upcoming">
           <SectionHeader
             icon={<CalendarClock size={18} />}

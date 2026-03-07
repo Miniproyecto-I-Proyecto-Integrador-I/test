@@ -29,6 +29,9 @@ const SelectedSubtask: React.FC<selectedSubtask> = ({
                 <span className="tag time-tag">
                   Horas necesarias: {selectedSubtask.needed_hours}
                 </span>
+                <span className="tag time-tag">
+                  Planificado: {new Date(selectedSubtask.planification_date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+                </span>
               </div>
             </div>
 
