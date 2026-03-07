@@ -20,13 +20,13 @@ const EmptyState: React.FC = () => {
             
             <h2 className="empty-state-title">¡Estás al día!</h2>
             <p className="empty-state-text">
-                No tienes tareas pendientes . Aprovecha para<br />
+                No tienes actividades pendientes . Aprovecha para<br />
                 descansar o planificar tu próxima meta.
             </p>
             
             <button className="btn-primary empty-state-btn" onClick={() => navigate('/create')}>
                 <Plus size={18} strokeWidth={2.5} />
-                Crear nueva tarea
+                Crear nueva actividad
             </button>
         </div>
     )
