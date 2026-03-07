@@ -1,4 +1,4 @@
-import type { EditableSubtask } from '../Components/SubtaskEdit';
+import type { EditableSubtask } from '../Hooks/useSubtaskEdit';
 
 export interface Task {
 	id: number;
