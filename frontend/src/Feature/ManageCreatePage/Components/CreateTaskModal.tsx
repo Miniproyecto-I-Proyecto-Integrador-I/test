@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Task, TaskPayload } from '../Types/taskTypes';
 import SuccessTaskModal from './SuccessTaskModal';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 
 const getTodayDateStr = () => {
   const today = new Date();
@@ -15,12 +16,14 @@ interface CreateTaskModalProps {
   onClose: () => void;
   onSubmit: (payload: TaskPayload) => Promise<Task>;
   onAddSubtasks: (task: Task) => void;
+  inline?: boolean;
 }
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   onSubmit,
   onAddSubtasks,
+  inline = false,
 }) => {
   const navigate = useNavigate();
   const [formStatus, setFormStatus] = useState<'idle' | 'success'>('idle');
@@ -88,25 +91,42 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
   const errorCount = Object.keys(errors).filter((k) => k !== 'general').length;
 
-  return (
-    <div className="modal-overlay" onClick={handleCloseTaskModal}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        {formStatus === 'idle' && (
-          <>
-            <div className="modal-header">
+  const content = (
+    <>
+      <div 
+        className={inline ? "modal-card inline-form-card" : "modal-card"} 
+        onClick={!inline ? (e) => e.stopPropagation() : undefined}
+      >
+        <div className="modal-header">
               <h2>Crear Nueva Tarea</h2>
               <p>Organiza tus objetivos académicos con facilidad.</p>
             </div>
 
             {errorCount > 0 && (
-              <div className="error-banner">
-                <span className="error-icon">ⓘ</span> Hay {errorCount} errores
-                en el formulario.
+              <div className="error-banner" style={{ margin: '24px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <span className="error-icon" style={{ display: 'flex', alignItems: 'center', marginTop: '2px' }}>
+                    <AlertCircle size={18} />
+                  </span>
+                  <div>
+                    <p style={{ margin: '0 0 4px 0', fontWeight: 500 }}>
+                      Hay {errorCount} {errorCount === 1 ? 'error' : 'errores'} en el formulario:
+                    </p>
+                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9em' }}>
+                      {Object.entries(errors).map(
+                        ([key, msg]) => key !== 'general' && <li key={key}>{msg}</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
             {errors.general && (
               <div className="error-banner">
-                <span className="error-icon">⚠</span> {errors.general}
+                <span className="error-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                  <AlertTriangle size={18} />
+                </span> 
+                {errors.general}
               </div>
             )}
 
@@ -209,29 +229,43 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               </div>
 
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={handleCloseTaskModal}
-                >
-                  Cancelar
-                </button>
+                {!inline && (
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={handleCloseTaskModal}
+                  >
+                    Cancelar
+                  </button>
+                )}
                 <button type="submit" className="btn-primary">
                   Crear Tarea Principal
                 </button>
               </div>
             </form>
-          </>
-        )}
-
-        {formStatus === 'success' && createdTask && (
-          <SuccessTaskModal
-            task={createdTask}
-            onNavigateToPanel={() => navigate('/create')}
-            onAddSubtasks={() => onAddSubtasks(createdTask)}
-          />
-        )}
       </div>
+
+      {formStatus === 'success' && createdTask && (
+        <div className="modal-overlay" style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(248, 250, 252, 0.7)', zIndex: 1100 }}>
+          <div className="modal-card" style={{ boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)' }}>
+            <SuccessTaskModal
+              task={createdTask}
+              onNavigateToPanel={() => navigate('/create')}
+              onAddSubtasks={() => onAddSubtasks(createdTask)}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  if (inline) {
+    return content;
+  }
+
+  return (
+    <div className="modal-overlay" onClick={handleCloseTaskModal}>
+      {content}
     </div>
   );
 };

@@ -5,9 +5,9 @@
     flex-direction: column;
     gap: 20px;
     width: 100%;
-    max-width: 950px;
-    margin: 0 auto;
-    padding: 0 40px;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 0 40px 0;
 }
 
 .task-summary-card {
@@ -56,14 +56,14 @@
     display: block;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-size: 11px;
+    font-size: var(--font-size-small);
     font-weight: 600;
     color: var(--text-tertiary);
 }
 
 .task-summary-title {
     display: block;
-    font-size: 17px;
+    font-size: var(--font-size-h3);
     font-weight: 600;
     color: var(--text-main);
 }
@@ -74,7 +74,7 @@
 
 .task-summary-value {
     display: block;
-    font-size: 17px;
+    font-size: var(--font-size-h3);
     font-weight: 600;
     color: var(--text-main);
 }
@@ -93,7 +93,7 @@
 
 .subtask-form-title {
     font-family: var(--font-family);
-    font-size: 22px;
+    font-size: var(--font-size-h2);
     font-weight: 600;
     color: var(--text-main);
     margin: 0 0 4px 0;
@@ -101,7 +101,7 @@
 }
 
 .subtask-form-subtitle {
-    font-size: 15px;
+    font-size: var(--font-size-body);
     color: var(--text-secondary);
     margin: 0 0 24px 0;
     line-height: 22px;
@@ -128,7 +128,7 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 0px;
-    font-size: 15px;
+    font-size: var(--font-size-body);
     font-weight: 500;
     color: var(--text-secondary);
     line-height: 22px;
@@ -140,7 +140,7 @@
     padding: var(--padding-input);
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius-base);
-    font-size: 15px;
+    font-size: var(--font-size-body);
     font-weight: 400;
     color: var(--text-main);
     font-family: var(--font-family);
@@ -168,7 +168,7 @@
 .subtask-form-char-count {
     display: flex;
     justify-content: flex-end;
-    font-size: 13px;
+    font-size: var(--font-size-small);
     color: var(--text-tertiary);
     margin-top: 0px;
 }
@@ -177,7 +177,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-small);
     color: var(--error-color);
     font-weight: 600;
     line-height: 19px;
@@ -208,7 +208,7 @@
     color: white;
     border: none;
     border-radius: var(--border-radius-base);
-    font-size: 17px;
+    font-size: var(--font-size-body);
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s, opacity 0.2s;
@@ -230,7 +230,7 @@
 
 .subtask-form-add-btn::before {
     content: '+';
-    font-size: 18px;
+    font-size: var(--font-size-h2);
     font-weight: 600;
 }
 
@@ -304,7 +304,7 @@
 }
 
 .subtask-form-item-description {
-    font-size: 15px;
+    font-size: var(--font-size-body);
     font-weight: 400;
     color: var(--text-main);
     margin: 0;
@@ -322,7 +322,7 @@
 .subtask-form-item-metadata {
     display: flex;
     gap: 8px;
-    font-size: 13px;
+    font-size: var(--font-size-small);
     color: var(--text-secondary);
     font-weight: 500;
     align-items: center;
@@ -337,7 +337,7 @@
     background: var(--btn-sec-hover);
     border-radius: 9999px;
     font-weight: 500;
-    font-size: 13px;
+    font-size: var(--font-size-small);
     line-height: 19px;
 }
 

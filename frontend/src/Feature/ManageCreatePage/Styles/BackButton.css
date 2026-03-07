@@ -1,0 +1,24 @@
+@import '../../../shared/Styles/Variables.css';
+
+.back-btn-minimal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: var(--font-size-body);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin-bottom: 24px;
+    border-radius: var(--border-radius-base);
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+}
+
+.back-btn-minimal:hover {
+    color: var(--primary-hover);
+    background: var(--surface);
+    transform: translateX(-4px);
+}

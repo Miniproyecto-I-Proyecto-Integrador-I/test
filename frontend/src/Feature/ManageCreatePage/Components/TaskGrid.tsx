@@ -26,10 +26,12 @@ const TaskGrid: React.FC<TaskGridProps> = ({ tasks, onTaskClick }) => {
 					className="task-card"
 					onClick={() => onTaskClick(task)}
 				>
-					<h3>{task.title}</h3>
-					{task.description && (
-						<p className="task-card-description">{task.description}</p>
-					)}
+					<div className="task-card-info">
+						<h3>{task.title}</h3>
+						{task.description && (
+							<p className="task-card-description">{task.description}</p>
+						)}
+					</div>
 					<div className={`status-badge ${task.status}`}>
 						<span className="status-dot"></span>
 						<span>{getStatusLabel(task.status)}</span>

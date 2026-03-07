@@ -22,8 +22,8 @@
 }
 
 .page-title {
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: var(--font-size-h1);
+    font-weight: 700;
     color: var(--text-main);
     margin: 0;
     font-family: var(--font-family);
@@ -54,7 +54,7 @@
 }
 
 .empty-text {
-    font-size: 1.1rem;
+    font-size: var(--font-size-body);
     color: var(--text-tertiary);
 }
 
@@ -69,14 +69,15 @@
     background: var(--surface);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 32px 24px;
+    padding: 20px 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
 }
 
 .task-card:hover {
@@ -87,10 +88,18 @@
 
 .task-card h3 {
     margin: 0;
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: var(--font-size-h3);
+    font-weight: 600;
     color: var(--text-main);
     font-family: var(--font-family);
+}
+
+.task-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
 }
 
 
@@ -178,6 +187,29 @@
     overflow-y: auto;
 }
 
+.subtask-fullscreen {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.modal-card.inline-form-card {
+    max-width: 100%;
+    max-height: none;
+    padding: 32px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--border-color) !important;
+    overflow-y: visible;
+    background: var(--surface);
+    border-radius: 16px;
+    flex: 1;
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
 .subtask-modal-card {
     background: var(--surface);
     width: 100%;
@@ -222,9 +254,9 @@
 }
 
 .modal-header h2 {
-    font-size: 1.8rem;
+    font-size: var(--font-size-h2);
     color: var(--text-main);
-    font-weight: 800;
+    font-weight: 700;
     margin: 0 0 8px 0;
     font-family: var(--font-family);
 }
@@ -237,13 +269,12 @@
 }
 
 .section-title {
-    font-size: 1.125rem;
+    font-size: var(--font-size-h2);
     font-weight: 600;
     color: var(--text-main);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 12px;
     margin-bottom: 20px;
-    margin-top: 24px;
     font-family: var(--font-family);
 }
 
@@ -267,7 +298,7 @@
 }
 
 .form-group label {
-    font-size: 0.875rem;
+    font-size: var(--font-size-body);
     font-weight: 600;
     color: var(--text-secondary);
     font-family: var(--font-family);
@@ -278,7 +309,7 @@
     padding: var(--padding-input);
     border: 1px solid var(--border-secondary);
     border-radius: var(--border-radius-base);
-    font-size: 0.95rem;
+    font-size: var(--font-size-body);
     color: var(--text-main);
     transition: all 0.2s ease;
     background-color: var(--surface);
@@ -312,7 +343,7 @@
     padding: 12px 24px;
     border-radius: var(--border-radius-base);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-body);
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
     font-family: var(--font-family);
@@ -330,7 +361,7 @@
     padding: 12px 24px;
     border-radius: var(--border-radius-base);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-body);
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: var(--font-family);
@@ -458,8 +489,8 @@
 
 .subtask-item-header h4 {
     margin: 0;
-    color: var(--text-secondary);
-    font-size: 1rem;
+    color: var(--text-main);
+    font-size: var(--font-size-h3);
 }
 
 .btn-remove {
@@ -544,7 +575,7 @@
 .toast-error {
     background-color: var(--error-color);
     /* Rojo de error */
-}.form-group textarea.form-textarea { width: 100%; box-sizing: border-box; padding: var(--padding-input); border: 1px solid var(--border-secondary); border-radius: var(--border-radius-base); font-size: 0.95rem; color: var(--text-main); transition: all 0.2s ease; background-color: var(--surface); font-family: var(--font-family); resize: vertical; min-height: 80px; }
+}.form-group textarea.form-textarea { width: 100%; box-sizing: border-box; padding: var(--padding-input); border: 1px solid var(--border-secondary); border-radius: var(--border-radius-base); font-size: var(--font-size-body); color: var(--text-main); transition: all 0.2s ease; background-color: var(--surface); font-family: var(--font-family); resize: vertical; min-height: 80px; }
 .form-group textarea.form-textarea::placeholder { color: var(--text-tertiary); }
 .form-group textarea.form-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light); }
-.task-card-description { font-size: var(--font-size-body); color: var(--text-secondary); margin: -16px 0 0 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+.task-card-description { font-size: var(--font-size-small); color: var(--text-secondary); margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
