@@ -10,6 +10,7 @@ interface StatusCardProps {
   subtask?: Subtask
   message: string
   variant: CardVariant
+  onClick?: () => void
 }
 
 /* ── Helpers ────────────────────────────────────────────── */
@@ -22,7 +23,7 @@ function FooterIcon({ variant }: { variant: CardVariant }) {
 
 /* ── Component ──────────────────────────────────────────── */
 
-const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant }) => {
+const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant, onClick }) => {
   // Empty state: render nothing so flex siblings expand
   if (!subtask) {
     return <div className="status-card--empty" aria-hidden="true" />
@@ -33,7 +34,11 @@ const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant }) =>
   const footerLabel = buildFooterLabel(variant, subtask)
 
   return (
-    <div className={`status-card status-card--${variant}`}>
+    <div 
+      className={`status-card status-card--${variant}`}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
       {/* Badge */}
       <p className="status-card__badge">{message}</p>
 

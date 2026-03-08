@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 import type { Subtask } from '../Feature/ManageTodayPage/Types/models';
 import '../Feature/ManageTodayPage/Styles/TodayPage.css';
-import SelectedSubtask from '../Feature/ManageTodayPage/Components/SelectedSubtask';
 import CardsGrid from '@/Feature/ManageTodayPage/Components/CardsGrid';
 import SelectedFilter from '@/Feature/ManageTodayPage/Components/SelectedFilter';
 import { fecha } from '../Feature/ManageTodayPage/Utils/DateFormatted';
@@ -17,8 +16,6 @@ import { ArrowLeft } from 'lucide-react';
 
 const TodayPage: React.FC = () => {
   const navigate = useNavigate();
-  /** Which subtask is open in the detail panel */
-  const [selectedSubtask, setSelectedSubtask] = useState<Subtask | null>(null);
 
   /** Filters driven by SelectedFilter; passed down to CardsGrid → useGroupedSubtasks */
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -57,7 +54,11 @@ const TodayPage: React.FC = () => {
 
   const clearFilters = () => setFilters({});
 
-  const onClose = () => setSelectedSubtask(null);
+  const handleSubtaskClick = (sub: Subtask) => {
+    if (sub.task?.id) {
+      navigate(`/activity/${sub.task.id}`);
+    }
+  };
 
   return (
     <div className="today-page">
@@ -99,10 +100,11 @@ const TodayPage: React.FC = () => {
             todaySubTask={rawToday[0]} 
             nextSubTask={rawUpcoming[0]} 
             viewOptions={viewOptions}
+            onSubtaskClick={handleSubtaskClick}
           />
 
           <CardsGrid
-            setSelectedSubtask={setSelectedSubtask}
+            onSubtaskClick={handleSubtaskClick}
             overdue={overdue}
             today={today}
             upcoming={upcoming}
@@ -161,10 +163,6 @@ const TodayPage: React.FC = () => {
           )}
         </div>
       </div>
-
-      {selectedSubtask && (
-        <SelectedSubtask onClose={onClose} selectedSubtask={selectedSubtask} />
-      )}
     </div>
   );
 };

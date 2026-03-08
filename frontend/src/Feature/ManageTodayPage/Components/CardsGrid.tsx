@@ -9,7 +9,7 @@ import LoadingScreen from '../../../shared/Components/LoadingScreen';
 import '../Styles/CardTasks.css'
 
 interface CardsGridProps {
-  setSelectedSubtask: (sub: Subtask) => void
+  onSubtaskClick: (sub: Subtask) => void
   overdue: Subtask[]
   today: Subtask[]
   upcoming: Subtask[]
@@ -38,7 +38,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, label, count, toolt
 /* ── Main component ─────────────────────────────────────── */
 
 const CardsGrid: React.FC<CardsGridProps> = ({ 
-  setSelectedSubtask, 
+  onSubtaskClick, 
   overdue, 
   today, 
   upcoming,
@@ -88,7 +88,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="today" // Use today variant for standard visualization of completed items (since it shows duration)
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
@@ -113,7 +113,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="overdue"
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
@@ -133,7 +133,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="today"
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
@@ -153,7 +153,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="upcoming"
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
