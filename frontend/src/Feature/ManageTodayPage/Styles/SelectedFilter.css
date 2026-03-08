@@ -1,97 +1,120 @@
 @import '../../../shared/Styles/Variables.css';
 
-.filter-divider-container {
+.filter-sidebar-container {
+  background-color: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0;
   width: 100%;
-  margin: 32px 0 24px 0;
-  border-top: 1px solid var(--border-color);
-  padding-top: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
 }
 
-.selected-filter-wrapper {
+.filter-sidebar-header {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.filter-sidebar-title svg {
+  color: var(--primary-color);
+}
+
+.filter-sidebar-body {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
   gap: 16px;
+}
+
+.filter-divider {
+  height: 1px;
+  background-color: var(--border-color);
   width: 100%;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-width: 180px;
+  gap: 10px;
+  width: 100%;
 }
 
 .filter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-family);
   font-size: 11px;
-  font-weight: 600;
-  color: var(--text-tertiary);
+  font-weight: 700;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.filter-label-icon {
+  color: var(--text-tertiary);
 }
 
 .filter-select {
   font-family: var(--font-family);
   font-size: var(--font-size-body);
-  color: var(--text-main);
-  background-color: var(--surface);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background-color: #fafafa;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 14px;
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
+  background-position: right 14px center;
   transition: all 0.2s ease;
-  min-width: 200px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-select:hover {
   border-color: var(--border-secondary);
+  background-color: var(--surface);
 }
 
 .filter-select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background-color: var(--surface);
 }
 
-.filter-clear-btn {
+.filter-clear-btn-icon {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-family: var(--font-family);
-  font-size: var(--font-size-body);
-  font-weight: 500;
-  color: var(--error-color);
+  justify-content: center;
+  color: var(--text-tertiary);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px 12px;
+  padding: 4px;
   border-radius: 6px;
-  margin-top: auto;
-  margin-bottom: 2px;
   transition: all 0.2s ease;
 }
 
-.filter-clear-btn:hover {
-  background-color: #fef2f2;
-}
-
-.empty-filter-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  text-align: center;
-  color: var(--text-tertiary);
-}
-
-.empty-filter-state p {
-  font-family: var(--font-family);
-  font-size: var(--font-size-body);
-  margin-top: 12px;
+.filter-clear-btn-icon:hover {
+  background-color: var(--bg-base);
+  color: var(--error-color);
 }

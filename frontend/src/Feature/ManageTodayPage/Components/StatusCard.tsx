@@ -28,7 +28,8 @@ const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant }) =>
     return <div className="status-card--empty" aria-hidden="true" />
   }
 
-  const subject = subtask.task?.subject == '' ? 'No asignado' : subtask.task?.subject
+  const parentTaskTitle = subtask.task?.title || 'Sin tarea principal'
+  const timeInfo = subtask.needed_hours ? `${subtask.needed_hours}h` : ''
   const footerLabel = buildFooterLabel(variant, subtask)
 
   return (
@@ -41,8 +42,14 @@ const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant }) =>
         {subtask.description}
       </h3>
 
-      {/* Subject from the parent task */}
-      <p className="status-card__subject">Curso: {subject}</p>
+      <div className="status-card__info-row">
+        <p className="status-card__parent-task">{parentTaskTitle}</p>
+        {timeInfo && (
+          <span className="status-card__time">
+            {timeInfo}
+          </span>
+        )}
+      </div>
 
       {/* Footer with icon + contextual label */}
       <div className="status-card__footer">

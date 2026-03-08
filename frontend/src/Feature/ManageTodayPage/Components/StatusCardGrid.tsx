@@ -22,7 +22,7 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
       {viewOptions.overdue && (
         <StatusCard
           subtask={defeatedSubTask}
-          message="Más antigua"
+          message="Vencida · Más antigua"
           variant="overdue"
         />
       )}
@@ -31,7 +31,7 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
       {viewOptions.today && (
         <StatusCard
           subtask={todaySubTask}
-          message="Hoy"
+          message="Hoy · Rápida de completar"
           variant="today"
         />
       )}
@@ -40,7 +40,7 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
       {viewOptions.upcoming && (
         <StatusCard
           subtask={nextSubTask}
-          message="Por venir"
+          message="Próxima · La más cercana"
           variant="upcoming"
         />
       )}

@@ -33,7 +33,7 @@ const ViewMenu: React.FC<ViewMenuProps> = ({ viewOptions, setViewOptions, showVi
         className="btn-primary view-menu-trigger" 
         onClick={() => setShowViewMenu(!showViewMenu)}
       >
-        Vista
+        Filtrar secciones visibles
       </button>
       {showViewMenu && (
         <div className="view-menu-dropdown">
