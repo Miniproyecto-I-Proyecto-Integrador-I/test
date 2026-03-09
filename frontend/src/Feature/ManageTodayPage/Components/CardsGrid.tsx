@@ -2,18 +2,15 @@ import React from 'react'
 import { AlertCircle, CalendarCheck, CalendarClock, SearchX, CheckCircle2 } from 'lucide-react'
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
-import EmptyState from './EmptyState'
 import InfoTooltip from '../../../shared/Components/InfoTooltip'
-import LoadingScreen from '../../../shared/Components/LoadingScreen';
 
 import '../Styles/CardTasks.css'
 
 interface CardsGridProps {
-  setSelectedSubtask: (sub: Subtask) => void
+  onSubtaskClick: (sub: Subtask) => void
   overdue: Subtask[]
   today: Subtask[]
   upcoming: Subtask[]
-  loading: boolean
   filters?: Record<string, string>
   viewOptions?: { overdue: boolean; today: boolean; upcoming: boolean }
 }
@@ -38,17 +35,13 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon, label, count, toolt
 /* ── Main component ─────────────────────────────────────── */
 
 const CardsGrid: React.FC<CardsGridProps> = ({ 
-  setSelectedSubtask, 
+  onSubtaskClick, 
   overdue, 
   today, 
   upcoming,
-  loading,
   filters,
   viewOptions = { overdue: true, today: true, upcoming: true }
 }) => {
-  if (loading) {
-    return <LoadingScreen message="Cargando tus actividades del día..." />;
-  }
 
   const isEmpty = 
     (!viewOptions.overdue || overdue.length === 0) && 
@@ -68,7 +61,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
         </div>
       )
     }
-    return <EmptyState />
+    return null
   }
 
   // Combined render for completed items
@@ -88,7 +81,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="today" // Use today variant for standard visualization of completed items (since it shows duration)
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
@@ -113,7 +106,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="overdue"
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
@@ -133,7 +126,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="today"
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>
@@ -153,7 +146,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               key={sub.id}
               sub={sub}
               variant="upcoming"
-              onClick={() => setSelectedSubtask(sub)}
+              onClick={() => onSubtaskClick(sub)}
             />
           ))}
         </section>

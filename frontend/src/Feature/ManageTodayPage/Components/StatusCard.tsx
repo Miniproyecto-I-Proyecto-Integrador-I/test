@@ -10,6 +10,7 @@ interface StatusCardProps {
   subtask?: Subtask
   message: string
   variant: CardVariant
+  onClick?: () => void
 }
 
 /* ── Helpers ────────────────────────────────────────────── */
@@ -22,17 +23,21 @@ function FooterIcon({ variant }: { variant: CardVariant }) {
 
 /* ── Component ──────────────────────────────────────────── */
 
-const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant }) => {
+const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant, onClick }) => {
   // Empty state: render nothing so flex siblings expand
   if (!subtask) {
     return <div className="status-card--empty" aria-hidden="true" />
   }
 
-  const subject = subtask.task?.subject == '' ? 'No asignado' : subtask.task?.subject
+  const parentTaskTitle = subtask.task?.title || 'Sin tarea principal'
   const footerLabel = buildFooterLabel(variant, subtask)
 
   return (
-    <div className={`status-card status-card--${variant}`}>
+    <div 
+      className={`status-card status-card--${variant}`}
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
       {/* Badge */}
       <p className="status-card__badge">{message}</p>
 
@@ -41,8 +46,9 @@ const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant }) =>
         {subtask.description}
       </h3>
 
-      {/* Subject from the parent task */}
-      <p className="status-card__subject">Curso: {subject}</p>
+      <div className="status-card__info-row">
+        <p className="status-card__parent-task">{parentTaskTitle}</p>
+      </div>
 
       {/* Footer with icon + contextual label */}
       <div className="status-card__footer">

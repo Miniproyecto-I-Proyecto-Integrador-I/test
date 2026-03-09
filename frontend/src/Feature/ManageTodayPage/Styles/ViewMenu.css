@@ -15,6 +15,7 @@
   border: 1px solid var(--border-color);
   color: var(--text-main);
   transition: all 0.2s ease;
+  font-weight: 400;
 }
 
 .view-menu-trigger:hover {

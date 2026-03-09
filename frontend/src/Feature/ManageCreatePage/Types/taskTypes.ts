@@ -1,4 +1,4 @@
-import type { EditableSubtask } from '../Hooks/useSubtaskEdit';
+import type { EditableSubtask } from '../../ManageActivityPage/Hooks/useSubtaskEdit';
 
 export interface Task {
 	id: number;

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Trash2, Edit2, Calendar, Clock, FileText, X, Check } from 'lucide-react';
 import { useSubtaskEdit, type EditableSubtask } from '../Hooks/useSubtaskEdit';
-import BackButton from './BackButton';
+import BackButton from '../../ManageCreatePage/Components/BackButton';
 import {
   formatShortDate,
   formatTaskDueDate,
@@ -89,10 +89,14 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     onClose,
   });
 
+  // Store a stringified version of initial subtasks to prevent unnecessary resets
+  const initialSubtasksStr = useMemo(() => JSON.stringify(initialSubtasks ?? []), [initialSubtasks]);
+
   useEffect(() => {
-    setSubtasks(initialSubtasks ?? []);
+    const parsed = JSON.parse(initialSubtasksStr);
+    setSubtasks(parsed);
     cancelEditing();
-  }, [initialSubtasks, setSubtasks, cancelEditing]);
+  }, [initialSubtasksStr, setSubtasks, cancelEditing]);
 
   const computedTotalHours = useMemo(() => {
     if (typeof totalHours === 'number') return totalHours;

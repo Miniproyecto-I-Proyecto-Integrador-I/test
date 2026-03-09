@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import type { SubtaskFormData, ValidationErrors } from '../Types/subtask.types';
-import { hasValidationErrors, validateSubtaskForm } from '../Utils/subtaskValidator';
-import { deleteTask } from '../Services/subtaskService';
+import type { SubtaskFormData, ValidationErrors } from '../../ManageCreatePage/Types/subtask.types';
+import { hasValidationErrors, validateSubtaskForm } from '../../ManageCreatePage/Utils/subtaskValidator';
+import { deleteTask } from '../../ManageCreatePage/Services/subtaskService';
 
 // Re-defining interface here for use throughout the local hooks, or imports from types.
 export interface EditableSubtask {

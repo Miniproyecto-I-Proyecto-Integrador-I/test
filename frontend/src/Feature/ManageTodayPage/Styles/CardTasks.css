@@ -77,6 +77,15 @@
   transform: translateY(-1px);
 }
 
+/* Remove hover effects for overdue items as they have explicit call-to-action buttons */
+.task-section--overdue .task-card:hover,
+.task-section--overdue .task-card {
+  box-shadow: none !important;
+  transform: none !important;
+  border-color: var(--border-color) !important;
+  cursor: default;
+}
+
 /* Left-border colour per section variant - completely flat style */
 
 
@@ -154,6 +163,25 @@
 }
 
 .task-card__subject {
+  display: none; /* Just in case it's used elsewhere, can be removed really */
+}
+
+.task-card__info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.task-card__info-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+}
+
+.task-card__parent-task {
   font-family: var(--font-family);
   font-size: 13px;
   color: #64748b;
@@ -161,7 +189,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  max-width: 65%;
 }
 
 /* =============================================
@@ -176,7 +204,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-top: 8px; /* Push below subject */
+  margin-top: 0; 
 }
 
 /* Overdue badge — red text */
@@ -203,6 +231,48 @@
   font-size: var(--font-size-body);
   color: var(--text-tertiary);
   padding: 12px 4px;
+}
+
+/* =============================================
+   OVERDUE ACTIONS
+   ============================================= */
+
+.task-card__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.task-card__action-btn {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.archive-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.archive-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.reschedule-btn {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.reschedule-btn:hover {
+  background-color: var(--surface);
+  border-color: var(--text-secondary);
+  color: var(--text-main);
 }
 
 @media (max-width: 768px) {

@@ -4,26 +4,28 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 import type { Subtask } from '../Feature/ManageTodayPage/Types/models';
 import '../Feature/ManageTodayPage/Styles/TodayPage.css';
-import SelectedSubtask from '../Feature/ManageTodayPage/Components/SelectedSubtask';
 import CardsGrid from '@/Feature/ManageTodayPage/Components/CardsGrid';
 import SelectedFilter from '@/Feature/ManageTodayPage/Components/SelectedFilter';
 import { fecha } from '../Feature/ManageTodayPage/Utils/DateFormatted';
 import { useGroupedSubtasks } from '../Feature/ManageTodayPage/Hooks/useGroupedSubtasks';
 import StatusCardGrid from '@/Feature/ManageTodayPage/Components/StatusCardGrid';
 import ViewMenu from '@/Feature/ManageTodayPage/Components/ViewMenu';
+import OverdueTasksAlert from '@/Feature/ManageTodayPage/Components/OverdueTasksAlert';
+import TodaySummaryCard from '@/Feature/ManageTodayPage/Components/TodaySummaryCard';
+import { ArrowLeft } from 'lucide-react';
+import LoadingScreen from '../shared/Components/LoadingScreen';
+import EmptyState from '@/Feature/ManageTodayPage/Components/EmptyState';
 
 const TodayPage: React.FC = () => {
   const navigate = useNavigate();
-  /** Which subtask is open in the detail panel */
-  const [selectedSubtask, setSelectedSubtask] = useState<Subtask | null>(null);
 
   /** Filters driven by SelectedFilter; passed down to CardsGrid → useGroupedSubtasks */
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const [viewOptions, setViewOptions] = useState({
-    overdue: true,
+    overdue: false,
     today: true,
-    upcoming: true
+    upcoming: false
   });
   const [showViewMenu, setShowViewMenu] = useState(false);
 
@@ -35,6 +37,17 @@ const TodayPage: React.FC = () => {
   } = useGroupedSubtasks(filters);
 
   const hasAnyTasks = rawOverdue.length > 0 || rawToday.length > 0 || rawUpcoming.length > 0;
+
+  const allThreeSelected = 
+    viewOptions.overdue && overdue.length > 0 &&
+    viewOptions.today && today.length > 0 &&
+    viewOptions.upcoming && upcoming.length > 0;
+
+  const isFiltered = Object.values(filters).some(val => val !== '');
+  const isGridEmpty = 
+    (!viewOptions.overdue || overdue.length === 0) && 
+    (!viewOptions.today || today.length === 0) && 
+    (!viewOptions.upcoming || upcoming.length === 0);
 
   /* ── Filter handlers ──────────────────────────────────── */
 
@@ -52,7 +65,15 @@ const TodayPage: React.FC = () => {
 
   const clearFilters = () => setFilters({});
 
-  const onClose = () => setSelectedSubtask(null);
+  const handleSubtaskClick = (sub: Subtask) => {
+    if (sub.task?.id) {
+      navigate(`/activity/${sub.task.id}`);
+    }
+  };
+
+  if (loading) {
+    return <LoadingScreen message="Cargando tus actividades del día..." />;
+  }
 
   return (
     <div className="today-page">
@@ -84,34 +105,90 @@ const TodayPage: React.FC = () => {
         </div>
       </header>
 
-      <StatusCardGrid 
-        defeatedSubTask={rawOverdue[0]} 
-        todaySubTask={rawToday[0]} 
-        nextSubTask={rawUpcoming[0]} 
-        viewOptions={viewOptions}
-      />
+      {isGridEmpty && !isFiltered ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', padding: '60px 20px', flexGrow: 1 }}>
+          <EmptyState 
+            hiddenOverdueCount={!viewOptions.overdue ? rawOverdue.length : 0}
+            hiddenUpcomingCount={!viewOptions.upcoming ? rawUpcoming.length : 0}
+            onViewOverdue={() => setViewOptions({ overdue: true, today: false, upcoming: false })}
+            onViewUpcoming={() => setViewOptions({ overdue: false, today: false, upcoming: true })}
+          />
+        </div>
+      ) : (
+        <div className={`today-content-layout ${allThreeSelected ? 'layout-full-width' : ''}`}>
+          {/* Main Column */}
+          <div className="today-main-column">
 
-      {hasAnyTasks && (
-        <SelectedFilter
-          handleFilterChange={handleFilterChange}
-          clearFilters={clearFilters}
-          filters={filters}
-          allCourses={allCourses}
-        />
-      )}
 
-      <CardsGrid
-        setSelectedSubtask={setSelectedSubtask}
-        overdue={overdue}
-        today={today}
-        upcoming={upcoming}
-        loading={loading}
-        filters={filters}
-        viewOptions={viewOptions}
-      />
+            <StatusCardGrid 
+              defeatedSubTask={rawOverdue[0]} 
+              todaySubTask={rawToday[0]} 
+              nextSubTask={rawUpcoming[0]} 
+              viewOptions={viewOptions}
+              onSubtaskClick={handleSubtaskClick}
+            />
 
-      {selectedSubtask && (
-        <SelectedSubtask onClose={onClose} selectedSubtask={selectedSubtask} />
+            <CardsGrid
+              onSubtaskClick={handleSubtaskClick}
+              overdue={overdue}
+              today={today}
+              upcoming={upcoming}
+              filters={filters}
+              viewOptions={viewOptions}
+            />
+          </div>
+
+          {/* Sidebar Column */}
+          <div className="today-side-column">
+            {!viewOptions.overdue && rawOverdue.length > 0 && (
+              <OverdueTasksAlert 
+                count={rawOverdue.length} 
+                onSolve={() => setViewOptions({ overdue: true, today: false, upcoming: false })} 
+              />
+            )}
+            
+            {viewOptions.overdue && !viewOptions.today && !viewOptions.upcoming && (
+              <div className="overdue-return-banner">
+                <div className="overdue-return-main">
+                  <div className="overdue-return-icon-wrapper">
+                    <ArrowLeft size={20} color="var(--primary-color)" />
+                  </div>
+                  <div className="overdue-return-content">
+                    <span className="overdue-return-title">
+                      Resolviendo tareas vencidas
+                    </span>
+                    <span className="overdue-return-subtitle">
+                      Ponte al día para no afectar tu progreso.
+                    </span>
+                  </div>
+                </div>
+                <button 
+                  className="overdue-return-button"
+                  onClick={() => setViewOptions({ overdue: false, today: true, upcoming: true })}
+                >
+                  <ArrowLeft size={16} />
+                  Volver a mi día
+                </button>
+              </div>
+            )}
+
+            {rawToday.length > 0 && (
+              <TodaySummaryCard 
+                pendingCount={rawToday.length}
+                totalNeededHours={rawToday.reduce((acc, curr) => acc + (curr.needed_hours || 0), 0)}
+              />
+            )}
+
+            {hasAnyTasks && (
+              <SelectedFilter
+                handleFilterChange={handleFilterChange}
+                clearFilters={clearFilters}
+                filters={filters}
+                allCourses={allCourses}
+              />
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

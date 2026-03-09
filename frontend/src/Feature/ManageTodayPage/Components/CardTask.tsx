@@ -10,19 +10,21 @@ interface CardTaskProps {
   onClick: () => void
 }
 
-/* ── Component ───────────────────────────────────────────── */
-
 const CardTask: React.FC<CardTaskProps> = ({ sub, variant, onClick }) => {
   const [checked, setChecked] = useState(sub.status === 'completed')
 
-  const subject = sub.task?.subject === '' || !sub.task?.subject
-    ? 'No asignado'
-    : sub.task.subject
-
+  const parentTaskTitle = sub.task?.title || 'Sin tarea asiganda'
+  const timeInfo = sub.needed_hours ? `${sub.needed_hours}h` : ''
   const badgeLabel = buildBadgeLabel(variant, sub)
 
+  let displayTimeInfo = timeInfo
+  if (variant === 'overdue' && sub.planification_date) {
+    const formattedDate = new Date(sub.planification_date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+    displayTimeInfo = timeInfo ? `${timeInfo} • ${formattedDate}` : formattedDate
+  }
+
   const handleCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation()          // don't bubble to card click
+    e.stopPropagation()
     setChecked(e.target.checked)
   }
 
@@ -31,23 +33,57 @@ const CardTask: React.FC<CardTaskProps> = ({ sub, variant, onClick }) => {
       className={`task-card${checked ? ' task-card--done' : ''}`}
       onClick={onClick}
     >
+      {variant !== 'overdue' && (
+        <input
+          type="checkbox"
+          className="task-card__check"
+          checked={checked}
+          onChange={handleCheckChange}
+          onClick={e => e.stopPropagation()}
+          aria-label={`Marcar "${sub.description}" como completada`}
+        />
+      )}
+
       <div className="task-card__body">
         <p className="task-card__title">{sub.description}</p>
-        <p className="task-card__subject">{subject}</p>
-        <span className="task-card__badge">
-          {variant === 'upcoming' ? <Calendar size={13} /> : <Clock size={13} />}
-          {badgeLabel}
-        </span>
+        
+        {variant === 'overdue' ? (
+          <div className="task-card__info-col">
+            <p className="task-card__parent-task">{parentTaskTitle}</p>
+            <span className="task-card__badge">
+              <Clock size={13} />
+              {displayTimeInfo || badgeLabel}
+            </span>
+          </div>
+        ) : (
+          <div className="task-card__info-row">
+            <p className="task-card__parent-task">{parentTaskTitle}</p>
+            <span className="task-card__badge">
+              {variant === 'upcoming' ? <Calendar size={13} /> : <Clock size={13} />}
+              {timeInfo || badgeLabel}
+            </span>
+          </div>
+        )}
       </div>
 
-      <input
-        type="checkbox"
-        className="task-card__check"
-        checked={checked}
-        onChange={handleCheckChange}
-        onClick={e => e.stopPropagation()}
-        aria-label={`Marcar "${sub.description}" como completada`}
-      />
+      {variant === 'overdue' && (
+        <div className="task-card__actions" onClick={e => e.stopPropagation()}>
+          <button 
+            className="task-card__action-btn archive-btn"
+            onClick={(e) => { e.stopPropagation(); setChecked(true); }}
+            aria-label={`Archivar "${sub.description}"`}
+          >
+            Archivar
+          </button>
+          <button 
+            className="task-card__action-btn reschedule-btn"
+            onClick={(e) => { e.stopPropagation(); }}
+            aria-label={`Reprogramar "${sub.description}"`}
+          >
+            Reprogramar
+          </button>
+        </div>
+      )}
     </div>
   )
 }

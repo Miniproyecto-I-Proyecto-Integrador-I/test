@@ -8,6 +8,7 @@ interface StatusCardGridProps {
   todaySubTask?: Subtask;
   nextSubTask?: Subtask;
   viewOptions?: { overdue: boolean; today: boolean; upcoming: boolean };
+  onSubtaskClick?: (sub: Subtask) => void;
 }
 
 const StatusCardGrid: React.FC<StatusCardGridProps> = ({
@@ -15,6 +16,7 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
   todaySubTask,
   nextSubTask,
   viewOptions = { overdue: true, today: true, upcoming: true },
+  onSubtaskClick,
 }) => {
   return (
     <div className="status-card-grid">
@@ -22,8 +24,9 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
       {viewOptions.overdue && (
         <StatusCard
           subtask={defeatedSubTask}
-          message="Más antigua"
+          message="Vencida · Más antigua"
           variant="overdue"
+          onClick={defeatedSubTask ? () => onSubtaskClick?.(defeatedSubTask) : undefined}
         />
       )}
 
@@ -31,8 +34,9 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
       {viewOptions.today && (
         <StatusCard
           subtask={todaySubTask}
-          message="Hoy"
+          message="Hoy · Rápida de completar"
           variant="today"
+          onClick={todaySubTask ? () => onSubtaskClick?.(todaySubTask) : undefined}
         />
       )}
 
@@ -40,8 +44,9 @@ const StatusCardGrid: React.FC<StatusCardGridProps> = ({
       {viewOptions.upcoming && (
         <StatusCard
           subtask={nextSubTask}
-          message="Por venir"
+          message="Próxima · La más cercana"
           variant="upcoming"
+          onClick={nextSubTask ? () => onSubtaskClick?.(nextSubTask) : undefined}
         />
       )}
     </div>

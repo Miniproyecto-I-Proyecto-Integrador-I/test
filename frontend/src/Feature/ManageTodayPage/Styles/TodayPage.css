@@ -1,7 +1,7 @@
 /* --- CONTENEDOR PRINCIPAL --- */
 .today-page {
-    padding: 32px;
-    max-width: 1200px;
+    padding: 32px 40px;
+    max-width: 1500px;
     margin: 0 auto;
     font-family: var(--font-family);
     color: var(--text-main);
@@ -43,6 +43,130 @@
     color: var(--text-secondary);
     font-weight: 500;
     margin: 0;
+}
+
+/* --- GRID LAYOUT --- */
+.today-content-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px; /* main column vs sidebar */
+    gap: 32px;
+    align-items: start;
+}
+
+.today-main-column {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* allows children to shrink and truncate if needed */
+}
+
+.today-side-column {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 32px;
+}
+
+/* Three views selected -> Make main column 100% and wrap the sidebar beneath it */
+.today-content-layout.layout-full-width {
+    grid-template-columns: 1fr;
+}
+
+.today-content-layout.layout-full-width .today-side-column {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 32px;
+}
+
+.today-content-layout.layout-full-width .today-side-column > * {
+    flex: 1;
+    min-width: 300px;
+}
+
+@media (max-width: 1024px) {
+    .today-content-layout {
+        grid-template-columns: 1fr;
+    }
+    .today-side-column {
+        position: static;
+        order: -1; /* optionally move the sidebar to top on mobile */
+    }
+}
+
+/* --- OVERDUE RETURN BANNER --- */
+.overdue-return-banner {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.overdue-return-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.overdue-return-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-base);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.overdue-return-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.overdue-return-title {
+    font-size: 15px;
+    color: var(--text-main);
+    font-weight: 600;
+    font-family: var(--font-family);
+    line-height: 1.3;
+}
+
+.overdue-return-subtitle {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-family: var(--font-family);
+    line-height: 1.4;
+}
+
+.overdue-return-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: white;
+    color: var(--text-main);
+    cursor: pointer;
+    font-family: var(--font-family);
+    width: 100%;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.overdue-return-button:hover {
+    background-color: var(--bg-base);
+    border-color: #d1d5db;
 }
 
 /* --- ESTADOS (CARGANDO Y VACÍO) --- */
@@ -166,6 +290,45 @@
     padding: 12px 28px !important;
     font-size: var(--font-size-body) !important;
     border-radius: var(--border-radius-base) !important;
+}
+
+.empty-state-hidden-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: var(--font-size-body);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background-color: var(--surface);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-family);
+}
+
+.empty-state-hidden-btn.overdue-btn {
+    color: var(--error-color);
+    border-color: #fca5a5;
+    background-color: #fef2f2;
+}
+
+.empty-state-hidden-btn.overdue-btn:hover {
+    background-color: #fee2e2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.empty-state-hidden-btn.upcoming-btn {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: transparent;
+}
+
+.empty-state-hidden-btn.upcoming-btn:hover {
+    background-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
 
 /* Card/grid styles → moved to CardTasks.css */
