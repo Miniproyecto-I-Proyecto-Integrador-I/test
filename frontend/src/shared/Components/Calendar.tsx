@@ -14,6 +14,8 @@ export interface CalendarProps {
   month?: Date;
   /** Fired when the user navigates to a different month. */
   onMonthChange?: (newMonth: Date) => void;
+  /** Fired when the user clicks a day cell. */
+  onDaySelect?: (date: Date) => void;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -71,6 +73,7 @@ const Calendar = ({
   renderDay,
   month: controlledMonth,
   onMonthChange,
+  onDaySelect,
 }: CalendarProps) => {
   const today = new Date();
 
@@ -158,7 +161,10 @@ const Calendar = ({
             <div
               key={idx}
               className={cellClass}
-              onClick={() => setSelectedDate(date)}
+              onClick={() => {
+                setSelectedDate(date);
+                onDaySelect?.(date);
+              }}
             >
               <span className="calendar__day-number">{date.getDate()}</span>
               <div className="calendar__cell-content">
