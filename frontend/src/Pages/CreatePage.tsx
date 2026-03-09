@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import LoadingScreen from '../shared/Components/LoadingScreen';
 import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
 import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
 import '../Feature/ManageCreatePage/Styles/CreatePage.css';
@@ -12,7 +11,7 @@ import { useTasks } from '../Feature/ManageCreatePage/Hooks/useTasks';
 import { useNotification } from '../Feature/ManageCreatePage/Hooks/useNotification';
 
 const CreatePage = () => {
-  const { isLoading, addTask } = useTasks();
+  const { addTask } = useTasks();
   const { notification, showNotification } = useNotification();
   const navigate = useNavigate();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -39,10 +38,6 @@ const CreatePage = () => {
       );
     }
   };
-
-  if (isLoading) {
-    return <LoadingScreen message="Preparando tu espacio de trabajo..." />;
-  }
 
   return (
     <div className="create-page">

@@ -1,8 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, AlertCircle, CalendarClock } from 'lucide-react';
 
-const EmptyState: React.FC = () => {
+interface EmptyStateProps {
+  hiddenOverdueCount?: number;
+  hiddenUpcomingCount?: number;
+  onViewOverdue?: () => void;
+  onViewUpcoming?: () => void;
+}
+
+const EmptyState: React.FC<EmptyStateProps> = ({
+  hiddenOverdueCount = 0,
+  hiddenUpcomingCount = 0,
+  onViewOverdue,
+  onViewUpcoming
+}) => {
     const navigate = useNavigate();
     
     return (
@@ -20,7 +32,7 @@ const EmptyState: React.FC = () => {
             
             <h2 className="empty-state-title">¡Estás al día!</h2>
             <p className="empty-state-text">
-                No tienes actividades pendientes . Aprovecha para<br />
+                No tienes actividades pendientes en esta vista. Aprovecha para<br />
                 descansar o planificar tu próxima meta.
             </p>
             
@@ -28,6 +40,29 @@ const EmptyState: React.FC = () => {
                 <Plus size={18} strokeWidth={2.5} />
                 Crear nueva actividad
             </button>
+
+            {(hiddenOverdueCount > 0 || hiddenUpcomingCount > 0) && (
+                <div style={{ display: 'flex', gap: '16px', marginTop: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {hiddenOverdueCount > 0 && (
+                        <button 
+                            className="empty-state-hidden-btn overdue-btn"
+                            onClick={onViewOverdue}
+                        >
+                            <AlertCircle size={16} />
+                            Tienes {hiddenOverdueCount} {hiddenOverdueCount === 1 ? 'tarea vencida' : 'tareas vencidas'}
+                        </button>
+                    )}
+                    {hiddenUpcomingCount > 0 && (
+                        <button 
+                            className="empty-state-hidden-btn upcoming-btn"
+                            onClick={onViewUpcoming}
+                        >
+                            <CalendarClock size={16} />
+                            Tienes {hiddenUpcomingCount} {hiddenUpcomingCount === 1 ? 'tarea próxima' : 'tareas próximas'}
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     )
 }

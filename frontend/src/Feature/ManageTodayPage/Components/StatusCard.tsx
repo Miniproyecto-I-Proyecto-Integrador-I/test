@@ -30,7 +30,6 @@ const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant, onCl
   }
 
   const parentTaskTitle = subtask.task?.title || 'Sin tarea principal'
-  const timeInfo = subtask.needed_hours ? `${subtask.needed_hours}h` : ''
   const footerLabel = buildFooterLabel(variant, subtask)
 
   return (
@@ -49,11 +48,6 @@ const StatusCard: React.FC<StatusCardProps> = ({ subtask, message, variant, onCl
 
       <div className="status-card__info-row">
         <p className="status-card__parent-task">{parentTaskTitle}</p>
-        {timeInfo && (
-          <span className="status-card__time">
-            {timeInfo}
-          </span>
-        )}
       </div>
 
       {/* Footer with icon + contextual label */}

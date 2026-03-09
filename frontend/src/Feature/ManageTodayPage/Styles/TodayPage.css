@@ -292,6 +292,45 @@
     border-radius: var(--border-radius-base) !important;
 }
 
+.empty-state-hidden-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: var(--font-size-body);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background-color: var(--surface);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-family);
+}
+
+.empty-state-hidden-btn.overdue-btn {
+    color: var(--error-color);
+    border-color: #fca5a5;
+    background-color: #fef2f2;
+}
+
+.empty-state-hidden-btn.overdue-btn:hover {
+    background-color: #fee2e2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.empty-state-hidden-btn.upcoming-btn {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: transparent;
+}
+
+.empty-state-hidden-btn.upcoming-btn:hover {
+    background-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
 /* Card/grid styles → moved to CardTasks.css */
 
 /* --- MODAL DE DETALLES --- */

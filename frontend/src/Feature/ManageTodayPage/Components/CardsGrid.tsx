@@ -2,9 +2,7 @@ import React from 'react'
 import { AlertCircle, CalendarCheck, CalendarClock, SearchX, CheckCircle2 } from 'lucide-react'
 import type { Subtask } from '../Types/models'
 import CardTask from './CardTask'
-import EmptyState from './EmptyState'
 import InfoTooltip from '../../../shared/Components/InfoTooltip'
-import LoadingScreen from '../../../shared/Components/LoadingScreen';
 
 import '../Styles/CardTasks.css'
 
@@ -13,7 +11,6 @@ interface CardsGridProps {
   overdue: Subtask[]
   today: Subtask[]
   upcoming: Subtask[]
-  loading: boolean
   filters?: Record<string, string>
   viewOptions?: { overdue: boolean; today: boolean; upcoming: boolean }
 }
@@ -42,13 +39,9 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   overdue, 
   today, 
   upcoming,
-  loading,
   filters,
   viewOptions = { overdue: true, today: true, upcoming: true }
 }) => {
-  if (loading) {
-    return <LoadingScreen message="Cargando tus actividades del día..." />;
-  }
 
   const isEmpty = 
     (!viewOptions.overdue || overdue.length === 0) && 
@@ -68,7 +61,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
         </div>
       )
     }
-    return <EmptyState />
+    return null
   }
 
   // Combined render for completed items
