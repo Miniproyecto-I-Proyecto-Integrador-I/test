@@ -1,0 +1,135 @@
+/* =========================================================
+   Calendar Component Styles
+   ========================================================= */
+
+.calendar {
+  background: var(--surface);
+  border-radius: var(--border-radius-base);
+  padding: 24px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.calendar__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.calendar__nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  padding: 0;
+}
+
+.calendar__nav-btn:hover {
+  background: var(--btn-sec-hover);
+  color: var(--text-main);
+}
+
+.calendar__title {
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1;
+  width: 200px;
+  text-align: center;
+}
+
+/* ── Day-of-week header ─────────────────────────────────── */
+.calendar__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0;
+}
+
+.calendar__weekday {
+  text-align: center;
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  padding: 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Grid ───────────────────────────────────────────────── */
+.calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-left: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+}
+
+/* ── Cell ───────────────────────────────────────────────── */
+.calendar__cell {
+  position: relative;
+  min-height: 88px;
+  padding: 8px;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  box-sizing: border-box;
+  background: var(--surface);
+  transition: background 0.12s;
+}
+
+.calendar__cell--empty {
+  background: var(--bg-base);
+  pointer-events: none;
+}
+
+.calendar__cell--today {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.calendar__cell--selected {
+  background: #D1FAE5;
+}
+
+.calendar__cell--outside.calendar__cell--selected {
+  background: #D1FAE5;
+}
+
+.calendar__cell:not(.calendar__cell--today):not(.calendar__cell--empty):hover {
+  background: var(--btn-sec-hover);
+  cursor: pointer;
+}
+
+/* ── Day number ─────────────────────────────────────────── */
+.calendar__day-number {
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+.calendar__cell--today .calendar__day-number {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.calendar__cell--outside .calendar__day-number {
+  color: var(--text-tertiary);
+}
+
+/* ── Custom content area ────────────────────────────────── */
+.calendar__cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
