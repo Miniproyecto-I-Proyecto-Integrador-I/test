@@ -38,22 +38,24 @@ const MONTHS_ES = [
 ];
 
 /**
- * Returns only the cells needed for the month (4, 5 or 6 rows).
- * Slots before the 1st and after the last day are null (empty placeholders).
+ * Returns every cell for the visible weeks (4, 5 or 6 rows).
+ * Outside-month days get `isCurrentMonth: false` so they can be dimmed.
  */
-function buildCalendarCells(year: number, month: number): (Date | null)[] {
+function buildCalendarCells(
+  year: number,
+  month: number,
+): { date: Date; isCurrentMonth: boolean }[] {
   const startOffset = new Date(year, month, 1).getDay(); // 0 = Sunday
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-  const cells: (Date | null)[] = [];
+  const cells: { date: Date; isCurrentMonth: boolean }[] = [];
 
   for (let i = 0; i < totalCells; i++) {
     const dayNum = i - startOffset + 1;
-    cells.push(
-      dayNum >= 1 && dayNum <= daysInMonth
-        ? new Date(year, month, dayNum)
-        : null,
-    );
+    cells.push({
+      date: new Date(year, month, dayNum),
+      isCurrentMonth: dayNum >= 1 && dayNum <= daysInMonth,
+    });
   }
 
   return cells;
@@ -114,9 +116,52 @@ const Calendar = ({
         >
           <ChevronLeft size={16} />
         </button>
-        <span className="calendar__title">
-          {MONTHS_ES[activeMonth.getMonth()]} {activeMonth.getFullYear()}
-        </span>
+
+        <div className="calendar__selectors">
+          <select
+            className="calendar__select"
+            value={activeMonth.getMonth()}
+            onChange={(e) => {
+              const next = new Date(
+                activeMonth.getFullYear(),
+                Number(e.target.value),
+                1,
+              );
+              onMonthChange ? onMonthChange(next) : setInternalMonth(next);
+            }}
+            aria-label="Seleccionar mes"
+          >
+            {MONTHS_ES.map((m, i) => (
+              <option key={m} value={i}>
+                {m}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="calendar__select"
+            value={activeMonth.getFullYear()}
+            onChange={(e) => {
+              const next = new Date(
+                Number(e.target.value),
+                activeMonth.getMonth(),
+                1,
+              );
+              onMonthChange ? onMonthChange(next) : setInternalMonth(next);
+            }}
+            aria-label="Seleccionar año"
+          >
+            {Array.from(
+              { length: 11 },
+              (_, i) => today.getFullYear() - 5 + i,
+            ).map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
           className="calendar__nav-btn"
           onClick={() => navigate(1)}
@@ -137,13 +182,7 @@ const Calendar = ({
 
       {/* Day grid */}
       <div className="calendar__grid">
-        {days.map((date, idx) => {
-          if (!date) {
-            return (
-              <div key={idx} className="calendar__cell calendar__cell--empty" />
-            );
-          }
-
+        {days.map(({ date, isCurrentMonth }, idx) => {
           const isToday = isSameDay(date, today);
           const isSelected = selectedDate
             ? isSameDay(date, selectedDate)
@@ -151,6 +190,7 @@ const Calendar = ({
 
           const cellClass = [
             'calendar__cell',
+            !isCurrentMonth ? 'calendar__cell--outside' : '',
             isToday ? 'calendar__cell--today' : '',
             isSelected ? 'calendar__cell--selected' : '',
           ]
@@ -168,7 +208,7 @@ const Calendar = ({
             >
               <span className="calendar__day-number">{date.getDate()}</span>
               <div className="calendar__cell-content">
-                {renderDay?.(date, true)}
+                {renderDay?.(date, isCurrentMonth)}
               </div>
             </div>
           );
