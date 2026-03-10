@@ -22,10 +22,24 @@ class SubtaskFilter(filters.FilterSet):
     subject = filters.CharFilter(field_name='task__subject', lookup_expr='icontains')
     type = filters.CharFilter(field_name='task__type', lookup_expr='iexact')
     priority = filters.CharFilter(field_name='task__priority', lookup_expr='iexact')
+    # Permite excluir subtareas por id: ?exclude_ids=1,2,3
+    exclude_ids = filters.CharFilter(method='filter_exclude_ids', label='Exclude IDs (csv)')
+
+    def filter_exclude_ids(self, queryset, name, value):
+        """Excluye los ids provistos en una lista CSV."""
+        if not value:
+            return queryset
+        try:
+            ids = [int(s) for s in value.split(',') if s.strip()]
+        except ValueError:
+            return queryset
+        if ids:
+            return queryset.exclude(id__in=ids)
+        return queryset
     
     class Meta:
         model = Subtask
-        fields = ['planification_date', 'planification_date_gte', 'planification_date_lte', 'status', 'needed_hours', 'subject', 'type', 'priority', 'task', 'task_title']
+        fields = ['planification_date', 'planification_date_gte', 'planification_date_lte', 'status', 'needed_hours', 'subject', 'type', 'priority', 'task', 'task_title', 'exclude_ids']
 
 
 class SubtaskViewSet(viewsets.ModelViewSet):
