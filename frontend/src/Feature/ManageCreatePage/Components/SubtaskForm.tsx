@@ -3,16 +3,15 @@ import { useSubtaskForm } from '../Hooks/useSubtaskForm';
 import type { SubtaskItem } from '../Types/subtask.types';
 import '../Styles/SubtaskForm.css';
 import { getTaskById } from '../Services/taskService';
-import { ClipboardList, GripVertical, Calendar, Clock, Trash2 } from 'lucide-react';
+import {
+  ClipboardList,
+  GripVertical,
+  Calendar,
+  Clock,
+  Trash2,
+} from 'lucide-react';
 import InfoTooltip from '../../../shared/Components/InfoTooltip';
-
-const getTodayDateStr = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+import DatePickerModal from './DatePickerModal';
 
 interface SubtaskFormProps {
   onSubtasksChange?: (subtasks: any[]) => void;
@@ -37,9 +36,10 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
     errors,
     totalNeededHours,
     handleFieldChange,
-    addSubtask,
     removeSubtask,
     reorderSubtasks,
+    validateForSchedule,
+    addSubtaskWithDate,
   } = useSubtaskForm(initialSubtasks);
 
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -47,6 +47,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [originalHours, setOriginalHours] = useState(0);
   const [maxDate, setMaxDate] = useState<string | undefined>(undefined);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   useEffect(() => {
     const fetchOriginalHours = async () => {
@@ -64,7 +65,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
           if (!baseSubtasksForHours && fetchedTask.subtasks) {
             const totalOriginal = fetchedTask.subtasks.reduce(
               (sum: number, st: any) => sum + (Number(st.needed_hours) || 0),
-              0
+              0,
             );
             setOriginalHours(totalOriginal);
           }
@@ -85,12 +86,14 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
     }
   }, [subtasks, onSubtasksChange]);
 
-  const handleAddSubtask = () => {
-    if (maxDate && formData.planification_date > maxDate) {
-      alert(`La fecha del paso no puede superar la fecha límite de la tarea (${formatDate(maxDate)}).`);
-      return;
-    }
-    addSubtask();
+  const handleElegirHorario = () => {
+    if (!validateForSchedule()) return;
+    setIsDatePickerOpen(true);
+  };
+
+  const handleDateConfirm = (date: string) => {
+    addSubtaskWithDate(date);
+    setIsDatePickerOpen(false);
   };
 
   const handleRemoveSubtask = (id: string) => {
@@ -160,13 +163,28 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
             <span className="task-summary-label">Tarea principal</span>
             <span className="task-summary-title">{taskTitle}</span>
             {maxDate && (
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', display: 'block', marginTop: '4px' }}>
+              <span
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-tertiary)',
+                  display: 'block',
+                  marginTop: '4px',
+                }}
+              >
                 Fecha de entrega: {formatDate(maxDate)}
               </span>
             )}
           </div>
         </div>
-        <div className="task-summary-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+        <div
+          className="task-summary-right"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             <span className="task-summary-label">Tiempo total:</span>
             <span className="task-summary-value">
@@ -184,53 +202,50 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
         </p>
 
         <div className="subtask-form-input-section">
-          <div className="subtask-form-field">
-            <label htmlFor="description">Descripción del paso a realizar</label>
-            <input
-              id="description"
-              type="text"
-              className={`subtask-form-input ${errors.description ? 'error' : ''}`}
-              placeholder="Ej. Buscar 3 referencias bibliográficas en la biblioteca"
-              value={formData.description}
-              onChange={(e) => handleFieldChange('description', e.target.value)}
-              maxLength={300}
-            />
-            <span className="subtask-form-char-count">
-              {formData.description.length}/300 caracteres
-            </span>
-            {errors.description && (
-              <span className="subtask-form-error">{errors.description}</span>
-            )}
-          </div>
-
           <div className="subtask-form-row">
-            <div className="subtask-form-field">
-              <label htmlFor="planification_date" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexDirection: 'row' }}>
-                <span>¿Qué día planeas hacer esto?</span>
-                {maxDate && (
-                  <InfoTooltip content={`Limitado por la entrega de la tarea principal (${formatDate(maxDate)})`} />
-                )}
+            <div className="subtask-form-field" style={{ flex: 1 }}>
+              <label htmlFor="description">
+                Descripción del paso a realizar
               </label>
               <input
-                id="planification_date"
-                type="date"
-                min={getTodayDateStr()}
-                max={maxDate}
-                className={`subtask-form-input ${errors.planification_date ? 'error' : ''}`}
-                value={formData.planification_date}
+                id="description"
+                type="text"
+                className={`subtask-form-input ${errors.description ? 'error' : ''}`}
+                placeholder="Ej. Buscar 3 referencias bibliográficas en la biblioteca"
+                value={formData.description}
                 onChange={(e) =>
-                  handleFieldChange('planification_date', e.target.value)
+                  handleFieldChange('description', e.target.value)
                 }
+                maxLength={300}
               />
-              {errors.planification_date && (
-                <span className="subtask-form-error">
-                  {errors.planification_date}
-                </span>
+              <span className="subtask-form-char-count">
+                {formData.description.length}/300 caracteres
+              </span>
+              {errors.description && (
+                <span className="subtask-form-error">{errors.description}</span>
               )}
             </div>
 
-            <div className="subtask-form-field">
-              <label htmlFor="needed_hours">Tiempo estimado (horas)</label>
+            <div
+              className="subtask-form-field"
+              style={{ width: '160px', flexShrink: 0 }}
+            >
+              <label
+                htmlFor="needed_hours"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span>Tiempo estimado (horas)</span>
+                {maxDate && (
+                  <InfoTooltip
+                    content={`Limitado por la entrega de la tarea principal (${formatDate(maxDate)})`}
+                  />
+                )}
+              </label>
               <input
                 id="needed_hours"
                 type="number"
@@ -257,9 +272,10 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
           <button
             type="button"
             className="subtask-form-add-btn"
-            onClick={handleAddSubtask}
+            onClick={handleElegirHorario}
           >
-            Añadir esta actividad
+            <Calendar size={16} aria-hidden="true" />
+            Elegir horario
           </button>
         </div>
 
@@ -327,6 +343,16 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
           </button>
         </div>
       )}
+
+      <DatePickerModal
+        isOpen={isDatePickerOpen}
+        onClose={() => setIsDatePickerOpen(false)}
+        onConfirm={handleDateConfirm}
+        newSubtaskDescription={formData.description}
+        newSubtaskHours={formData.needed_hours}
+        pendingSubtasks={subtasks}
+        maxDate={maxDate}
+      />
     </div>
   );
 };

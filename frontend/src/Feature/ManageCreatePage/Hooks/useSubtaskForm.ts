@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { SubtaskFormData, SubtaskItem, ValidationErrors } from '../Types/subtask.types';
-import { validateSubtaskForm, hasValidationErrors } from '../Utils/subtaskValidator';
+import { validateSubtaskForm, hasValidationErrors, validateDescription, validateHours } from '../Utils/subtaskValidator';
 
 export const useSubtaskForm = (initialSubtasks: SubtaskItem[] = []) => {
     const [subtasks, setSubtasks] = useState<SubtaskItem[]>(initialSubtasks);
@@ -108,6 +108,46 @@ export const useSubtaskForm = (initialSubtasks: SubtaskItem[] = []) => {
         setErrors({});
     };
 
+    /**
+     * Validates only description + hours (no date), sets errors, returns true if valid.
+     * Used before opening the date-picker modal.
+     */
+    const validateForSchedule = (): boolean => {
+        const partialErrors: ValidationErrors = {};
+        if (!validateDescription(formData.description)) {
+            partialErrors.description = 'La descripción no puede estar vacía';
+        }
+        if (!validateHours(formData.needed_hours)) {
+            partialErrors.needed_hours = 'El tiempo debe ser mayor que 0 horas';
+        }
+        if (hasValidationErrors(partialErrors)) {
+            setErrors(partialErrors);
+            return false;
+        }
+        return true;
+    };
+
+    /**
+     * Adds a subtask using an externally-provided date (from the date-picker modal).
+     * Validates all fields and resets the form on success.
+     */
+    const addSubtaskWithDate = (date: string): boolean => {
+        const dataWithDate: SubtaskFormData = { ...formData, planification_date: date };
+        const validationErrors = validateSubtaskForm(dataWithDate);
+        if (hasValidationErrors(validationErrors)) {
+            setErrors(validationErrors);
+            return false;
+        }
+        const newSubtask: SubtaskItem = {
+            ...dataWithDate,
+            id: `temp-${Date.now()}`,
+        };
+        setSubtasks(prev => [...prev, newSubtask]);
+        setFormData({ description: '', planification_date: '', needed_hours: 0 });
+        setErrors({});
+        return true;
+    };
+
     return {
         subtasks,
         formData,
@@ -118,5 +158,7 @@ export const useSubtaskForm = (initialSubtasks: SubtaskItem[] = []) => {
         removeSubtask,
         reorderSubtasks,
         resetForm,
+        validateForSchedule,
+        addSubtaskWithDate,
     };
 };
