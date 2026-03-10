@@ -20,6 +20,7 @@ interface SubtaskFormProps {
   initialSubtasks?: SubtaskItem[];
   onFinalize?: (subtasks: any[]) => Promise<void>;
   taskId?: number;
+  baseSubtasksForHours?: Array<{ needed_hours?: number }>;
 }
 
 const SubtaskForm: React.FC<SubtaskFormProps> = ({
@@ -28,6 +29,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
   initialSubtasks = [],
   onFinalize,
   taskId,
+  baseSubtasksForHours,
 }) => {
   const {
     subtasks,
@@ -48,10 +50,18 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
 
   useEffect(() => {
     const fetchOriginalHours = async () => {
+      if (baseSubtasksForHours && baseSubtasksForHours.length > 0) {
+        const totalBase = baseSubtasksForHours.reduce(
+          (sum, st) => sum + (Number(st.needed_hours) || 0),
+          0,
+        );
+        setOriginalHours(totalBase);
+      }
+
       if (taskId) {
         try {
           const fetchedTask = await getTaskById(taskId);
-          if (fetchedTask.subtasks) {
+          if (!baseSubtasksForHours && fetchedTask.subtasks) {
             const totalOriginal = fetchedTask.subtasks.reduce(
               (sum: number, st: any) => sum + (Number(st.needed_hours) || 0),
               0
@@ -67,7 +77,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({
       }
     };
     fetchOriginalHours();
-  }, [taskId]);
+  }, [taskId, baseSubtasksForHours]);
 
   useEffect(() => {
     if (onSubtasksChange) {
