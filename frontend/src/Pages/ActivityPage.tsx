@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import SubtaskEdit from '../Feature/ManageActivityPage/Components/SubtaskEdit';
 import { deleteSubtask, updateSubtask, deleteTask as deleteMainTaskService } from '../Feature/ManageCreatePage/Services/subtaskService';
 import { updateTask } from '../Feature/ManageCreatePage/Services/taskService';
+import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
+import SubtaskForm from '../Feature/ManageCreatePage/Components/SubtaskForm';
+import BackButton from '../Feature/ManageCreatePage/Components/BackButton';
 import apiClient from '../Services/ApiClient';
 import LoadingScreen from '../shared/Components/LoadingScreen';
 import { useNotification } from '../Feature/ManageCreatePage/Hooks/useNotification';
@@ -14,6 +17,8 @@ const ActivityPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [task, setTask] = useState<Task | null>(null);
+  const [draftSubtasks, setDraftSubtasks] = useState<EditableSubtask[] | null>(null);
+  const [isAddingSteps, setIsAddingSteps] = useState(false);
   const [loading, setLoading] = useState(true);
   const { notification, showNotification } = useNotification();
 
@@ -22,6 +27,7 @@ const ActivityPage = () => {
       try {
         const response = await apiClient.get<Task>(`/api/task/${id}/`);
         setTask(response.data);
+        setDraftSubtasks(response.data.subtasks ?? []);
       } catch (error) {
         console.error('Error fetching task:', error);
         showNotification('No se pudo cargar la tarea', 'error');
@@ -48,9 +54,13 @@ const ActivityPage = () => {
       });
       await Promise.all(updatePromises);
       showNotification('Subtareas actualizadas correctamente.', 'success');
-      // Update local state if needed or refetch
+
       const response = await apiClient.get<Task>(`/api/task/${id}/`);
       setTask(response.data);
+      setDraftSubtasks(response.data.subtasks ?? []);
+      
+      // Redirigir a /today después de guardar
+      navigate('/today');
     } catch (error) {
       console.error('Error al actualizar subtareas:', error);
       showNotification('No se pudieron guardar los cambios.', 'error');
@@ -61,6 +71,16 @@ const ActivityPage = () => {
     if (typeof subtask.id !== 'number') return;
     try {
       await deleteSubtask(subtask.id);
+      setTask((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          subtasks: (prev.subtasks ?? []).filter((item) => item.id !== subtask.id),
+        };
+      });
+      setDraftSubtasks((prev) =>
+        (prev ?? []).filter((item) => item.id !== subtask.id),
+      );
       showNotification('Subtarea eliminada.', 'success');
     } catch (error) {
       console.error('Error al eliminar subtarea:', error);
@@ -115,6 +135,41 @@ const ActivityPage = () => {
     }
   };
 
+  const handleOpenAddSteps = () => {
+    setIsAddingSteps(true);
+  };
+
+  const handleFinalizeSubtasks = async (subtasksData: any[]) => {
+    if (!task) return;
+
+    try {
+      const createdSubtasks = await createMultipleSubtasks(task.id, subtasksData);
+
+      const normalizedCreated: EditableSubtask[] = createdSubtasks.map((item: any) => ({
+        id: item.id,
+        description: item.description,
+        planification_date: item.planification_date,
+        needed_hours: Number(item.needed_hours) || 0,
+        is_completed: item.is_completed,
+      }));
+
+      setTask((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          subtasks: [...(prev.subtasks ?? []), ...normalizedCreated],
+        };
+      });
+
+      setDraftSubtasks((prev) => [...(prev ?? []), ...normalizedCreated]);
+      setIsAddingSteps(false);
+      showNotification('Nuevos pasos agregados correctamente.', 'success');
+    } catch (error) {
+      console.error('Error al crear subtareas:', error);
+      showNotification('No se pudieron crear los nuevos pasos.', 'error');
+    }
+  };
+
   if (loading) {
     return <LoadingScreen message="Cargando detalles de la actividad..." />;
   }
@@ -127,17 +182,30 @@ const ActivityPage = () => {
         </div>
       )}
       <div className="subtask-fullscreen">
-        {task ? (
+        {task && isAddingSteps ? (
+          <>
+            <BackButton onClick={() => setIsAddingSteps(false)} label="Volver a editar subtareas" />
+            <SubtaskForm
+              taskId={task.id}
+              taskTitle={task.title}
+              baseSubtasksForHours={draftSubtasks ?? task.subtasks ?? []}
+              onFinalize={handleFinalizeSubtasks}
+            />
+          </>
+        ) : task ? (
           <SubtaskEdit
             taskId={task.id}
-            initialSubtasks={task.subtasks ?? []}
+            initialSubtasks={draftSubtasks ?? task.subtasks ?? []}
+            persistedSubtasks={task.subtasks ?? []}
             taskTitle={task.title}
             taskDueDate={task.due_date ?? undefined}
             task={task}
+            onSubtasksChange={setDraftSubtasks}
             onSaveChanges={handleSaveSubtasks}
             onSaveTask={handleSaveTask}
             onDeleteSubtask={handleDeleteEditedSubtask}
             onTaskDeleted={handleTaskDeleted}
+            onAddNewSubtask={handleOpenAddSteps}
             onClose={() => navigate(-1)}
           />
         ) : (
