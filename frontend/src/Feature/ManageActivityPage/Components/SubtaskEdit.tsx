@@ -10,6 +10,8 @@ import {
   CircleAlert,
   Plus,
 } from 'lucide-react';
+import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
+import type { LocalSubtask } from '../../ManageCalendarPage/Components/DatePickerModal';
 import { useSubtaskEdit, type EditableSubtask } from '../Hooks/useSubtaskEdit';
 import BackButton from '../../ManageCreatePage/Components/BackButton';
 import {
@@ -64,6 +66,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 }) => {
   const [isEditingTask, setIsEditingTask] = useState(false);
   const [isSavingTask, setIsSavingTask] = useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [taskEditData, setTaskEditData] = useState({
     title: task?.title || taskTitle || '',
     description: task?.description || '',
@@ -102,7 +105,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   });
 
   // Store a stringified version of initial subtasks to prevent unnecessary resets
-  const initialSubtasksStr = useMemo(() => JSON.stringify(initialSubtasks ?? []), [initialSubtasks]);
+  const initialSubtasksStr = useMemo(
+    () => JSON.stringify(initialSubtasks ?? []),
+    [initialSubtasks],
+  );
 
   useEffect(() => {
     const parsed = JSON.parse(initialSubtasksStr);
@@ -112,7 +118,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
   const computedTotalHours = useMemo(() => {
     if (typeof totalHours === 'number') return totalHours;
-    return subtasks.reduce((acc, item) => acc + (Number(item.needed_hours) || 0), 0);
+    return subtasks.reduce(
+      (acc, item) => acc + (Number(item.needed_hours) || 0),
+      0,
+    );
   }, [subtasks, totalHours]);
 
   const hasUnsavedChanges = useMemo(() => {
@@ -126,8 +135,43 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         needed_hours: Number(item.needed_hours) || 0,
       }));
 
-    return JSON.stringify(normalize(subtasks)) !== JSON.stringify(normalize(base));
+    return (
+      JSON.stringify(normalize(subtasks)) !== JSON.stringify(normalize(base))
+    );
   }, [initialSubtasks, persistedSubtasks, subtasks]);
+
+  // Subtasks that have been locally modified (vs persisted state) but not yet saved,
+  // excluding the one currently open in the date picker (it's handled by excludeIds separately).
+  const locallyModifiedSubtasks = useMemo((): LocalSubtask[] => {
+    const base = persistedSubtasks ?? initialSubtasks ?? [];
+    const baseMap = new Map(
+      base.map((st) => [
+        st.id,
+        {
+          planification_date: (st.planification_date ?? '').split('T')[0],
+          needed_hours: Number(st.needed_hours) || 0,
+        },
+      ]),
+    );
+    return subtasks
+      .filter((st) => st.id !== editingId)
+      .filter((st) => {
+        const orig = baseMap.get(st.id);
+        if (!orig) return false; // new subtask, not an edit
+        const dateChanged =
+          (st.planification_date ?? '').split('T')[0] !==
+          orig.planification_date;
+        const hoursChanged =
+          (Number(st.needed_hours) || 0) !== orig.needed_hours;
+        return dateChanged || hoursChanged;
+      })
+      .map((st) => ({
+        id: st.id,
+        description: st.description,
+        planification_date: (st.planification_date ?? '').split('T')[0],
+        needed_hours: Number(st.needed_hours) || 0,
+      }));
+  }, [subtasks, editingId, persistedSubtasks, initialSubtasks]);
 
   const handleTaskEditFieldChange = (field: string, value: string) => {
     setTaskEditData((prev) => ({ ...prev, [field]: value }));
@@ -168,14 +212,18 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   return (
     <div className="subtask-edit-wrapper">
       {hasUnsavedChanges && (
-        <div className="subtask-edit-unsaved-toast" role="status" aria-live="polite">
+        <div
+          className="subtask-edit-unsaved-toast"
+          role="status"
+          aria-live="polite"
+        >
           <CircleAlert size={18} />
           <span>Tienes cambios sin guardar</span>
         </div>
       )}
-      <BackButton 
-        onClick={isEditingTask ? handleCancelTaskEdit : onClose} 
-        label={isEditingTask ? "Volver sin editar" : "Volver a inicio"}
+      <BackButton
+        onClick={isEditingTask ? handleCancelTaskEdit : onClose}
+        label={isEditingTask ? 'Volver sin editar' : 'Volver a inicio'}
       />
       <div className="subtask-edit-container">
         {!isEditingTask ? (
@@ -185,8 +233,12 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 <div>
                   <div className="subtask-edit-task-header-row">
                     <div className="subtask-edit-title-group">
-                      <h2 className="subtask-edit-title">{taskEditData.title}</h2>
-                      <span className="subtask-edit-category">PRIORIDAD: {getPriorityLabel(taskEditData.priority)}</span>
+                      <h2 className="subtask-edit-title">
+                        {taskEditData.title}
+                      </h2>
+                      <span className="subtask-edit-category">
+                        PRIORIDAD: {getPriorityLabel(taskEditData.priority)}
+                      </span>
                     </div>
 
                     <div className="subtask-edit-buttons-group">
@@ -223,11 +275,13 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                     </span>
                     <span className="subtask-edit-meta-item">
                       <Clock size={16} />
-                     ESTIMADO: {computedTotalHours.toFixed(1)} Horas totales
+                      ESTIMADO: {computedTotalHours.toFixed(1)} Horas totales
                     </span>
                   </div>
                   <div className="subtask-edit-description-row">
-                    <span className="subtask-edit-description-label">Descripción:</span>
+                    <span className="subtask-edit-description-label">
+                      Descripción:
+                    </span>
                     <span className="subtask-edit-description-text">
                       {taskEditData.description?.trim() || '-'}
                     </span>
@@ -238,13 +292,21 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
             <div className="subtask-edit-subtasks-card">
               <section className="subtask-edit-list-section">
-                <h3 className="subtask-edit-section-title">Actividades de la tarea</h3>
+                <h3 className="subtask-edit-section-title">
+                  Actividades de la tarea
+                </h3>
 
                 <div className="subtask-edit-list">
                   {subtasks.length === 0 ? (
                     <div className="subtask-edit-empty-state">
-                      <FileText size={56} className="subtask-edit-empty-icon" strokeWidth={1.5} />
-                      <p className="subtask-edit-empty-text">No hay subtareas creadas</p>
+                      <FileText
+                        size={56}
+                        className="subtask-edit-empty-icon"
+                        strokeWidth={1.5}
+                      />
+                      <p className="subtask-edit-empty-text">
+                        No hay subtareas creadas
+                      </p>
                       <p className="subtask-edit-empty-hint">
                         Agrega un nuevo paso para comenzar a organizar tu tarea
                       </p>
@@ -260,11 +322,20 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                           {!isEditing ? (
                             <>
                               <div className="subtask-edit-item-left">
-                                <span className="subtask-edit-item-circle" aria-hidden="true" />
+                                <span
+                                  className="subtask-edit-item-circle"
+                                  aria-hidden="true"
+                                />
                                 <div className="subtask-edit-item-content">
-                                  <p className="subtask-edit-item-title">{subtask.description}</p>
+                                  <p className="subtask-edit-item-title">
+                                    {subtask.description}
+                                  </p>
                                   <p className="subtask-edit-item-meta">
-                                    Fecha: {formatShortDate(subtask.planification_date)} • {formatHours(subtask.needed_hours)}
+                                    Fecha:{' '}
+                                    {formatShortDate(
+                                      subtask.planification_date,
+                                    )}{' '}
+                                    • {formatHours(subtask.needed_hours)}
                                   </p>
                                 </div>
                               </div>
@@ -280,7 +351,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                                 <button
                                   type="button"
                                   className="subtask-edit-icon-btn danger"
-                                  onClick={() => openDeleteSubtaskModal(subtask)}
+                                  onClick={() =>
+                                    openDeleteSubtaskModal(subtask)
+                                  }
                                   aria-label="Eliminar subtarea"
                                 >
                                   <Trash2 size={16} />
@@ -298,27 +371,40 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                                 <input
                                   type="text"
                                   value={editData.description}
-                                  onChange={(e) => handleEditFieldChange('description', e.target.value)}
+                                  onChange={(e) =>
+                                    handleEditFieldChange(
+                                      'description',
+                                      e.target.value,
+                                    )
+                                  }
                                   className={errors.description ? 'error' : ''}
                                   maxLength={300}
                                 />
                                 {errors.description && (
-                                  <span className="subtask-edit-error">{errors.description}</span>
+                                  <span className="subtask-edit-error">
+                                    {errors.description}
+                                  </span>
                                 )}
                               </div>
 
                               <div className="subtask-edit-input-group">
                                 <label>Fecha</label>
-                                <input
-                                  type="date"
-                                  min={getTodayDateStr()}
-                                  max={taskEditData.due_date}
-                                  value={editData.planification_date}
-                                  onChange={(e) => handleEditFieldChange('planification_date', e.target.value)}
-                                  className={errors.planification_date ? 'error' : ''}
-                                />
+                                <button
+                                  type="button"
+                                  className={`subtask-edit-date-btn${errors.planification_date ? ' error' : ''}`}
+                                  onClick={() => setIsDatePickerOpen(true)}
+                                >
+                                  <Calendar size={14} aria-hidden="true" />
+                                  {editData.planification_date
+                                    ? formatShortDate(
+                                        editData.planification_date,
+                                      )
+                                    : 'Elegir fecha'}
+                                </button>
                                 {errors.planification_date && (
-                                  <span className="subtask-edit-error">{errors.planification_date}</span>
+                                  <span className="subtask-edit-error">
+                                    {errors.planification_date}
+                                  </span>
                                 )}
                               </div>
 
@@ -329,11 +415,18 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                                   min="0.1"
                                   step="0.1"
                                   value={editData.needed_hours || ''}
-                                  onChange={(e) => handleEditFieldChange('needed_hours', parseFloat(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    handleEditFieldChange(
+                                      'needed_hours',
+                                      parseFloat(e.target.value) || 0,
+                                    )
+                                  }
                                   className={errors.needed_hours ? 'error' : ''}
                                 />
                                 {errors.needed_hours && (
-                                  <span className="subtask-edit-error">{errors.needed_hours}</span>
+                                  <span className="subtask-edit-error">
+                                    {errors.needed_hours}
+                                  </span>
                                 )}
                               </div>
 
@@ -350,8 +443,14 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                                   type="button"
                                   className="subtask-edit-round-btn success"
                                   onClick={() => {
-                                    if (taskEditData.due_date && editData.planification_date > taskEditData.due_date) {
-                                      alert(`La fecha de la actividad no puede ser posterior a la fecha de entrega de la tarea (${taskEditData.due_date}).\nPor favor, selecciona una fecha anterior o igual.`);
+                                    if (
+                                      taskEditData.due_date &&
+                                      editData.planification_date >
+                                        taskEditData.due_date
+                                    ) {
+                                      alert(
+                                        `La fecha de la actividad no puede ser posterior a la fecha de entrega de la tarea (${taskEditData.due_date}).\nPor favor, selecciona una fecha anterior o igual.`,
+                                      );
                                       return;
                                     }
                                     saveEditedSubtask();
@@ -368,7 +467,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                     })
                   )}
                 </div>
-
               </section>
 
               {onAddNewSubtask && (
@@ -407,7 +505,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 <input
                   type="text"
                   value={taskEditData.title}
-                  onChange={(e) => handleTaskEditFieldChange('title', e.target.value)}
+                  onChange={(e) =>
+                    handleTaskEditFieldChange('title', e.target.value)
+                  }
                   maxLength={200}
                 />
               </div>
@@ -416,7 +516,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 <label>Descripción</label>
                 <textarea
                   value={taskEditData.description}
-                  onChange={(e) => handleTaskEditFieldChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleTaskEditFieldChange('description', e.target.value)
+                  }
                   maxLength={500}
                   rows={3}
                 />
@@ -427,7 +529,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 <input
                   type="text"
                   value={taskEditData.subject}
-                  onChange={(e) => handleTaskEditFieldChange('subject', e.target.value)}
+                  onChange={(e) =>
+                    handleTaskEditFieldChange('subject', e.target.value)
+                  }
                   maxLength={100}
                 />
               </div>
@@ -436,7 +540,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 <label>Tipo de evaluación</label>
                 <select
                   value={taskEditData.type}
-                  onChange={(e) => handleTaskEditFieldChange('type', e.target.value)}
+                  onChange={(e) =>
+                    handleTaskEditFieldChange('type', e.target.value)
+                  }
                 >
                   <option value="">Seleccionar tipo</option>
                   <option value="ensayo">Ensayo</option>
@@ -453,7 +559,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                   type="date"
                   min={getTodayDateStr()}
                   value={taskEditData.due_date}
-                  onChange={(e) => handleTaskEditFieldChange('due_date', e.target.value)}
+                  onChange={(e) =>
+                    handleTaskEditFieldChange('due_date', e.target.value)
+                  }
                 />
               </div>
 
@@ -461,7 +569,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 <label>Nivel de prioridad</label>
                 <select
                   value={taskEditData.priority}
-                  onChange={(e) => handleTaskEditFieldChange('priority', e.target.value)}
+                  onChange={(e) =>
+                    handleTaskEditFieldChange('priority', e.target.value)
+                  }
                 >
                   <option value="high">Alta</option>
                   <option value="medium">Media</option>
@@ -471,7 +581,11 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
             </div>
 
             <footer className="subtask-edit-footer">
-              <button type="button" className="subtask-edit-cancel" onClick={handleCancelTaskEdit}>
+              <button
+                type="button"
+                className="subtask-edit-cancel"
+                onClick={handleCancelTaskEdit}
+              >
                 Cancelar
               </button>
               <button
@@ -487,8 +601,31 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         )}
       </div>
 
+      <DatePickerModal
+        isOpen={isDatePickerOpen}
+        onClose={() => setIsDatePickerOpen(false)}
+        onConfirm={(date) => {
+          handleEditFieldChange('planification_date', date);
+          setIsDatePickerOpen(false);
+        }}
+        newSubtaskDescription={editData.description}
+        newSubtaskHours={editData.needed_hours}
+        maxDate={taskEditData.due_date || undefined}
+        confirmLabel="Modificar aquí"
+        excludeIds={[
+          ...(editingId !== null ? [editingId] : []),
+          ...locallyModifiedSubtasks.map((st) => st.id),
+        ]}
+        originalDate={editData.planification_date || undefined}
+        localSubtasks={locallyModifiedSubtasks}
+      />
+
       {deleteTarget && (
-        <div className="subtask-edit-modal-overlay" role="dialog" aria-modal="true">
+        <div
+          className="subtask-edit-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="subtask-edit-modal">
             <h4>
               {deleteTarget.type === 'main-task'
@@ -501,7 +638,11 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 : 'Esta acción no se puede deshacer y eliminará la subtarea seleccionada.'}
             </p>
             <div className="subtask-edit-modal-actions">
-              <button type="button" className="subtask-edit-cancel" onClick={closeDeleteModal}>
+              <button
+                type="button"
+                className="subtask-edit-cancel"
+                onClick={closeDeleteModal}
+              >
                 Cancelar
               </button>
               <button

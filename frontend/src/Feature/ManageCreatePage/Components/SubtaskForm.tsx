@@ -11,7 +11,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import InfoTooltip from '../../../shared/Components/InfoTooltip';
-import DatePickerModal from './DatePickerModal';
+import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
 
 interface SubtaskFormProps {
   onSubtasksChange?: (subtasks: any[]) => void;

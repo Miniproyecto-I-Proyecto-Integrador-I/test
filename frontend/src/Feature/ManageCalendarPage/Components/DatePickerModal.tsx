@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { X, CalendarDays, AlertTriangle } from 'lucide-react';
 import Calendar from '../../../shared/Components/Calendar';
-import { useCalendarData } from '../../ManageCalendarPage/Hooks/useCalendarData';
-import CalendarDayCell, {
-  CalendarDayCellSkeleton,
-} from '../../ManageCalendarPage/Components/CalendarDayCell';
-import {
-  toISODate,
-  formatDayLabel,
-} from '../../ManageCalendarPage/Utils/calendarUtils';
+import { useCalendarData } from '../Hooks/useCalendarData';
+import CalendarDayCell, { CalendarDayCellSkeleton } from './CalendarDayCell';
+import { toISODate, formatDayLabel } from '../Utils/calendarUtils';
 import { useAuth } from '../../../Context/AuthContext';
 import type { Subtask } from '../../ManageTodayPage/Types/models';
-import type { SubtaskItem } from '../Types/subtask.types';
+import type { SubtaskItem } from '../../ManageCreatePage/Types/subtask.types';
 import '../Styles/DatePickerModal.css';
+
+/** A locally-modified subtask not yet saved to the backend. */
+export interface LocalSubtask {
+  id: string | number;
+  description: string;
+  planification_date: string;
+  needed_hours: number;
+}
 
 interface DatePickerModalProps {
   isOpen: boolean;
@@ -25,6 +28,14 @@ interface DatePickerModalProps {
   pendingSubtasks?: SubtaskItem[];
   /** Optional upper bound (task due date). Dates after this are not selectable. */
   maxDate?: string;
+  /** Custom label for the confirm button. Defaults to 'Añadir esta actividad' / 'Resolver conflicto'. */
+  confirmLabel?: string;
+  /** Subtask ids to exclude from the calendar API query (avoids duplicates when editing). */
+  excludeIds?: (string | number)[];
+  /** Current date of the subtask being edited ('YYYY-MM-DD'). Selecting this day shows a blocked message. */
+  originalDate?: string;
+  /** Locally-modified subtasks not yet saved to the backend; shown in the calendar instead of stale API data. */
+  localSubtasks?: LocalSubtask[];
 }
 
 const DatePickerModal = ({
@@ -35,6 +46,10 @@ const DatePickerModal = ({
   newSubtaskHours,
   pendingSubtasks = [],
   maxDate,
+  confirmLabel,
+  excludeIds,
+  originalDate,
+  localSubtasks = [],
 }: DatePickerModalProps) => {
   const today = new Date();
   const todayISO = toISODate(today);
@@ -44,13 +59,22 @@ const DatePickerModal = ({
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const { dayMap, subtasksByDate, isLoading } = useCalendarData(activeMonth);
+  const { dayMap, subtasksByDate, isLoading } = useCalendarData(
+    activeMonth,
+    excludeIds,
+  );
   const { user } = useAuth();
   const dailyHours = user?.daily_hours ?? 8;
 
   const SKELETON_FADE_MS = 350;
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [skeletonFading, setSkeletonFading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedDate(null);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isLoading) {
@@ -70,6 +94,20 @@ const DatePickerModal = ({
 
   // Augment dayMap with pending (locally added) subtasks for calendar cell badges
   const augmentedDayMap = { ...dayMap };
+  // Also augment with locally-modified subtasks (edited but not yet saved)
+  for (const st of localSubtasks) {
+    const key = st.planification_date;
+    if (!augmentedDayMap[key]) {
+      augmentedDayMap[key] = { count: 1, totalHours: st.needed_hours };
+    } else {
+      augmentedDayMap[key] = {
+        count: augmentedDayMap[key].count + 1,
+        totalHours: parseFloat(
+          (augmentedDayMap[key].totalHours + st.needed_hours).toFixed(2),
+        ),
+      };
+    }
+  }
   for (const st of pendingSubtasks) {
     const key = st.planification_date;
     if (!augmentedDayMap[key]) {
@@ -85,12 +123,16 @@ const DatePickerModal = ({
   }
 
   const selectedISO = selectedDate ? toISODate(selectedDate) : null;
+  const localForDay: LocalSubtask[] = selectedISO
+    ? localSubtasks.filter((st) => st.planification_date === selectedISO)
+    : [];
   const existingSubtasks: Subtask[] = selectedISO
     ? (subtasksByDate[selectedISO] ?? [])
     : [];
   const pendingForDay: SubtaskItem[] = selectedISO
     ? pendingSubtasks.filter((st) => st.planification_date === selectedISO)
     : [];
+  const localHours = localForDay.reduce((sum, st) => sum + st.needed_hours, 0);
   const existingHours = existingSubtasks.reduce(
     (sum, st) => sum + st.needed_hours,
     0,
@@ -100,10 +142,11 @@ const DatePickerModal = ({
     0,
   );
   const totalHours = parseFloat(
-    (existingHours + pendingHours + newSubtaskHours).toFixed(2),
+    (existingHours + pendingHours + localHours + newSubtaskHours).toFixed(2),
   );
   const isOver = totalHours > dailyHours;
   const pct = Math.min((totalHours / dailyHours) * 100, 100);
+  const isSameAsOriginal = !!(originalDate && selectedISO === originalDate);
 
   const handleDaySelect = (date: Date) => {
     const iso = toISODate(date);
@@ -212,6 +255,24 @@ const DatePickerModal = ({
                         </span>
                       </li>
 
+                      {/* Locally-modified subtasks (edited, not yet saved) */}
+                      {localForDay.map((st) => (
+                        <li key={st.id} className="dpm__item dpm__item--local">
+                          <div className="dpm__item-accent dpm__item-accent--local" />
+                          <div className="dpm__item-body">
+                            <span className="dpm__item-name">
+                              {st.description}
+                            </span>
+                            <span className="dpm__item-local-badge">
+                              Modificada
+                            </span>
+                          </div>
+                          <span className="dpm__item-hours dpm__item-hours--local">
+                            {st.needed_hours}h
+                          </span>
+                        </li>
+                      ))}
+
                       {/* Pending subtasks (added this session, not yet saved) */}
                       {pendingForDay.map((st) => (
                         <li
@@ -257,7 +318,12 @@ const DatePickerModal = ({
 
                 {/* CTA */}
                 <div className="dpm__actions">
-                  {isOver && (
+                  {isSameAsOriginal && (
+                    <p className="dpm__same-day-hint">
+                      Esta actividad ya está programada en este día.
+                    </p>
+                  )}
+                  {!isSameAsOriginal && isOver && (
                     <p className="dpm__overload-hint">
                       <AlertTriangle size={13} />
                       Supera el límite diario por{' '}
@@ -265,10 +331,15 @@ const DatePickerModal = ({
                     </p>
                   )}
                   <button
-                    className={`dpm__confirm-btn${isOver ? ' dpm__confirm-btn--conflict' : ''}`}
-                    onClick={handleConfirm}
+                    className={`dpm__confirm-btn${isSameAsOriginal ? ' dpm__confirm-btn--disabled' : isOver ? ' dpm__confirm-btn--conflict' : ''}`}
+                    onClick={isSameAsOriginal ? undefined : handleConfirm}
+                    disabled={isSameAsOriginal}
                   >
-                    {isOver ? 'Resolver conflicto' : 'Añadir esta actividad'}
+                    {isSameAsOriginal
+                      ? 'Ya está en este día'
+                      : isOver
+                        ? 'Resolver conflicto'
+                        : (confirmLabel ?? 'Añadir esta actividad')}
                   </button>
                 </div>
               </>
