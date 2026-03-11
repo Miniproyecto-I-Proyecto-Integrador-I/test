@@ -9,6 +9,7 @@ interface AuthContextValue {
   loading: boolean;
   login: (access: string, refresh: string) => Promise<void>;
   logout: () => void;
+  updateDailyLimit: (dailyLimit: number) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -63,8 +64,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
   };
 
+  const updateDailyLimit = async (dailyLimit: number) => {
+    try {
+      const userData = await userService.updateCurrentUser({ daily_hours: dailyLimit });
+      setUser(userData);
+    } catch (error) {
+      console.error('Error updating daily limit:', error);
+      throw error;
+    }
+  };
+
   const value = useMemo(
-    () => ({ isAuthenticated, user, loading, login, logout }),
+    () => ({ isAuthenticated, user, loading, login, logout, updateDailyLimit }),
     [isAuthenticated, user, loading],
   );
 

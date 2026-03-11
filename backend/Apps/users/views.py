@@ -37,3 +37,11 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='me')
     def me(self, request):
         return Response(UserSerializer(request.user).data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['put'], permission_classes=[IsAuthenticated], url_path='update')
+    def update_me(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        

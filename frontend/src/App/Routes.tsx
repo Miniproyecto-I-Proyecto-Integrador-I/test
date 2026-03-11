@@ -9,6 +9,7 @@ import CalendarPage from '../Pages/CalendarPage';
 import Layout from '../shared/Components/Layout';
 import { AuthProvider } from '../Context/AuthContext';
 import ProtectedRoute from '../shared/Components/Auth/ProtectedRoute';
+import UserSettingPage from '../Pages/UserSettingPage';
 
 const AppRoutes = () => {
   return (
@@ -38,6 +39,14 @@ const AppRoutes = () => {
               element={
                 <ProtectedRoute>
                   <CreatePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/usersetting"
+              element={
+                <ProtectedRoute>
+                  <UserSettingPage />
                 </ProtectedRoute>
               }
             />
