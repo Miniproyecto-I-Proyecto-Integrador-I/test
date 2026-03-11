@@ -5,7 +5,6 @@ import {
   Calendar,
   X,
   Check,
-  AlertTriangle,
 } from 'lucide-react';
 import type { EditableSubtask } from '../Hooks/useSubtaskEdit';
 import type { SubtaskFormData } from '../../ManageCreatePage/Types/subtask.types';
@@ -30,6 +29,7 @@ interface SubtaskItemProps {
   errors: SubtaskItemErrors;
   conflictWarning: boolean;
   isCheckingConflict: boolean;
+  maxHours: number;
   onStartEditing: (subtask: EditableSubtask) => void;
   onDeleteClick: (subtask: EditableSubtask) => void;
   onFieldChange: (field: keyof SubtaskFormData, value: string | number) => void;
@@ -47,6 +47,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
   errors,
   conflictWarning,
   isCheckingConflict,
+  maxHours,
   onStartEditing,
   onDeleteClick,
   onFieldChange,
@@ -62,7 +63,9 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
         <div className="subtask-edit-item-left">
           <span className="subtask-edit-item-circle" aria-hidden="true" />
           <div className="subtask-edit-item-content">
-            <p className="subtask-edit-item-title">{subtask.description}</p>
+            <div className="subtask-edit-item-title-row">
+              <p className="subtask-edit-item-title">{subtask.description}</p>
+            </div>
             <p className="subtask-edit-item-meta">
               Fecha: {formatShortDate(subtask.planification_date)}{' '}
               • {formatHours(subtask.needed_hours)}
@@ -94,14 +97,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
         role="group"
         aria-label="Editar subtarea"
       >
-        {conflictWarning && (
-          <div className="subtask-edit-conflict-warning">
-            <AlertTriangle size={14} />
-            <span>
-              Conflicto de horas: este día supera tu límite diario
-            </span>
-          </div>
-        )}
+        {/* Banner de conflicto eliminado según solicitud - ahora se usa Toast persistente */}
 
         <div className="subtask-edit-input-group grow">
           <label>Descripción</label>
@@ -141,6 +137,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
           <input
             type="number"
             min="0.1"
+            max={maxHours}
             step="0.1"
             value={editData.needed_hours || ''}
             onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
@@ -174,7 +171,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               type="button"
               className="subtask-edit-round-btn success"
               onClick={onSave}
-              disabled={isCheckingConflict}
+              disabled={isCheckingConflict || !!errors.needed_hours}
               aria-label="Guardar edición"
             >
               {isCheckingConflict ? '…' : <Check size={14} />}

@@ -78,6 +78,7 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({
           </span>
         </div>
 
+        <hr className="subtask-edit-divider" />
         <div className="subtask-edit-description-row">
           <span className="subtask-edit-description-label">Descripción:</span>
           <span className="subtask-edit-description-text">
