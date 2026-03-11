@@ -9,6 +9,7 @@ import {
   Check,
   CircleAlert,
   Plus,
+  AlertTriangle,
 } from 'lucide-react';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
 import type { LocalSubtask } from '../../ManageCalendarPage/Components/DatePickerModal';
@@ -22,6 +23,8 @@ import {
   getTodayDateStr,
 } from '../Utils/subtaskEditUtils';
 import '../Styles/SubtaskEdit.css';
+import { useAuth } from '../../../Context/AuthContext';
+import apiClient from '../../../Services/ApiClient';
 
 interface SubtaskEditProps {
   taskId: number;
@@ -67,6 +70,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const [isEditingTask, setIsEditingTask] = useState(false);
   const [isSavingTask, setIsSavingTask] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [conflictWarning, setConflictWarning] = useState(false);
+  const [isCheckingConflict, setIsCheckingConflict] = useState(false);
+  const { user } = useAuth();
+  const dailyHours = user?.daily_hours ?? 8;
   const [taskEditData, setTaskEditData] = useState({
     title: task?.title || taskTitle || '',
     description: task?.description || '',
@@ -172,6 +179,54 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         needed_hours: Number(st.needed_hours) || 0,
       }));
   }, [subtasks, editingId, persistedSubtasks, initialSubtasks]);
+
+  const checkAndSaveSubtask = async () => {
+    if (
+      taskEditData.due_date &&
+      editData.planification_date > taskEditData.due_date
+    ) {
+      alert(
+        `La fecha de la actividad no puede ser posterior a la fecha de entrega de la tarea (${taskEditData.due_date}).\nPor favor, selecciona una fecha anterior o igual.`,
+      );
+      return;
+    }
+    setIsCheckingConflict(true);
+    try {
+      const date = editData.planification_date;
+      let url = `/api/subtasks/?planification_date=${date}`;
+      if (editingId !== null) {
+        url += `&exclude_ids=${editingId}`;
+      }
+      const response =
+        await apiClient.get<Array<{ needed_hours: number }>>(url);
+      const subtasksForDay = response.data;
+      const localForDay = locallyModifiedSubtasks.filter(
+        (st) => st.planification_date === date,
+      );
+      const backendHours = subtasksForDay.reduce(
+        (sum, st) => sum + (Number(st.needed_hours) || 0),
+        0,
+      );
+      const localHours = localForDay.reduce(
+        (sum, st) => sum + st.needed_hours,
+        0,
+      );
+      const newHours = Number(editData.needed_hours) || 0;
+      const total = parseFloat(
+        (backendHours + localHours + newHours).toFixed(2),
+      );
+      if (total > dailyHours) {
+        setConflictWarning(true);
+        return;
+      }
+      setConflictWarning(false);
+      saveEditedSubtask();
+    } catch {
+      saveEditedSubtask();
+    } finally {
+      setIsCheckingConflict(false);
+    }
+  };
 
   const handleTaskEditFieldChange = (field: string, value: string) => {
     setTaskEditData((prev) => ({ ...prev, [field]: value }));
@@ -366,6 +421,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                               role="group"
                               aria-label="Editar subtarea"
                             >
+                              {conflictWarning && (
+                                <div className="subtask-edit-conflict-warning">
+                                  <AlertTriangle size={14} />
+                                  <span>
+                                    Conflicto de horas: este día supera tu
+                                    límite diario
+                                  </span>
+                                </div>
+                              )}
                               <div className="subtask-edit-input-group grow">
                                 <label>Descripción</label>
                                 <input
@@ -415,12 +479,13 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                                   min="0.1"
                                   step="0.1"
                                   value={editData.needed_hours || ''}
-                                  onChange={(e) =>
+                                  onChange={(e) => {
+                                    setConflictWarning(false);
                                     handleEditFieldChange(
                                       'needed_hours',
                                       parseFloat(e.target.value) || 0,
-                                    )
-                                  }
+                                    );
+                                  }}
                                   className={errors.needed_hours ? 'error' : ''}
                                 />
                                 {errors.needed_hours && (
@@ -434,31 +499,41 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                                 <button
                                   type="button"
                                   className="subtask-edit-round-btn"
-                                  onClick={cancelEditing}
+                                  onClick={() => {
+                                    setConflictWarning(false);
+                                    cancelEditing();
+                                  }}
                                   aria-label="Cancelar edición"
                                 >
                                   <X size={14} />
                                 </button>
-                                <button
-                                  type="button"
-                                  className="subtask-edit-round-btn success"
-                                  onClick={() => {
-                                    if (
-                                      taskEditData.due_date &&
-                                      editData.planification_date >
-                                        taskEditData.due_date
-                                    ) {
-                                      alert(
-                                        `La fecha de la actividad no puede ser posterior a la fecha de entrega de la tarea (${taskEditData.due_date}).\nPor favor, selecciona una fecha anterior o igual.`,
-                                      );
-                                      return;
-                                    }
-                                    saveEditedSubtask();
-                                  }}
-                                  aria-label="Guardar edición"
-                                >
-                                  <Check size={14} />
-                                </button>
+                                {conflictWarning ? (
+                                  <button
+                                    type="button"
+                                    className="subtask-edit-round-btn conflict"
+                                    onClick={() => {
+                                      setConflictWarning(false);
+                                      setIsDatePickerOpen(true);
+                                    }}
+                                    aria-label="Resolver conflicto"
+                                  >
+                                    Resolver conflicto
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="subtask-edit-round-btn success"
+                                    onClick={checkAndSaveSubtask}
+                                    disabled={isCheckingConflict}
+                                    aria-label="Guardar edición"
+                                  >
+                                    {isCheckingConflict ? (
+                                      '…'
+                                    ) : (
+                                      <Check size={14} />
+                                    )}
+                                  </button>
+                                )}
                               </div>
                             </div>
                           )}
@@ -605,6 +680,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         isOpen={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
         onConfirm={(date) => {
+          setConflictWarning(false);
           handleEditFieldChange('planification_date', date);
           setIsDatePickerOpen(false);
         }}

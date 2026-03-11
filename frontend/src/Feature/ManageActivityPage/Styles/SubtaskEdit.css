@@ -348,7 +348,8 @@
     width: 100%;
     display: grid;
     grid-template-columns: 3fr 180px 120px auto;
-    gap: 80px;
+    column-gap: 80px;
+    row-gap: 8px;
     align-items: start;
 }
 
@@ -474,6 +475,37 @@
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
+}
+
+.subtask-edit-round-btn.conflict {
+    width: auto;
+    padding: 0 10px;
+    background: var(--warning-color);
+    border-color: var(--warning-color);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.subtask-edit-round-btn.conflict:hover {
+    background: #d97706;
+    border-color: #d97706;
+    transform: scale(1.02);
+}
+
+.subtask-edit-conflict-warning {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: var(--font-size-small);
+    font-weight: 600;
 }
 
 .subtask-edit-add-row {
