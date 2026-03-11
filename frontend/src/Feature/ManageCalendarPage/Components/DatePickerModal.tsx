@@ -61,7 +61,14 @@ const DatePickerModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedDate(null);
+      if (originalDate) {
+        const [y, m, d] = originalDate.split('-').map(Number);
+        const date = new Date(y, m - 1, d);
+        setSelectedDate(date);
+        setActiveMonth(new Date(y, m - 1, 1));
+      } else {
+        setSelectedDate(null);
+      }
     }
   }, [isOpen]);
 
@@ -120,8 +127,6 @@ const DatePickerModal = ({
   const isSameAsOriginal = !!(originalDate && selectedISO === originalDate);
 
   const handleDaySelect = (date: Date) => {
-    const iso = toISODate(date);
-    if (maxDate && iso > maxDate) return;
     setSelectedDate(date);
   };
 
@@ -149,6 +154,9 @@ const DatePickerModal = ({
               month={activeMonth}
               onMonthChange={setActiveMonth}
               onDaySelect={handleDaySelect}
+              minDate={todayISO}
+              maxDate={maxDate}
+              value={selectedDate}
               renderDay={(date) => {
                 const iso = toISODate(date);
                 if (iso < todayISO) return null;
@@ -213,13 +221,15 @@ const DatePickerModal = ({
                   ) : (
                     <>
                       {/* New subtask – highlighted */}
-                      <li className="dpm__item dpm__item--new">
+                      <li className="dpm__item">
                         <div className="dpm__item-accent dpm__item-accent--new" />
                         <div className="dpm__item-body">
                           <span className="dpm__item-name">
                             {newSubtaskDescription || '(sin descripción)'}
                           </span>
-                          <span className="dpm__item-new-badge">Nueva</span>
+                          <span className="dpm__item-new-badge">
+                            {originalDate ? 'Modificando' : 'Nueva'}
+                          </span>
                         </div>
                         <span className="dpm__item-hours dpm__item-hours--new">
                           {newSubtaskHours}h
