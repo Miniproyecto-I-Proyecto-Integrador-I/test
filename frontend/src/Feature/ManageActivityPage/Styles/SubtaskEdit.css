@@ -285,6 +285,11 @@
     padding: 20px;
 }
 
+.subtask-edit-item.is-editing.has-conflict {
+    border-color: var(--warning-color);
+    box-shadow: 0 2px 12px rgba(245, 158, 11, 0.2);
+}
+
 @keyframes subtask-pop-in {
     from {
         opacity: 0;
@@ -412,9 +417,9 @@
 .subtask-edit-inline-form {
     width: 100%;
     display: grid;
-    grid-template-columns: 3fr 180px 120px auto;
-    column-gap: 80px;
-    row-gap: 8px;
+    grid-template-columns: 1fr 120px 220px auto;
+    column-gap: 60px;
+    row-gap: 12px;
     align-items: start;
 }
 
@@ -433,7 +438,8 @@
     color: var(--text-tertiary);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
 }
 
 .subtask-edit-input-group input {

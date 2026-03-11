@@ -40,6 +40,10 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
   const [conflictToastId, setConflictToastId] = useState<number | null>(null);
 
   const setField = (field: keyof SubtaskFormData, value: string | number) => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => {
       if (prev[field]) {
@@ -52,6 +56,10 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
   };
 
   const handleHoursChange = (value: number) => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
     if (value <= 0 || isNaN(value)) {
       setHourLimitError('El tiempo debe ser mayor que 0 horas.');
     } else if (value > maxHours) {
@@ -131,7 +139,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
   return (
     <>
       <div
-        className="subtask-edit-item is-editing subtask-new-form"
+        className={`subtask-edit-item is-editing subtask-new-form ${conflictToastId ? 'has-conflict' : ''}`}
         role="group"
         aria-label="Nueva actividad"
       >
@@ -140,7 +148,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
 
           {/* Descripción */}
           <div className="subtask-edit-input-group grow">
-            <label>Descripción</label>
+            <label>Descripción de actividad</label>
             <input
               type="text"
               placeholder="¿Qué vas a hacer?"
@@ -155,9 +163,26 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
             )}
           </div>
 
+          {/* Horas — ahora antes que fecha */}
+          <div className="subtask-edit-input-group small">
+            <label>Tiempo a invertir</label>
+            <input
+              type="number"
+              min="0.1"
+              max={maxHours}
+              step="0.1"
+              value={formData.needed_hours || ''}
+              onChange={(e) => handleHoursChange(parseFloat(e.target.value) || 0)}
+              className={activeErrors.needed_hours ? 'error' : ''}
+            />
+            {activeErrors.needed_hours && (
+              <span className="subtask-edit-error">{activeErrors.needed_hours}</span>
+            )}
+          </div>
+
           {/* Fecha */}
           <div className="subtask-edit-input-group">
-            <label>Fecha</label>
+            <label>Día de realización</label>
             <button
               type="button"
               className={`subtask-edit-date-btn${activeErrors.planification_date ? ' error' : ''}`}
@@ -170,23 +195,6 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
             </button>
             {activeErrors.planification_date && (
               <span className="subtask-edit-error">{activeErrors.planification_date}</span>
-            )}
-          </div>
-
-          {/* Horas */}
-          <div className="subtask-edit-input-group small">
-            <label>Horas</label>
-            <input
-              type="number"
-              min="0.1"
-              max={maxHours}
-              step="0.1"
-              value={formData.needed_hours || ''}
-              onChange={(e) => handleHoursChange(parseFloat(e.target.value) || 0)}
-              className={activeErrors.needed_hours ? 'error' : ''}
-            />
-            {activeErrors.needed_hours && (
-              <span className="subtask-edit-error">{activeErrors.needed_hours}</span>
             )}
           </div>
 
@@ -206,15 +214,26 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
             >
               <X size={14} />
             </button>
-            <button
-              type="button"
-              className="subtask-edit-round-btn success"
-              onClick={handleSubmit}
-              disabled={isChecking || isSaving || !!activeErrors.needed_hours}
-              aria-label="Agregar actividad"
-            >
-              {isChecking || isSaving ? '…' : <Check size={14} />}
-            </button>
+            {conflictToastId ? (
+              <button
+                type="button"
+                className="subtask-edit-round-btn conflict"
+                onClick={handleSubmit}
+                aria-label="Resolver conflicto"
+              >
+                Resolver conflicto
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="subtask-edit-round-btn success"
+                onClick={handleSubmit}
+                disabled={isChecking || isSaving || !!activeErrors.needed_hours}
+                aria-label="Agregar actividad"
+              >
+                {isChecking || isSaving ? '…' : <Check size={14} />}
+              </button>
+            )}
           </div>
         </div>
       </div>

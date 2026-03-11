@@ -57,7 +57,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
   onResolveConflict,
   onHoursChange,
 }) => (
-  <div className={`subtask-edit-item ${isEditing ? 'is-editing' : ''}`}>
+  <div className={`subtask-edit-item ${isEditing ? 'is-editing' : ''} ${conflictWarning ? 'has-conflict' : ''}`}>
     {!isEditing ? (
       <>
         <div className="subtask-edit-item-left">
@@ -100,7 +100,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
         {/* Banner de conflicto eliminado según solicitud - ahora se usa Toast persistente */}
 
         <div className="subtask-edit-input-group grow">
-          <label>Descripción</label>
+          <label>Descripción de actividad</label>
           <input
             type="text"
             value={editData.description}
@@ -113,8 +113,24 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
           )}
         </div>
 
+        <div className="subtask-edit-input-group small">
+          <label>Tiempo a invertir</label>
+          <input
+            type="number"
+            min="0.1"
+            max={maxHours}
+            step="0.1"
+            value={editData.needed_hours || ''}
+            onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
+            className={errors.needed_hours ? 'error' : ''}
+          />
+          {errors.needed_hours && (
+            <span className="subtask-edit-error">{errors.needed_hours}</span>
+          )}
+        </div>
+
         <div className="subtask-edit-input-group">
-          <label>Fecha</label>
+          <label>Día de realización</label>
           <button
             type="button"
             className={`subtask-edit-date-btn${errors.planification_date ? ' error' : ''}`}
@@ -129,22 +145,6 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
             <span className="subtask-edit-error">
               {errors.planification_date}
             </span>
-          )}
-        </div>
-
-        <div className="subtask-edit-input-group small">
-          <label>Horas</label>
-          <input
-            type="number"
-            min="0.1"
-            max={maxHours}
-            step="0.1"
-            value={editData.needed_hours || ''}
-            onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
-            className={errors.needed_hours ? 'error' : ''}
-          />
-          {errors.needed_hours && (
-            <span className="subtask-edit-error">{errors.needed_hours}</span>
           )}
         </div>
 

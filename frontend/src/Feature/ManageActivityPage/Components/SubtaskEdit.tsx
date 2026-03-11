@@ -85,7 +85,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     deleteTarget,
     startEditing,
     cancelEditing,
-    handleEditFieldChange,
+    handleEditFieldChange: originalHandleEditFieldChange,
     saveEditedSubtask,
     openDeleteSubtaskModal,
     openDeleteMainTaskModal,
@@ -117,6 +117,19 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   }, [subtasks, totalHours]);
 
   const checkAndSaveSubtask = async () => {
+    // Si no hay cambios, simplemente cancelar edición sin mostrar toast
+    const original = subtasks.find((s) => s.id === editingId);
+    const hasChanged = original && (
+      original.description !== editData.description ||
+      original.planification_date !== editData.planification_date ||
+      Number(original.needed_hours) !== Number(editData.needed_hours)
+    );
+
+    if (!hasChanged) {
+      handleCancelEditing();
+      return;
+    }
+
     // Validar antes de procesar
     const validationErrors = validateSubtaskForm(editData);
     if (hasValidationErrors(validationErrors) || hourLimitError) {
@@ -181,6 +194,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     }
   };
 
+  const handleEditFieldChange = (field: keyof SubtaskFormData, value: string | number) => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
+    setConflictWarning(false);
+    originalHandleEditFieldChange(field, value);
+  };
+
   const handleTaskEditFieldChange = (field: string, value: string) => {
     setTaskEditData((prev) => ({ ...prev, [field]: value }));
   };
@@ -190,7 +212,19 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       dismiss(conflictToastId);
       setConflictToastId(null);
     }
+    setConflictWarning(false);
+    setHourLimitError('');
     cancelEditing();
+  };
+
+  const handleStartEditing = (subtask: EditableSubtask) => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
+    setConflictWarning(false);
+    setHourLimitError('');
+    startEditing(subtask);
   };
 
   const handleConfirmDelete = async () => {
@@ -281,7 +315,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
               maxHours={dailyHours}
               taskDueDate={taskEditData.due_date || undefined}
               onCreateSubtask={onCreateSubtask ?? (() => Promise.resolve())}
-              onStartEditing={startEditing}
+              onStartEditing={handleStartEditing}
               onDeleteClick={openDeleteSubtaskModal}
               onFieldChange={handleEditFieldChange}
               onOpenDatePicker={() => setIsDatePickerOpen(true)}
@@ -289,7 +323,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
               onSaveSubtask={checkAndSaveSubtask}
               onResolveConflict={checkAndSaveSubtask}
               onHoursChange={(value) => {
-                setConflictWarning(false);
                 if (value <= 0 || isNaN(value)) {
                   setHourLimitError('El tiempo debe ser mayor que 0 horas.');
                 } else if (value > dailyHours) {
@@ -319,7 +352,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         isOpen={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
         onConfirm={(date) => {
-          setConflictWarning(false);
           handleEditFieldChange('planification_date', date);
           setIsDatePickerOpen(false);
         }}
