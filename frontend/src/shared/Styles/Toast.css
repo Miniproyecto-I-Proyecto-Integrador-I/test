@@ -1,0 +1,178 @@
+/* ───────────────────────────────────────────────
+   Toast  –  global fixed container + card styles
+   ─────────────────────────────────────────────── */
+
+/* Fixed host – bottom-right corner */
+.toast-host {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+/* ── Card ─────────────────────────────────────── */
+.toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 320px;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 44px 16px 16px;       /* right padding for × button */
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  pointer-events: all;
+  overflow: hidden;
+
+  /* start hidden off-screen right */
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast--exiting {
+  opacity: 0;
+  transform: translateX(56px);
+  transition: opacity 0.28s ease-in,
+              transform 0.28s ease-in;
+}
+
+/* ── Colored left accent bar ──────────────────── */
+.toast__accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 12px 0 0 12px;
+}
+
+.toast__accent--success  { background: var(--success-color); }
+.toast__accent--error    { background: var(--error-color); }
+.toast__accent--warning  { background: var(--warning-color); }
+.toast__accent--info     { background: var(--primary-color); }
+.toast__accent--loading  { background: var(--text-tertiary); }
+
+/* ── Icon circle ──────────────────────────────── */
+.toast__icon-wrap {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast__icon-wrap--success  { background: #DCFCE7; color: var(--success-color); }
+.toast__icon-wrap--error    { background: #FEE2E2; color: var(--error-color); }
+.toast__icon-wrap--warning  { background: #FEF3C7; color: var(--warning-color); }
+.toast__icon-wrap--info     { background: var(--primary-light); color: var(--primary-color); }
+.toast__icon-wrap--loading  { background: var(--secondary-light); color: var(--text-tertiary); }
+
+/* ── Body text ────────────────────────────────── */
+.toast__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toast__title {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.toast__subtitle {
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Close button ─────────────────────────────── */
+.toast__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toast__close:hover {
+  background: var(--secondary-light);
+  color: var(--text-main);
+}
+
+/* ── Progress bar ─────────────────────────────── */
+.toast__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border-color);
+}
+
+.toast__progress-fill {
+  height: 100%;
+  border-radius: 0 0 0 12px;
+  transition: width 0.1s linear;
+}
+
+.toast__progress-fill--success  { background: var(--success-color); }
+.toast__progress-fill--error    { background: var(--error-color); }
+.toast__progress-fill--warning  { background: var(--warning-color); }
+.toast__progress-fill--info     { background: var(--primary-color); }
+.toast__progress-fill--loading  { background: var(--text-tertiary); }
+
+/* ── Spin animation for loading icon ─────────── */
+@keyframes toast-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.toast-spin {
+  animation: toast-spin 0.9s linear infinite;
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 480px) {
+  .toast-host {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+  }
+
+  .toast {
+    min-width: unset;
+    max-width: 100%;
+  }
+}

@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CircleAlert } from 'lucide-react';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
-import type { LocalSubtask } from '../../ManageCalendarPage/Components/DatePickerModal';
 import { useSubtaskEdit, type EditableSubtask } from '../Hooks/useSubtaskEdit';
 import BackButton from '../../ManageCreatePage/Components/BackButton';
 import { useAuth } from '../../../Context/AuthContext';
@@ -12,18 +10,21 @@ import TaskInfoCard from './TaskInfoCard';
 import TaskEditForm from './TaskEditForm';
 import SubtaskList from './SubtaskList';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import type { SubtaskFormData } from '../../ManageCreatePage/Types/subtask.types';
+import { validateSubtaskForm, hasValidationErrors } from '../../ManageCreatePage/Utils/subtaskValidator';
+import { useToast } from '../../../shared/Hooks/useToast';
+import ToastHost from '../../../shared/Components/ToastHost';
 
 interface SubtaskEditProps {
   taskId: number;
   initialSubtasks: EditableSubtask[];
   onSubtasksChange?: (subtasks: EditableSubtask[]) => void;
-  onSaveChanges?: (subtasks: EditableSubtask[]) => Promise<void> | void;
+  onSaveIndividualSubtask?: (subtask: EditableSubtask) => Promise<void>;
+  onCreateSubtask?: (data: SubtaskFormData) => Promise<void>;
   onDeleteSubtask?: (subtask: EditableSubtask) => Promise<void> | void;
   onTaskDeleted?: () => void;
   onClose?: () => void;
-  onAddNewSubtask?: () => void;
   onSaveTask?: (taskData: any) => Promise<void> | void;
-  persistedSubtasks?: EditableSubtask[];
   taskTitle?: string;
   taskDueDate?: string;
   totalHours?: number;
@@ -42,13 +43,12 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   taskId,
   initialSubtasks,
   onSubtasksChange,
-  onSaveChanges,
+  onSaveIndividualSubtask,
+  onCreateSubtask,
   onDeleteSubtask,
   onTaskDeleted,
   onClose,
-  onAddNewSubtask,
   onSaveTask,
-  persistedSubtasks,
   taskTitle = 'Ensayo sobre la Revolución Francesa',
   taskDueDate,
   totalHours,
@@ -59,9 +59,12 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [conflictWarning, setConflictWarning] = useState(false);
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
+  const [hourLimitError, setHourLimitError] = useState('');
 
   const { user } = useAuth();
   const dailyHours = user?.daily_hours ?? 8;
+  const { toasts, dismiss, success: toastSuccess, error: toastError, loading: toastLoading, show: toastShow } = useToast();
+  const [conflictToastId, setConflictToastId] = useState<number | null>(null);
 
   const [taskEditData, setTaskEditData] = useState({
     title: task?.title || taskTitle || '',
@@ -74,27 +77,24 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
   const {
     subtasks,
+    setSubtasks,
     editingId,
     editData,
     errors,
-    isSaving,
     isDeleting,
     deleteTarget,
     startEditing,
     cancelEditing,
-    handleEditFieldChange,
+    handleEditFieldChange: originalHandleEditFieldChange,
     saveEditedSubtask,
     openDeleteSubtaskModal,
     openDeleteMainTaskModal,
     closeDeleteModal,
-    confirmDelete,
-    handleSaveChanges,
-    setSubtasks,
+    confirmDelete: originalConfirmDelete,
   } = useSubtaskEdit({
     taskId,
     initialSubtasks,
     onSubtasksChange,
-    onSaveChanges,
     onDeleteSubtask,
     onTaskDeleted,
     onClose,
@@ -116,85 +116,140 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     return subtasks.reduce((acc, item) => acc + (Number(item.needed_hours) || 0), 0);
   }, [subtasks, totalHours]);
 
-  const hasUnsavedChanges = useMemo(() => {
-    const base = persistedSubtasks ?? initialSubtasks ?? [];
-    const normalize = (items: EditableSubtask[]) =>
-      items.map((item) => ({
-        id: item.id,
-        description: (item.description ?? '').trim(),
-        planification_date: (item.planification_date ?? '').split('T')[0],
-        needed_hours: Number(item.needed_hours) || 0,
-      }));
-    return JSON.stringify(normalize(subtasks)) !== JSON.stringify(normalize(base));
-  }, [initialSubtasks, persistedSubtasks, subtasks]);
-
-  const locallyModifiedSubtasks = useMemo((): LocalSubtask[] => {
-    const base = persistedSubtasks ?? initialSubtasks ?? [];
-    const baseMap = new Map(
-      base.map((st) => [
-        st.id,
-        {
-          planification_date: (st.planification_date ?? '').split('T')[0],
-          needed_hours: Number(st.needed_hours) || 0,
-        },
-      ]),
-    );
-    return subtasks
-      .filter((st) => st.id !== editingId)
-      .filter((st) => {
-        const orig = baseMap.get(st.id);
-        if (!orig) return false;
-        const dateChanged = (st.planification_date ?? '').split('T')[0] !== orig.planification_date;
-        const hoursChanged = (Number(st.needed_hours) || 0) !== orig.needed_hours;
-        return dateChanged || hoursChanged;
-      })
-      .map((st) => ({
-        id: st.id,
-        description: st.description,
-        planification_date: (st.planification_date ?? '').split('T')[0],
-        needed_hours: Number(st.needed_hours) || 0,
-      }));
-  }, [subtasks, editingId, persistedSubtasks, initialSubtasks]);
-
   const checkAndSaveSubtask = async () => {
+    // Si no hay cambios, simplemente cancelar edición sin mostrar toast
+    const original = subtasks.find((s) => s.id === editingId);
+    const hasChanged = original && (
+      original.description !== editData.description ||
+      original.planification_date !== editData.planification_date ||
+      Number(original.needed_hours) !== Number(editData.needed_hours)
+    );
+
+    if (!hasChanged) {
+      handleCancelEditing();
+      return;
+    }
+
+    // Validar antes de procesar
+    const validationErrors = validateSubtaskForm(editData);
+    if (hasValidationErrors(validationErrors) || hourLimitError) {
+      toastError('Datos incompletos', 'Por favor, llena la descripción y el tiempo correctamente.');
+      return;
+    }
     if (taskEditData.due_date && editData.planification_date > taskEditData.due_date) {
-      alert(
-        `La fecha de la actividad no puede ser posterior a la fecha de entrega de la tarea (${taskEditData.due_date}).\nPor favor, selecciona una fecha anterior o igual.`,
-      );
+      toastError('Fecha inválida', `La actividad no puede ser posterior a la entrega (${taskEditData.due_date})`);
       return;
     }
     setIsCheckingConflict(true);
+    const loadId = toastLoading('Guardando actividad…', 'Verificando conflictos de horario');
     try {
       const date = editData.planification_date;
       let url = `/api/subtasks/?planification_date=${date}`;
       if (editingId !== null) url += `&exclude_ids=${editingId}`;
       const response = await apiClient.get<Array<{ needed_hours: number }>>(url);
-      const subtasksForDay = response.data;
-      const localForDay = locallyModifiedSubtasks.filter((st) => st.planification_date === date);
-      const backendHours = subtasksForDay.reduce((sum, st) => sum + (Number(st.needed_hours) || 0), 0);
-      const localHours = localForDay.reduce((sum, st) => sum + st.needed_hours, 0);
+      const backendHours = response.data.reduce((sum, st) => sum + (Number(st.needed_hours) || 0), 0);
       const newHours = Number(editData.needed_hours) || 0;
-      const total = parseFloat((backendHours + localHours + newHours).toFixed(2));
+      const total = parseFloat((backendHours + newHours).toFixed(2));
       if (total > dailyHours) {
+        dismiss(loadId);
         setConflictWarning(true);
+        const id = toastShow({
+          title: 'Límite excedido',
+          subtitle: 'Has superado las horas disponibles para este día.',
+          variant: 'warning',
+          duration: 0, // Persistente
+          showProgress: false,
+          loading: false,
+        });
+        setConflictToastId(id);
         return;
       }
+      if (conflictToastId) {
+        dismiss(conflictToastId);
+        setConflictToastId(null);
+      }
       setConflictWarning(false);
+      // Guardar en estado local
       saveEditedSubtask();
+      // Persistir en BD si hay callback
+      if (onSaveIndividualSubtask && editingId !== null) {
+        const updatedSubtask = subtasks.find((st) => st.id === editingId);
+        if (updatedSubtask) {
+          await onSaveIndividualSubtask({
+            ...updatedSubtask,
+            description: editData.description,
+            planification_date: editData.planification_date,
+            needed_hours: Number(editData.needed_hours),
+          });
+        }
+      }
+      dismiss(loadId);
+      toastSuccess('¡Cambios guardados!', 'La actividad se ha actualizado correctamente.');
     } catch {
+      dismiss(loadId);
+      toastError('Error al guardar', 'No se pudo actualizar la actividad.');
       saveEditedSubtask();
     } finally {
       setIsCheckingConflict(false);
     }
   };
 
+  const handleEditFieldChange = (field: keyof SubtaskFormData, value: string | number) => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
+    setConflictWarning(false);
+    originalHandleEditFieldChange(field, value);
+  };
+
   const handleTaskEditFieldChange = (field: string, value: string) => {
     setTaskEditData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCancelEditing = () => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
+    setConflictWarning(false);
+    setHourLimitError('');
+    cancelEditing();
+  };
+
+  const handleStartEditing = (subtask: EditableSubtask) => {
+    if (conflictToastId) {
+      dismiss(conflictToastId);
+      setConflictToastId(null);
+    }
+    setConflictWarning(false);
+    setHourLimitError('');
+    startEditing(subtask);
+  };
+
+  const handleConfirmDelete = async () => {
+    const isMainTask = deleteTarget?.type === 'main-task';
+    const loadId = toastLoading(
+      isMainTask ? 'Eliminando tarea…' : 'Eliminando actividad…',
+      'Por favor espera'
+    );
+    try {
+      await originalConfirmDelete();
+      dismiss(loadId);
+      toastSuccess(
+        isMainTask ? '¡Tarea eliminada!' : '¡Actividad eliminada!',
+        isMainTask ? 'La tarea se ha borrado correctamente.' : 'El paso se ha eliminado de la lista.'
+      );
+    } catch (error) {
+      dismiss(loadId);
+      toastError('Error al eliminar', 'No se pudo completar la operación.');
+    }
   };
 
   const handleSaveTaskChanges = async () => {
     if (!onSaveTask) return;
     setIsSavingTask(true);
+    const loadId = toastLoading('Guardando tarea…', 'Aplicando los cambios');
     try {
       let formattedDate = taskEditData.due_date;
       if (formattedDate && !formattedDate.includes('T')) {
@@ -202,8 +257,12 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       }
       await onSaveTask({ ...taskEditData, due_date: formattedDate });
       setIsEditingTask(false);
+      dismiss(loadId);
+      toastSuccess('¡Tarea guardada!', 'Los cambios se han aplicado correctamente.');
     } catch (error) {
       console.error('Error al guardar cambios de la tarea:', error);
+      dismiss(loadId);
+      toastError('Error al guardar', 'No se pudo actualizar la tarea.');
     } finally {
       setIsSavingTask(false);
     }
@@ -223,13 +282,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
   return (
     <div className="subtask-edit-wrapper">
-      {hasUnsavedChanges && (
-        <div className="subtask-edit-unsaved-toast" role="status" aria-live="polite">
-          <CircleAlert size={18} />
-          <span>Tienes cambios sin guardar</span>
-        </div>
-      )}
-
       <BackButton
         onClick={isEditingTask ? handleCancelTaskEdit : onClose}
         label={isEditingTask ? 'Volver sin editar' : 'Volver a inicio'}
@@ -254,30 +306,34 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
               subtasks={subtasks}
               editingId={editingId}
               editData={editData}
-              errors={errors}
+              errors={{
+                ...errors,
+                needed_hours: hourLimitError || errors.needed_hours,
+              }}
               conflictWarning={conflictWarning}
               isCheckingConflict={isCheckingConflict}
-              isSaving={isSaving}
-              hasSaveChangesHandler={!!onSaveChanges}
-              onAddNewSubtask={onAddNewSubtask}
-              onStartEditing={startEditing}
+              maxHours={dailyHours}
+              taskDueDate={taskEditData.due_date || undefined}
+              onCreateSubtask={onCreateSubtask ?? (() => Promise.resolve())}
+              onStartEditing={handleStartEditing}
               onDeleteClick={openDeleteSubtaskModal}
               onFieldChange={handleEditFieldChange}
               onOpenDatePicker={() => setIsDatePickerOpen(true)}
-              onCancelEditing={() => {
-                setConflictWarning(false);
-                cancelEditing();
-              }}
+              onCancelEditing={handleCancelEditing}
               onSaveSubtask={checkAndSaveSubtask}
-              onResolveConflict={() => {
-                setConflictWarning(false);
-                setIsDatePickerOpen(true);
-              }}
+              onResolveConflict={checkAndSaveSubtask}
               onHoursChange={(value) => {
-                setConflictWarning(false);
+                if (value <= 0 || isNaN(value)) {
+                  setHourLimitError('El tiempo debe ser mayor que 0 horas.');
+                } else if (value > dailyHours) {
+                  setHourLimitError(
+                    `No puedes asignar más de ${dailyHours}h en un día. Considera dividir esta actividad en varios días.`,
+                  );
+                } else {
+                  setHourLimitError('');
+                }
                 handleEditFieldChange('needed_hours', value);
               }}
-              onSaveChanges={handleSaveChanges}
             />
           </>
         ) : (
@@ -296,7 +352,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         isOpen={isDatePickerOpen}
         onClose={() => setIsDatePickerOpen(false)}
         onConfirm={(date) => {
-          setConflictWarning(false);
           handleEditFieldChange('planification_date', date);
           setIsDatePickerOpen(false);
         }}
@@ -304,22 +359,20 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         newSubtaskHours={editData.needed_hours}
         maxDate={taskEditData.due_date || undefined}
         confirmLabel="Modificar aquí"
-        excludeIds={[
-          ...(editingId !== null ? [editingId] : []),
-          ...locallyModifiedSubtasks.map((st) => st.id),
-        ]}
+        excludeIds={editingId !== null ? [editingId] : []}
         originalDate={editData.planification_date || undefined}
-        localSubtasks={locallyModifiedSubtasks}
       />
 
       {deleteTarget && (
         <DeleteConfirmModal
           type={deleteTarget.type}
           isDeleting={isDeleting}
-          onConfirm={confirmDelete}
+          onConfirm={handleConfirmDelete}
           onCancel={closeDeleteModal}
         />
       )}
+
+      <ToastHost toasts={toasts} onDismiss={dismiss} />
     </div>
   );
 };

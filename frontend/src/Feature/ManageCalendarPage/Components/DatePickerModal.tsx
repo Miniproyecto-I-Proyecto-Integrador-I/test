@@ -9,21 +9,13 @@ import type { Subtask } from '../../ManageTodayPage/Types/models';
 import type { SubtaskItem } from '../../ManageCreatePage/Types/subtask.types';
 import '../Styles/DatePickerModal.css';
 
-/** A locally-modified subtask not yet saved to the backend. */
-export interface LocalSubtask {
-  id: string | number;
-  description: string;
-  planification_date: string;
-  needed_hours: number;
-}
-
 interface DatePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
   /** Called with the chosen 'YYYY-MM-DD' string when the user confirms. */
   onConfirm: (date: string) => void;
   newSubtaskDescription: string;
-  newSubtaskHours: number;
+  newSubtaskHours: number | string;
   /** Subtasks already added in this session (not yet saved to API). */
   pendingSubtasks?: SubtaskItem[];
   /** Optional upper bound (task due date). Dates after this are not selectable. */
@@ -34,8 +26,6 @@ interface DatePickerModalProps {
   excludeIds?: (string | number)[];
   /** Current date of the subtask being edited ('YYYY-MM-DD'). Selecting this day shows a blocked message. */
   originalDate?: string;
-  /** Locally-modified subtasks not yet saved to the backend; shown in the calendar instead of stale API data. */
-  localSubtasks?: LocalSubtask[];
 }
 
 const DatePickerModal = ({
@@ -49,7 +39,6 @@ const DatePickerModal = ({
   confirmLabel,
   excludeIds,
   originalDate,
-  localSubtasks = [],
 }: DatePickerModalProps) => {
   const today = new Date();
   const todayISO = toISODate(today);
@@ -94,20 +83,6 @@ const DatePickerModal = ({
 
   // Augment dayMap with pending (locally added) subtasks for calendar cell badges
   const augmentedDayMap = { ...dayMap };
-  // Also augment with locally-modified subtasks (edited but not yet saved)
-  for (const st of localSubtasks) {
-    const key = st.planification_date;
-    if (!augmentedDayMap[key]) {
-      augmentedDayMap[key] = { count: 1, totalHours: st.needed_hours };
-    } else {
-      augmentedDayMap[key] = {
-        count: augmentedDayMap[key].count + 1,
-        totalHours: parseFloat(
-          (augmentedDayMap[key].totalHours + st.needed_hours).toFixed(2),
-        ),
-      };
-    }
-  }
   for (const st of pendingSubtasks) {
     const key = st.planification_date;
     if (!augmentedDayMap[key]) {
@@ -123,16 +98,12 @@ const DatePickerModal = ({
   }
 
   const selectedISO = selectedDate ? toISODate(selectedDate) : null;
-  const localForDay: LocalSubtask[] = selectedISO
-    ? localSubtasks.filter((st) => st.planification_date === selectedISO)
-    : [];
   const existingSubtasks: Subtask[] = selectedISO
     ? (subtasksByDate[selectedISO] ?? [])
     : [];
   const pendingForDay: SubtaskItem[] = selectedISO
     ? pendingSubtasks.filter((st) => st.planification_date === selectedISO)
     : [];
-  const localHours = localForDay.reduce((sum, st) => sum + st.needed_hours, 0);
   const existingHours = existingSubtasks.reduce(
     (sum, st) => sum + st.needed_hours,
     0,
@@ -142,7 +113,7 @@ const DatePickerModal = ({
     0,
   );
   const totalHours = parseFloat(
-    (existingHours + pendingHours + localHours + newSubtaskHours).toFixed(2),
+    (existingHours + pendingHours + Number(newSubtaskHours)).toFixed(2),
   );
   const isOver = totalHours > dailyHours;
   const pct = Math.min((totalHours / dailyHours) * 100, 100);
@@ -254,24 +225,6 @@ const DatePickerModal = ({
                           {newSubtaskHours}h
                         </span>
                       </li>
-
-                      {/* Locally-modified subtasks (edited, not yet saved) */}
-                      {localForDay.map((st) => (
-                        <li key={st.id} className="dpm__item dpm__item--local">
-                          <div className="dpm__item-accent dpm__item-accent--local" />
-                          <div className="dpm__item-body">
-                            <span className="dpm__item-name">
-                              {st.description}
-                            </span>
-                            <span className="dpm__item-local-badge">
-                              Modificada
-                            </span>
-                          </div>
-                          <span className="dpm__item-hours dpm__item-hours--local">
-                            {st.needed_hours}h
-                          </span>
-                        </li>
-                      ))}
 
                       {/* Pending subtasks (added this session, not yet saved) */}
                       {pendingForDay.map((st) => (
