@@ -6,6 +6,7 @@ import ProgressPage from '../Pages/ProgressPage';
 import TodayPage from '../Pages/TodayPage';
 import ActivityPage from '../Pages/ActivityPage';
 import CalendarPage from '../Pages/CalendarPage';
+import ConflictPage from '../Pages/ConflictPage';
 import Layout from '../shared/Components/Layout';
 import { AuthProvider } from '../Context/AuthContext';
 import ProtectedRoute from '../shared/Components/Auth/ProtectedRoute';
@@ -51,6 +52,8 @@ const AppRoutes = () => {
             />
             {/* Hidden dev route — no NavBar link */}
             <Route path="/calendar" element={<CalendarPage />} />
+            {/* Conflict resolution — no NavBar link */}
+            <Route path="/conflict" element={<ConflictPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
