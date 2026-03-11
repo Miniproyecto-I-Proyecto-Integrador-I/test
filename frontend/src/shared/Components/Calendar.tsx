@@ -16,9 +16,23 @@ export interface CalendarProps {
   onMonthChange?: (newMonth: Date) => void;
   /** Fired when the user clicks a day cell. */
   onDaySelect?: (date: Date) => void;
+  /** Dates strictly before this 'YYYY-MM-DD' string are disabled. */
+  minDate?: string;
+  /** Dates strictly after this 'YYYY-MM-DD' string are disabled. The day itself gets a deadline marker. */
+  maxDate?: string;
+  /** Controlled selected date. When provided, overrides internal selection state. */
+  value?: Date | null;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
+
+/** Local ISO date helper — avoids importing from a feature-level module. */
+function toISO(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 
 const WEEKDAYS = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
 
@@ -76,6 +90,9 @@ const Calendar = ({
   month: controlledMonth,
   onMonthChange,
   onDaySelect,
+  minDate,
+  maxDate,
+  value,
 }: CalendarProps) => {
   const today = new Date();
 
@@ -183,16 +200,23 @@ const Calendar = ({
       {/* Day grid */}
       <div className="calendar__grid">
         {days.map(({ date, isCurrentMonth }, idx) => {
+          const iso = toISO(date);
           const isToday = isSameDay(date, today);
-          const isSelected = selectedDate
-            ? isSameDay(date, selectedDate)
+          const effectiveSelected = value !== undefined ? value : selectedDate;
+          const isSelected = effectiveSelected
+            ? isSameDay(date, effectiveSelected)
             : false;
+          const isDisabled =
+            (!!minDate && iso < minDate) || (!!maxDate && iso > maxDate);
+          const isMaxDate = !!maxDate && iso === maxDate;
 
           const cellClass = [
             'calendar__cell',
             !isCurrentMonth ? 'calendar__cell--outside' : '',
             isToday ? 'calendar__cell--today' : '',
             isSelected ? 'calendar__cell--selected' : '',
+            isDisabled ? 'calendar__cell--disabled' : '',
+            isMaxDate ? 'calendar__cell--max-date' : '',
           ]
             .filter(Boolean)
             .join(' ');
@@ -202,6 +226,7 @@ const Calendar = ({
               key={idx}
               className={cellClass}
               onClick={() => {
+                if (isDisabled) return;
                 setSelectedDate(date);
                 onDaySelect?.(date);
               }}

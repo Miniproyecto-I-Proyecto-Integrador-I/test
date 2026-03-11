@@ -20,22 +20,32 @@ export function formatDayLabel(date: Date): string {
 }
 
 /**
- * Returns the query range for the given month.
- * - `from`: max(today, first day of month)  → never fetch past days
- * - `to`:   last day of month
+ * Returns the query range covering the full visible calendar grid for the
+ * given month, including the leading days from the previous month and the
+ * trailing days from the next month that fill the grid rows.
  *
- * If `from > to` the whole month is in the past; the hook skips the fetch.
+ * - `from`: max(today, first visible cell)  → never fetch past days
+ * - `to`:   last visible cell (may be in the next month)
+ *
+ * If `from > to` the entire visible range is in the past; the hook skips
+ * the fetch.
  */
 export function getMonthRange(month: Date): { from: string; to: string } {
   const today = toISODate(new Date());
-  const firstDay = toISODate(new Date(month.getFullYear(), month.getMonth(), 1));
-  const lastDay = toISODate(
-    new Date(month.getFullYear(), month.getMonth() + 1, 0),
-  );
+  const year = month.getFullYear();
+  const m = month.getMonth();
+
+  const startOffset = new Date(year, m, 1).getDay(); // 0 = Sunday
+  const daysInMonth = new Date(year, m + 1, 0).getDate();
+  const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+  // First and last cells of the rendered grid
+  const firstCell = toISODate(new Date(year, m, 1 - startOffset));
+  const lastCell = toISODate(new Date(year, m, totalCells - startOffset));
 
   return {
-    from: firstDay < today ? today : firstDay,
-    to: lastDay,
+    from: firstCell < today ? today : firstCell,
+    to: lastCell,
   };
 }
 

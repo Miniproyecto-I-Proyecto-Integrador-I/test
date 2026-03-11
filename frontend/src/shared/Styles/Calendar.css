@@ -124,14 +124,41 @@
   background: #D1FAE5;
 }
 
-.calendar__cell:not(.calendar__cell--outside):not(.calendar__cell--empty):hover {
+.calendar__cell:not(.calendar__cell--outside):not(.calendar__cell--empty):not(.calendar__cell--disabled):hover {
   background: var(--btn-sec-hover);
   cursor: pointer;
 }
 
-.calendar__cell--outside:hover {
+.calendar__cell--outside:not(.calendar__cell--disabled):hover {
   background: var(--btn-sec-hover);
   cursor: pointer;
+}
+
+/* ── Disabled cell (past or after maxDate) ────────────────── */
+.calendar__cell--disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── Max-date cell (task deadline) ────────────────────────── */
+.calendar__cell--max-date {
+  outline: 1.5px solid var(--warning-color, #f59e0b);
+  outline-offset: -1px;
+}
+
+.calendar__cell--max-date::after {
+  content: 'Límite';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--warning-color, #f59e0b);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* ── Day number ─────────────────────────────────────────── */
