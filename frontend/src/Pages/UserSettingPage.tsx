@@ -22,7 +22,7 @@ const UserSettingPage: React.FC = () => {
     });
 
     const handleClickPlus = () => {
-        if(userSetting.dailyLimit < 24){
+        if(userSetting.dailyLimit < 16){
             setUserSetting({...userSetting, dailyLimit: userSetting.dailyLimit + 1});
         }
     };
@@ -95,7 +95,7 @@ const UserSettingPage: React.FC = () => {
                 </div>
                 <div className='user-setting-section-content'>
                     <button className='hour-button' onClick={handleClickMinus}>-</button>
-                    <input className='hour-input' type="number" value={userSetting.dailyLimit} max={24} onChange={(e) => setUserSetting({...userSetting, dailyLimit: Number(e.target.value)})}/>
+                    <input className='hour-input' type="number" value={userSetting.dailyLimit} disabled max={16} min={1} onChange={(e) => setUserSetting({...userSetting, dailyLimit: Number(e.target.value)})}/>
                     <button className='hour-button' onClick={handleClickPlus}>+</button>
                     <p className='user-setting-section-content-text'>horas por día</p>
                 </div>
