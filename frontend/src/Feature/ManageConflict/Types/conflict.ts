@@ -7,6 +7,7 @@ export interface ConflictTask {
   hours: number;
   date: string; // ISO: 'YYYY-MM-DD'
   isNew?: boolean; // only true for the incoming task causing the conflict (case 1)
+  parentDueDate?: string;
 }
 
 export interface ConflictScenario {

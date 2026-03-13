@@ -12,6 +12,7 @@ interface ConflictTaskRowProps {
   editableHours: boolean;
   editableDate: boolean;
   resolved?: boolean;
+  maxDate?: string;
   onChangeHours: (id: string, hours: number) => void;
   onChangeDate: (id: string, date: string) => void;
 }
@@ -24,6 +25,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
   editableHours,
   editableDate,
   resolved = false,
+  maxDate,
   onChangeHours,
   onChangeDate,
 }) => {
@@ -137,6 +139,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
         newSubtaskHours={task.hours}
         excludeIds={!task.isNew ? [task.id] : []}
         originalDate={task.date}
+        maxDate={maxDate}
         blockConflict={true}
       />
     </div>

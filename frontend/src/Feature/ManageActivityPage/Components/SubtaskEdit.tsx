@@ -302,10 +302,22 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                  ...finalSubtaskData,
                  id: editingIdLocal,
               });
+              
+              // Mutate the local view immediately since onSaveIndividualSubtask only hits the backend
+              // and the table will revert to old temporary state without this.
+              setSubtasks(prev => prev.map(oldSubtask => 
+                 oldSubtask.id === editingIdLocal 
+                 ? { 
+                     ...oldSubtask, 
+                     planification_date: t.date, 
+                     needed_hours: t.hours,
+                     description: t.title 
+                   } 
+                 : oldSubtask
+              ));
            }
         } else {
            // If an existing task in the view was modified, we patch it
-           // This assumes `t.id` correctly points to the integer subtask ID from the DB
            if (onSaveIndividualSubtask) {
               const numericId = parseInt(t.id, 10);
               if (!isNaN(numericId)) {
@@ -315,6 +327,18 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                    needed_hours: t.hours,
                    planification_date: t.date
                 });
+                
+                // Keep UI in sync for existing tasks edited in the board
+                setSubtasks(prev => prev.map(oldSubtask => 
+                   oldSubtask.id === numericId
+                   ? { 
+                       ...oldSubtask, 
+                       planification_date: t.date, 
+                       needed_hours: t.hours,
+                       description: t.title 
+                     } 
+                   : oldSubtask
+                ));
               }
            }
         }
@@ -333,7 +357,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       setConflictData(null);
       cancelEditing();
       
-      // Reload the parent if necessary or assume state is merged via callbacks
     } catch(err) {
       console.error(err);
       dismiss(loadId);
@@ -356,6 +379,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 activityTasks={subtasks}
                 editingTask={conflictData.taskData}
                 taskTitle={taskEditData.title}
+                parentDueDate={taskEditData.due_date}
                 onSave={handleResolveSave}
                 onCancel={() => setConflictData(null)}
               />

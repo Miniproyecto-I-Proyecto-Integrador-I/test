@@ -52,6 +52,7 @@ const ConflictView: React.FC<ConflictViewProps> = ({ scenario, onSave, onCancel 
             editableHours={true}
             editableDate={false}
             resolved={resolved}
+            maxDate={newTask.parentDueDate}
             onChangeHours={(id, hours) => updateTask(id, { hours })}
             onChangeDate={(id, date) => updateTask(id, { date })}
           />
@@ -72,6 +73,7 @@ const ConflictView: React.FC<ConflictViewProps> = ({ scenario, onSave, onCancel 
             maxHoursPerDay={maxHours}
             editableHours={true}
             editableDate={true}
+            maxDate={task.parentDueDate}
             onChangeHours={(id, hours) => updateTask(id, { hours })}
             onChangeDate={(id, date) => updateTask(id, { date })}
           />
@@ -113,11 +115,12 @@ export interface ConflictPageProps {
   activityTasks?: import('../Feature/ManageActivityPage/Hooks/useSubtaskEdit').EditableSubtask[];
   editingTask?: import('../Feature/ManageCreatePage/Types/subtask.types').SubtaskFormData | import('../Feature/ManageActivityPage/Hooks/useSubtaskEdit').EditableSubtask;
   taskTitle?: string;
+  parentDueDate?: string;
   onSave?: (tasks: ConflictTask[]) => void;
   onCancel?: () => void;
 }
 
-const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask, taskTitle, onSave, onCancel }) => {
+const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask, taskTitle, parentDueDate, onSave, onCancel }) => {
   const { user } = useAuth();
   const maxHours = user?.daily_hours ?? 8;
 
@@ -153,6 +156,7 @@ const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask,
             parentTask: st.task?.title || 'Sin tarea',
             hours: Number(st.needed_hours),
             date: st.planification_date,
+            parentDueDate: st.task?.due_date ? String(st.task.due_date).split('T')[0] : undefined,
           }));
 
         // Transform the incoming/edited task causing the conflict
@@ -163,6 +167,7 @@ const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask,
           hours: Number(editingTask.needed_hours),
           date: editingTask.planification_date,
           isNew: true, // we treat the edited/created task as the new incoming change
+          parentDueDate: parentDueDate ? String(parentDueDate).split('T')[0] : undefined,
         };
 
         const newScenario: ConflictScenario = {
