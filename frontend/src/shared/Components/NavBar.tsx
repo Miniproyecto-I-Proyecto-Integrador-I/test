@@ -111,6 +111,7 @@ const NavBar = () => {
                 type="button"
                 className="popover-btn setting-btn"
                 onClick={() => {
+                  setIsProfileMenuOpen(false);
                   navigate('/usersetting');
                 }}
               >

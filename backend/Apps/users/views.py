@@ -66,17 +66,22 @@ class UserViewSet(viewsets.ModelViewSet):
                         dates = [c['planification_date'] for c in conflicts_dates]
                         conflicting_subtasks = subtasks_queryset.filter(planification_date__in=dates).order_by('planification_date')
                         
-                        # Serializar conflictos según formato solicitado: id, fecha, nombre, horas
-                        conflicts_data = [
-                            {
+                        # Agrupar por fecha
+                        grouped_conflicts = {}
+                        for s in conflicting_subtasks:
+                            date_key = s.planification_date.isoformat()
+                            if date_key not in grouped_conflicts:
+                                grouped_conflicts[date_key] = {
+                                    "fecha": s.planification_date,
+                                    "subtasks": []
+                                }
+                            grouped_conflicts[date_key]["subtasks"].append({
                                 "id": s.id,
-                                "fecha": s.planification_date,
-                                "descripcion": s.description,
+                                "nombre": s.description,
                                 "horas": s.needed_hours
-                            }
-                            for s in conflicting_subtasks
-                        ]
-                        return Response(conflicts_data, status=status.HTTP_409_CONFLICT)
+                            })
+                        
+                        return Response(list(grouped_conflicts.values()), status=status.HTTP_409_CONFLICT)
             except (ValueError, TypeError):
                 pass
 
