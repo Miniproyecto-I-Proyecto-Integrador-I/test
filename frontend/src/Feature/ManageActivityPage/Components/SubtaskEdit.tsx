@@ -68,6 +68,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
   const [hourLimitError, setHourLimitError] = useState('');
   const [conflictData, setConflictData] = useState<{ isNew: boolean, taskData: SubtaskFormData | EditableSubtask } | null>(null);
+  const [pendingInitialEditingId, setPendingInitialEditingId] = useState<
+    number | null | undefined
+  >(initialEditingSubtaskId);
 
   const { user } = useAuth();
   const dailyHours = user?.daily_hours ?? 8;
@@ -128,14 +131,19 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   }, [initialSubtasksStr, setSubtasks, cancelEditing]);
 
   useEffect(() => {
-    if (initialEditingSubtaskId == null || editingId !== null) return;
+    setPendingInitialEditingId(initialEditingSubtaskId);
+  }, [initialEditingSubtaskId, taskId]);
+
+  useEffect(() => {
+    if (pendingInitialEditingId == null || editingId !== null) return;
     const target = subtasks.find(
-      (subtask) => Number(subtask.id) === Number(initialEditingSubtaskId),
+      (subtask) => Number(subtask.id) === Number(pendingInitialEditingId),
     );
     if (target) {
       startEditing(target);
+      setPendingInitialEditingId(undefined);
     }
-  }, [initialEditingSubtaskId, subtasks, editingId, startEditing]);
+  }, [pendingInitialEditingId, subtasks, editingId, startEditing]);
 
   useEffect(() => {
     const dueDate = taskEditData.due_date;
@@ -374,71 +382,71 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       // Find the modified tasks to save
       for (const t of resolvedTasks) {
         if (t.isNew && conflictData) {
-           const finalSubtaskData: SubtaskFormData = {
-               description: t.title,
-               needed_hours: t.hours,
-               planification_date: t.date,
-           };
+          const finalSubtaskData: SubtaskFormData = {
+            description: t.title,
+            needed_hours: t.hours,
+            planification_date: t.date,
+          };
 
-           if (!isEditingMode && onCreateSubtask) {
-              // Creating a brand new subtask that triggered conflict
-              await onCreateSubtask(finalSubtaskData);
-           } else if (isEditingMode && onSaveIndividualSubtask) {
-              // Editing an EXISTING task that triggered conflict
-              const editingIdLocal = (conflictData.taskData as EditableSubtask).id;
-              const numericId = parseInt(String(editingIdLocal), 10);
-              const applyId = !isNaN(numericId) ? numericId : editingIdLocal;
+          if (!isEditingMode && onCreateSubtask) {
+            // Creating a brand new subtask that triggered conflict
+            await onCreateSubtask(finalSubtaskData);
+          } else if (isEditingMode && onSaveIndividualSubtask) {
+            // Editing an EXISTING task that triggered conflict
+            const editingIdLocal = (conflictData.taskData as EditableSubtask).id;
+            const numericId = parseInt(String(editingIdLocal), 10);
+            const applyId = !isNaN(numericId) ? numericId : editingIdLocal;
 
-              await onSaveIndividualSubtask({
-                 ...finalSubtaskData,
-                 id: applyId as any,
-              });
-              
-              // Mutate the local view directly
-              nextSubtasks = nextSubtasks.map(oldSubtask => 
-                 oldSubtask.id === editingIdLocal || oldSubtask.id === numericId
-                 ? { 
-                     ...oldSubtask, 
-                     planification_date: t.date, 
-                     needed_hours: t.hours,
-                     description: t.title 
-                   } 
-                 : oldSubtask
-              );
-           }
+            await onSaveIndividualSubtask({
+              ...finalSubtaskData,
+              id: applyId as any,
+            });
+
+            // Mutate the local view directly
+            nextSubtasks = nextSubtasks.map(oldSubtask =>
+              oldSubtask.id === editingIdLocal || oldSubtask.id === numericId
+                ? {
+                  ...oldSubtask,
+                  planification_date: t.date,
+                  needed_hours: t.hours,
+                  description: t.title
+                }
+                : oldSubtask
+            );
+          }
         } else {
-           // General adjacent existing tasks in the day being pushed around
-           if (onSaveIndividualSubtask) {
-              const numericId = parseInt(t.id, 10);
-              const applyId = !isNaN(numericId) ? numericId : t.id;
+          // General adjacent existing tasks in the day being pushed around
+          if (onSaveIndividualSubtask) {
+            const numericId = parseInt(t.id, 10);
+            const applyId = !isNaN(numericId) ? numericId : t.id;
 
-              await onSaveIndividualSubtask({
-                 id: applyId as any,
-                 description: t.title,
-                 needed_hours: t.hours,
-                 planification_date: t.date
-              });
-              
-              // Keep UI in sync for existing tasks edited in the board
-              nextSubtasks = nextSubtasks.map(oldSubtask => 
-                 oldSubtask.id === applyId || oldSubtask.id === String(applyId)
-                 ? { 
-                     ...oldSubtask, 
-                     planification_date: t.date, 
-                     needed_hours: t.hours,
-                     description: t.title 
-                   } 
-                 : oldSubtask
-              );
-           }
+            await onSaveIndividualSubtask({
+              id: applyId as any,
+              description: t.title,
+              needed_hours: t.hours,
+              planification_date: t.date
+            });
+
+            // Keep UI in sync for existing tasks edited in the board
+            nextSubtasks = nextSubtasks.map(oldSubtask =>
+              oldSubtask.id === applyId || oldSubtask.id === String(applyId)
+                ? {
+                  ...oldSubtask,
+                  planification_date: t.date,
+                  needed_hours: t.hours,
+                  description: t.title
+                }
+                : oldSubtask
+            );
+          }
         }
       }
-      
+
       setSubtasks(nextSubtasks);
-      
+
       dismiss(loadId);
       toastSuccess('¡Conflicto Resuelto!', 'Los horarios se ajustaron correctamente.');
-      
+
       // Cleanup UI
       setConflictWarning(false);
       if (conflictToastId) {
@@ -448,8 +456,8 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       setHourLimitError('');
       setConflictData(null);
       cancelEditing();
-      
-    } catch(err) {
+
+    } catch (err) {
       console.error(err);
       dismiss(loadId);
       toastError('Error', 'No se pudieron aplicar todos los cambios resueltos');
@@ -479,54 +487,54 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
             ) : (
               <>
                 <TaskInfoCard
-              title={taskEditData.title}
-              description={taskEditData.description}
-              subject={taskEditData.subject}
-              type={taskEditData.type}
-              priority={taskEditData.priority}
-              due_date={taskEditData.due_date}
-              computedTotalHours={computedTotalHours}
-              onEdit={() => setIsEditingTask(true)}
-              onDelete={openDeleteMainTaskModal}
-            />
+                  title={taskEditData.title}
+                  description={taskEditData.description}
+                  subject={taskEditData.subject}
+                  type={taskEditData.type}
+                  priority={taskEditData.priority}
+                  due_date={taskEditData.due_date}
+                  computedTotalHours={computedTotalHours}
+                  onEdit={() => setIsEditingTask(true)}
+                  onDelete={openDeleteMainTaskModal}
+                />
 
-            <SubtaskList
-              subtasks={subtasks}
-              editingId={editingId}
-              editData={editData}
-              errors={{
-                ...errors,
-                needed_hours: hourLimitError || errors.needed_hours,
-              }}
-              conflictWarning={conflictWarning}
-              isCheckingConflict={isCheckingConflict}
-              maxHours={dailyHours}
-              taskDueDate={taskEditData.due_date || undefined}
-              onCreateSubtask={onCreateSubtask ?? (() => Promise.resolve())}
-              onStartEditing={handleStartEditing}
-              onDeleteClick={openDeleteSubtaskModal}
-              onFieldChange={handleEditFieldChange}
-              onOpenDatePicker={() => setIsDatePickerOpen(true)}
-              onCancelEditing={handleCancelEditing}
-              onSaveSubtask={checkAndSaveSubtask}
-              onResolveConflict={() => setConflictData({ 
-                isNew: false, 
-                taskData: { ...editData, id: editingId as string | number } as EditableSubtask 
-              })}
-              onResolveConflictNew={(data) => setConflictData({ isNew: true, taskData: data })}
-              onHoursChange={(value) => {
-                if (value <= 0 || isNaN(value)) {
-                  setHourLimitError('El tiempo debe ser mayor que 0 horas.');
-                } else if (value > dailyHours) {
-                  setHourLimitError(
-                    `No puedes asignar más de ${dailyHours}h en un día. Considera dividir esta actividad en varios días.`,
-                  );
-                } else {
-                  setHourLimitError('');
-                }
-                handleEditFieldChange('needed_hours', value);
-              }}
-            />
+                <SubtaskList
+                  subtasks={subtasks}
+                  editingId={editingId}
+                  editData={editData}
+                  errors={{
+                    ...errors,
+                    needed_hours: hourLimitError || errors.needed_hours,
+                  }}
+                  conflictWarning={conflictWarning}
+                  isCheckingConflict={isCheckingConflict}
+                  maxHours={dailyHours}
+                  taskDueDate={taskEditData.due_date || undefined}
+                  onCreateSubtask={onCreateSubtask ?? (() => Promise.resolve())}
+                  onStartEditing={handleStartEditing}
+                  onDeleteClick={openDeleteSubtaskModal}
+                  onFieldChange={handleEditFieldChange}
+                  onOpenDatePicker={() => setIsDatePickerOpen(true)}
+                  onCancelEditing={handleCancelEditing}
+                  onSaveSubtask={checkAndSaveSubtask}
+                  onResolveConflict={() => setConflictData({
+                    isNew: false,
+                    taskData: { ...editData, id: editingId as string | number } as EditableSubtask
+                  })}
+                  onResolveConflictNew={(data) => setConflictData({ isNew: true, taskData: data })}
+                  onHoursChange={(value) => {
+                    if (value <= 0 || isNaN(value)) {
+                      setHourLimitError('El tiempo debe ser mayor que 0 horas.');
+                    } else if (value > dailyHours) {
+                      setHourLimitError(
+                        `No puedes asignar más de ${dailyHours}h en un día. Considera dividir esta actividad en varios días.`,
+                      );
+                    } else {
+                      setHourLimitError('');
+                    }
+                    handleEditFieldChange('needed_hours', value);
+                  }}
+                />
               </>
             )}
           </>
