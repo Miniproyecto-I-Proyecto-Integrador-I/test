@@ -66,6 +66,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const [conflictWarning, setConflictWarning] = useState(false);
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
   const [hourLimitError, setHourLimitError] = useState('');
+  const [pendingInitialEditingId, setPendingInitialEditingId] = useState<
+    number | null | undefined
+  >(initialEditingSubtaskId);
 
   const { user } = useAuth();
   const dailyHours = user?.daily_hours ?? 8;
@@ -126,14 +129,19 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   }, [initialSubtasksStr, setSubtasks, cancelEditing]);
 
   useEffect(() => {
-    if (initialEditingSubtaskId == null || editingId !== null) return;
+    setPendingInitialEditingId(initialEditingSubtaskId);
+  }, [initialEditingSubtaskId, taskId]);
+
+  useEffect(() => {
+    if (pendingInitialEditingId == null || editingId !== null) return;
     const target = subtasks.find(
-      (subtask) => Number(subtask.id) === Number(initialEditingSubtaskId),
+      (subtask) => Number(subtask.id) === Number(pendingInitialEditingId),
     );
     if (target) {
       startEditing(target);
+      setPendingInitialEditingId(undefined);
     }
-  }, [initialEditingSubtaskId, subtasks, editingId, startEditing]);
+  }, [pendingInitialEditingId, subtasks, editingId, startEditing]);
 
   useEffect(() => {
     const dueDate = taskEditData.due_date;
