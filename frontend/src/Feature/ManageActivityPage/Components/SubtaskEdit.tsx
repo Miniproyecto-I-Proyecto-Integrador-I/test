@@ -368,6 +368,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const handleResolveSave = async (resolvedTasks: ConflictTask[]) => {
     const loadId = toastLoading('Aplicando resolución…', 'Guardando cambios en el servidor');
     try {
+      let nextSubtasks = [...subtasks];
+      const isEditingMode = conflictData ? !conflictData.isNew : false;
+
       // Find the modified tasks to save
       for (const t of resolvedTasks) {
         if (t.isNew && conflictData) {
@@ -377,19 +380,23 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                planification_date: t.date,
            };
 
-           if (conflictData.isNew && onCreateSubtask) {
+           if (!isEditingMode && onCreateSubtask) {
+              // Creating a brand new subtask that triggered conflict
               await onCreateSubtask(finalSubtaskData);
-           } else if (!conflictData.isNew && onSaveIndividualSubtask) {
+           } else if (isEditingMode && onSaveIndividualSubtask) {
+              // Editing an EXISTING task that triggered conflict
               const editingIdLocal = (conflictData.taskData as EditableSubtask).id;
+              const numericId = parseInt(String(editingIdLocal), 10);
+              const applyId = !isNaN(numericId) ? numericId : editingIdLocal;
+
               await onSaveIndividualSubtask({
                  ...finalSubtaskData,
-                 id: editingIdLocal,
+                 id: applyId as any,
               });
               
-              // Mutate the local view immediately since onSaveIndividualSubtask only hits the backend
-              // and the table will revert to old temporary state without this.
-              setSubtasks(prev => prev.map(oldSubtask => 
-                 oldSubtask.id === editingIdLocal 
+              // Mutate the local view directly
+              nextSubtasks = nextSubtasks.map(oldSubtask => 
+                 oldSubtask.id === editingIdLocal || oldSubtask.id === numericId
                  ? { 
                      ...oldSubtask, 
                      planification_date: t.date, 
@@ -397,35 +404,37 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                      description: t.title 
                    } 
                  : oldSubtask
-              ));
+              );
            }
         } else {
-           // If an existing task in the view was modified, we patch it
+           // General adjacent existing tasks in the day being pushed around
            if (onSaveIndividualSubtask) {
               const numericId = parseInt(t.id, 10);
-              if (!isNaN(numericId)) {
-                await onSaveIndividualSubtask({
-                   id: numericId,
-                   description: t.title,
-                   needed_hours: t.hours,
-                   planification_date: t.date
-                });
-                
-                // Keep UI in sync for existing tasks edited in the board
-                setSubtasks(prev => prev.map(oldSubtask => 
-                   oldSubtask.id === numericId
-                   ? { 
-                       ...oldSubtask, 
-                       planification_date: t.date, 
-                       needed_hours: t.hours,
-                       description: t.title 
-                     } 
-                   : oldSubtask
-                ));
-              }
+              const applyId = !isNaN(numericId) ? numericId : t.id;
+
+              await onSaveIndividualSubtask({
+                 id: applyId as any,
+                 description: t.title,
+                 needed_hours: t.hours,
+                 planification_date: t.date
+              });
+              
+              // Keep UI in sync for existing tasks edited in the board
+              nextSubtasks = nextSubtasks.map(oldSubtask => 
+                 oldSubtask.id === applyId || oldSubtask.id === String(applyId)
+                 ? { 
+                     ...oldSubtask, 
+                     planification_date: t.date, 
+                     needed_hours: t.hours,
+                     description: t.title 
+                   } 
+                 : oldSubtask
+              );
            }
         }
       }
+      
+      setSubtasks(nextSubtasks);
       
       dismiss(loadId);
       toastSuccess('¡Conflicto Resuelto!', 'Los horarios se ajustaron correctamente.');
@@ -463,6 +472,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 editingTask={conflictData.taskData}
                 taskTitle={taskEditData.title}
                 parentDueDate={taskEditData.due_date}
+                isEditingMode={!conflictData.isNew}
                 onSave={handleResolveSave}
                 onCancel={() => setConflictData(null)}
               />
@@ -499,7 +509,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
               onOpenDatePicker={() => setIsDatePickerOpen(true)}
               onCancelEditing={handleCancelEditing}
               onSaveSubtask={checkAndSaveSubtask}
-              onResolveConflict={() => setConflictData({ isNew: false, taskData: editData })}
+              onResolveConflict={() => setConflictData({ 
+                isNew: false, 
+                taskData: { ...editData, id: editingId as string | number } as EditableSubtask 
+              })}
               onResolveConflictNew={(data) => setConflictData({ isNew: true, taskData: data })}
               onHoursChange={(value) => {
                 if (value <= 0 || isNaN(value)) {

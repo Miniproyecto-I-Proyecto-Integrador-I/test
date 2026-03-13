@@ -15,11 +15,12 @@ import '../Feature/ManageConflict/Styles/ConflictPage.css';
 
 interface ConflictViewProps {
   scenario: ConflictScenario;
+  isEditingMode?: boolean;
   onSave?: (tasks: ConflictTask[]) => void;
   onCancel?: () => void;
 }
 
-const ConflictView: React.FC<ConflictViewProps> = ({ scenario, onSave, onCancel }) => {
+const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingMode, onSave, onCancel }) => {
   const { tasks, updateTask, resolved, totalOnDay, maxHours } =
     useConflictState(scenario);
 
@@ -43,7 +44,9 @@ const ConflictView: React.FC<ConflictViewProps> = ({ scenario, onSave, onCancel 
       {/* ---- Case 1: New task section ---- */}
       {isNewTaskCase && newTask && (
         <div className="conflict-section">
-          <p className="conflict-section__title">Nueva sub-Tarea</p>
+          <p className="conflict-section__title">
+            {isEditingMode ? 'Tarea en Edición' : 'Nueva sub-Tarea'}
+          </p>
           <ConflictTaskRow
             task={newTask}
             conflictDate={scenario.conflictDate}
@@ -91,12 +94,12 @@ const ConflictView: React.FC<ConflictViewProps> = ({ scenario, onSave, onCancel 
 
       {/* ---- Footer actions ---- */}
       <div className="conflict-footer">
-        <button 
-          className="conflict-btn-cancel" 
+        <button
+          className="conflict-btn-cancel"
           onClick={onCancel}
         >Cancelar</button>
-        <button 
-          className="conflict-btn-save" 
+        <button
+          className="conflict-btn-save"
           disabled={!resolved}
           onClick={() => onSave?.(tasks)}
         >
@@ -116,11 +119,12 @@ export interface ConflictPageProps {
   editingTask?: import('../Feature/ManageCreatePage/Types/subtask.types').SubtaskFormData | import('../Feature/ManageActivityPage/Hooks/useSubtaskEdit').EditableSubtask;
   taskTitle?: string;
   parentDueDate?: string;
+  isEditingMode?: boolean;
   onSave?: (tasks: ConflictTask[]) => void;
   onCancel?: () => void;
 }
 
-const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask, taskTitle, parentDueDate, onSave, onCancel }) => {
+const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask, taskTitle, parentDueDate, isEditingMode, onSave, onCancel }) => {
   const { user } = useAuth();
   const maxHours = user?.daily_hours ?? 8;
 
@@ -128,7 +132,8 @@ const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask,
   const [isLoading, setIsLoading] = useState(true);
 
   // Todo: Use real data when fully implemented natively
-  console.log('Conflict Page Received data:', activityTasks, editingTask);
+  console.log('--- CONFLICT PAGE MOUNT ---');
+  console.log('editingTask (La "Nueva" o "En Edición" recibida):', editingTask);
 
   useEffect(() => {
     if (!editingTask || !editingTask.planification_date) {
@@ -200,17 +205,17 @@ const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask,
   }
 
   if (!scenario) {
-     return (
-        <div className="conflict-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
-          <p>No se encontraron detalles de la tarea.</p>
-          <button className="conflict-btn-cancel" onClick={onCancel} style={{marginTop: '1rem'}}>Volver</button>
-        </div>
-      );
+    return (
+      <div className="conflict-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+        <p>No se encontraron detalles de la tarea.</p>
+        <button className="conflict-btn-cancel" onClick={onCancel} style={{ marginTop: '1rem' }}>Volver</button>
+      </div>
+    );
   }
 
   return (
     <div className="conflict-page">
-      <ConflictView scenario={scenario} onSave={onSave} onCancel={onCancel} />
+      <ConflictView scenario={scenario} isEditingMode={isEditingMode} onSave={onSave} onCancel={onCancel} />
     </div>
   );
 };
