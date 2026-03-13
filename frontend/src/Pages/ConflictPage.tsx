@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-import type { ConflictScenario } from '../Feature/ManageConflict/Types/conflict';
+import React, { useState, useEffect } from 'react';
+import type { ConflictScenario, ConflictTask } from '../Feature/ManageConflict/Types/conflict';
 import { useConflictState } from '../Feature/ManageConflict/Hooks/useConflictState';
 import ConflictHeader from '../Feature/ManageConflict/Components/ConflictHeader';
 import ConflictProgressBar from '../Feature/ManageConflict/Components/ConflictProgressBar';
 import ConflictTaskRow from '../Feature/ManageConflict/Components/ConflictTaskRow';
 import AutoResolveCard from '../Feature/ManageConflict/Components/AutoResolveCard';
-import {
-  mockNewTaskConflict,
-  mockDayOverloadConflict,
-} from '../Feature/ManageConflict/Services/mockData';
+import { useAuth } from '../Context/AuthContext';
+import apiClient from '../Services/ApiClient';
 import '../Feature/ManageConflict/Styles/ConflictPage.css';
 
 // ---------------------------------------------------------------------------
@@ -17,9 +15,11 @@ import '../Feature/ManageConflict/Styles/ConflictPage.css';
 
 interface ConflictViewProps {
   scenario: ConflictScenario;
+  onSave?: (tasks: ConflictTask[]) => void;
+  onCancel?: () => void;
 }
 
-const ConflictView: React.FC<ConflictViewProps> = ({ scenario }) => {
+const ConflictView: React.FC<ConflictViewProps> = ({ scenario, onSave, onCancel }) => {
   const { tasks, updateTask, resolved, totalOnDay, maxHours } =
     useConflictState(scenario);
 
@@ -89,8 +89,15 @@ const ConflictView: React.FC<ConflictViewProps> = ({ scenario }) => {
 
       {/* ---- Footer actions ---- */}
       <div className="conflict-footer">
-        <button className="conflict-btn-cancel">Cancelar</button>
-        <button className="conflict-btn-save" disabled={!resolved}>
+        <button 
+          className="conflict-btn-cancel" 
+          onClick={onCancel}
+        >Cancelar</button>
+        <button 
+          className="conflict-btn-save" 
+          disabled={!resolved}
+          onClick={() => onSave?.(tasks)}
+        >
           Guardar Cambios
         </button>
       </div>
@@ -99,40 +106,106 @@ const ConflictView: React.FC<ConflictViewProps> = ({ scenario }) => {
 };
 
 // ---------------------------------------------------------------------------
-// ConflictPage — top-level page, includes a dev tab switcher for demo
+// ConflictPage — top-level page, fetches real data on mount
 // ---------------------------------------------------------------------------
 
-const SCENARIOS: Record<string, ConflictScenario> = {
-  new_task: mockNewTaskConflict,
-  day_overload: mockDayOverloadConflict,
-};
+export interface ConflictPageProps {
+  activityTasks?: import('../Feature/ManageActivityPage/Hooks/useSubtaskEdit').EditableSubtask[];
+  editingTask?: import('../Feature/ManageCreatePage/Types/subtask.types').SubtaskFormData | import('../Feature/ManageActivityPage/Hooks/useSubtaskEdit').EditableSubtask;
+  taskTitle?: string;
+  onSave?: (tasks: ConflictTask[]) => void;
+  onCancel?: () => void;
+}
 
-const ConflictPage: React.FC = () => {
-  const [activeCase, setActiveCase] = useState<'new_task' | 'day_overload'>(
-    'new_task',
-  );
-  const scenario = SCENARIOS[activeCase];
+const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask, taskTitle, onSave, onCancel }) => {
+  const { user } = useAuth();
+  const maxHours = user?.daily_hours ?? 8;
+
+  const [scenario, setScenario] = useState<ConflictScenario | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Todo: Use real data when fully implemented natively
+  console.log('Conflict Page Received data:', activityTasks, editingTask);
+
+  useEffect(() => {
+    if (!editingTask || !editingTask.planification_date) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadRealData = async () => {
+      setIsLoading(true);
+      try {
+        const conflictDate = editingTask.planification_date;
+
+        // Fetch tasks specific to the conflicting date 
+        const response = await apiClient.get(`/api/subtasks/?planification_date=${conflictDate}`);
+        const dbSubtasks: any[] = response.data;
+
+        // Transform Real backend tasks to ConflictTasks
+        const editingTaskId = 'id' in editingTask ? editingTask.id : undefined;
+
+        const existingTasks = dbSubtasks
+          .filter(st => editingTaskId === undefined || st.id !== editingTaskId) // Avoid duplicates
+          .map(st => ({
+            id: String(st.id),
+            title: st.description,
+            parentTask: st.task?.title || 'Sin tarea',
+            hours: Number(st.needed_hours),
+            date: st.planification_date,
+          }));
+
+        // Transform the incoming/edited task causing the conflict
+        const mappedEditingTask = {
+          id: editingTaskId !== undefined ? String(editingTaskId) : 'new-draft',
+          title: editingTask.description || 'Actividad sin nombre',
+          parentTask: taskTitle || 'Sin tarea',
+          hours: Number(editingTask.needed_hours),
+          date: editingTask.planification_date,
+          isNew: true, // we treat the edited/created task as the new incoming change
+        };
+
+        const newScenario: ConflictScenario = {
+          case: 'new_task',
+          conflictDate,
+          maxHoursPerDay: maxHours,
+          newTask: mappedEditingTask,
+          existingTasks,
+        };
+
+        setScenario(newScenario);
+      } catch (error) {
+        console.error("Error fetching tasks for conflict page", error);
+        // Fallback or handle error scenario empty state if needed
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadRealData();
+  }, [editingTask, maxHours, taskTitle]);
+
+
+  if (isLoading) {
+    return (
+      <div className="conflict-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+        <p>Cargando detalles de conflicto...</p>
+      </div>
+    );
+  }
+
+  if (!scenario) {
+     return (
+        <div className="conflict-page" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+          <p>No se encontraron detalles de la tarea.</p>
+          <button className="conflict-btn-cancel" onClick={onCancel} style={{marginTop: '1rem'}}>Volver</button>
+        </div>
+      );
+  }
 
   return (
     <div className="conflict-page">
-      {/* Dev switcher — lets reviewers toggle between both cases */}
-      <div className="conflict-case-switcher">
-        <button
-          className={`conflict-case-tab ${activeCase === 'new_task' ? 'conflict-case-tab--active' : ''}`}
-          onClick={() => setActiveCase('new_task')}
-        >
-          Caso 1: tarea nueva
-        </button>
-        <button
-          className={`conflict-case-tab ${activeCase === 'day_overload' ? 'conflict-case-tab--active' : ''}`}
-          onClick={() => setActiveCase('day_overload')}
-        >
-          Caso 2: sobrecarga del día
-        </button>
-      </div>
-
-      {/* key forces full remount when scenario switches, resetting hook state */}
-      <ConflictView key={activeCase} scenario={scenario} />
+      <ConflictView scenario={scenario} onSave={onSave} onCancel={onCancel} />
     </div>
   );
 };

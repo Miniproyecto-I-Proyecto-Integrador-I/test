@@ -5,15 +5,16 @@ import BackButton from '../../ManageCreatePage/Components/BackButton';
 import { useAuth } from '../../../Context/AuthContext';
 import apiClient from '../../../Services/ApiClient';
 import '../Styles/SubtaskEdit.css';
-
 import TaskInfoCard from './TaskInfoCard';
 import TaskEditForm from './TaskEditForm';
 import SubtaskList from './SubtaskList';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import ConflictPage from '../../../Pages/ConflictPage';
 import type { SubtaskFormData } from '../../ManageCreatePage/Types/subtask.types';
 import { validateSubtaskForm, hasValidationErrors } from '../../ManageCreatePage/Utils/subtaskValidator';
 import { useToast } from '../../../shared/Hooks/useToast';
 import ToastHost from '../../../shared/Components/ToastHost';
+import type { ConflictTask } from '../../ManageConflict/Types/conflict';
 
 interface SubtaskEditProps {
   taskId: number;
@@ -60,6 +61,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const [conflictWarning, setConflictWarning] = useState(false);
   const [isCheckingConflict, setIsCheckingConflict] = useState(false);
   const [hourLimitError, setHourLimitError] = useState('');
+  const [conflictData, setConflictData] = useState<{ isNew: boolean, taskData: SubtaskFormData | EditableSubtask } | null>(null);
 
   const { user } = useAuth();
   const dailyHours = user?.daily_hours ?? 8;
@@ -280,6 +282,65 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     });
   };
 
+  const handleResolveSave = async (resolvedTasks: ConflictTask[]) => {
+    const loadId = toastLoading('Aplicando resolución…', 'Guardando cambios en el servidor');
+    try {
+      // Find the modified tasks to save
+      for (const t of resolvedTasks) {
+        if (t.isNew && conflictData) {
+           const finalSubtaskData: SubtaskFormData = {
+               description: t.title,
+               needed_hours: t.hours,
+               planification_date: t.date,
+           };
+
+           if (conflictData.isNew && onCreateSubtask) {
+              await onCreateSubtask(finalSubtaskData);
+           } else if (!conflictData.isNew && onSaveIndividualSubtask) {
+              const editingIdLocal = (conflictData.taskData as EditableSubtask).id;
+              await onSaveIndividualSubtask({
+                 ...finalSubtaskData,
+                 id: editingIdLocal,
+              });
+           }
+        } else {
+           // If an existing task in the view was modified, we patch it
+           // This assumes `t.id` correctly points to the integer subtask ID from the DB
+           if (onSaveIndividualSubtask) {
+              const numericId = parseInt(t.id, 10);
+              if (!isNaN(numericId)) {
+                await onSaveIndividualSubtask({
+                   id: numericId,
+                   description: t.title,
+                   needed_hours: t.hours,
+                   planification_date: t.date
+                });
+              }
+           }
+        }
+      }
+      
+      dismiss(loadId);
+      toastSuccess('¡Conflicto Resuelto!', 'Los horarios se ajustaron correctamente.');
+      
+      // Cleanup UI
+      setConflictWarning(false);
+      if (conflictToastId) {
+        dismiss(conflictToastId);
+        setConflictToastId(null);
+      }
+      setHourLimitError('');
+      setConflictData(null);
+      cancelEditing();
+      
+      // Reload the parent if necessary or assume state is merged via callbacks
+    } catch(err) {
+      console.error(err);
+      dismiss(loadId);
+      toastError('Error', 'No se pudieron aplicar todos los cambios resueltos');
+    }
+  };
+
   return (
     <div className="subtask-edit-wrapper">
       <BackButton
@@ -290,7 +351,17 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       <div className="subtask-edit-container">
         {!isEditingTask ? (
           <>
-            <TaskInfoCard
+            {conflictData ? (
+              <ConflictPage
+                activityTasks={subtasks}
+                editingTask={conflictData.taskData}
+                taskTitle={taskEditData.title}
+                onSave={handleResolveSave}
+                onCancel={() => setConflictData(null)}
+              />
+            ) : (
+              <>
+                <TaskInfoCard
               title={taskEditData.title}
               description={taskEditData.description}
               subject={taskEditData.subject}
@@ -321,7 +392,8 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
               onOpenDatePicker={() => setIsDatePickerOpen(true)}
               onCancelEditing={handleCancelEditing}
               onSaveSubtask={checkAndSaveSubtask}
-              onResolveConflict={checkAndSaveSubtask}
+              onResolveConflict={() => setConflictData({ isNew: false, taskData: editData })}
+              onResolveConflictNew={(data) => setConflictData({ isNew: true, taskData: data })}
               onHoursChange={(value) => {
                 if (value <= 0 || isNaN(value)) {
                   setHourLimitError('El tiempo debe ser mayor que 0 horas.');
@@ -335,6 +407,8 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                 handleEditFieldChange('needed_hours', value);
               }}
             />
+              </>
+            )}
           </>
         ) : (
           <TaskEditForm

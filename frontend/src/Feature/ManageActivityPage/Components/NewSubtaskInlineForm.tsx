@@ -16,6 +16,7 @@ interface NewSubtaskInlineFormProps {
   maxHours: number;
   onSave: (data: SubtaskFormData) => Promise<void>;
   onCancel: () => void;
+  onResolveConflict?: (data: SubtaskFormData) => void;
 }
 
 const EMPTY_FORM: SubtaskFormData = {
@@ -29,6 +30,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
   maxHours,
   onSave,
   onCancel,
+  onResolveConflict,
 }) => {
   const [formData, setFormData] = useState<SubtaskFormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -218,7 +220,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               <button
                 type="button"
                 className="subtask-edit-round-btn conflict"
-                onClick={handleSubmit}
+                onClick={() => onResolveConflict?.(formData)}
                 aria-label="Resolver conflicto"
               >
                 Resolver conflicto

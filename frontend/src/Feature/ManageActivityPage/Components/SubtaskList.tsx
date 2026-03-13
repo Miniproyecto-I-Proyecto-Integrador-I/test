@@ -36,6 +36,7 @@ interface SubtaskListProps {
   onCancelEditing: () => void;
   onSaveSubtask: () => void;
   onResolveConflict: () => void;
+  onResolveConflictNew: (data: SubtaskFormData) => void;
   onHoursChange: (value: number) => void;
 }
 
@@ -56,6 +57,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
   onCancelEditing,
   onSaveSubtask,
   onResolveConflict,
+  onResolveConflictNew,
   onHoursChange,
 }) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -122,6 +124,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
               maxHours={maxHours}
               onSave={handleSaveNew}
               onCancel={() => setIsAddingNew(false)}
+              onResolveConflict={onResolveConflictNew}
             />
           )}
         </div>

@@ -26,6 +26,8 @@ interface DatePickerModalProps {
   excludeIds?: (string | number)[];
   /** Current date of the subtask being edited ('YYYY-MM-DD'). Selecting this day shows a blocked message. */
   originalDate?: string;
+  /** If true, blocks the selection of a date if it causes a time overload conflict. */
+  blockConflict?: boolean;
 }
 
 const DatePickerModal = ({
@@ -38,6 +40,7 @@ const DatePickerModal = ({
   maxDate,
   excludeIds,
   originalDate,
+  blockConflict = false,
 }: DatePickerModalProps) => {
   const today = new Date();
   const todayISO = toISODate(today);
@@ -293,15 +296,17 @@ const DatePickerModal = ({
                     </p>
                   )}
                   <button
-                    className={`dpm__confirm-btn${isSameAsOriginal ? ' dpm__confirm-btn--disabled' : isOver ? ' dpm__confirm-btn--conflict' : ''}`}
-                    onClick={isSameAsOriginal ? undefined : handleConfirm}
-                    disabled={isSameAsOriginal}
+                    className={`dpm__confirm-btn${isSameAsOriginal ? ' dpm__confirm-btn--disabled' : (isOver && blockConflict) ? ' dpm__confirm-btn--conflict' : ''}`}
+                    onClick={isSameAsOriginal || (isOver && blockConflict) ? undefined : handleConfirm}
+                    disabled={isSameAsOriginal || (isOver && blockConflict)}
                   >
                     {isSameAsOriginal
                       ? 'Ya está en este día'
-                      : originalDate
-                        ? 'Modificar aquí'
-                        : 'Elegir esta fecha'}
+                      : (isOver && blockConflict)
+                        ? 'Sobrecarga de horas'
+                        : originalDate
+                          ? 'Modificar aquí'
+                          : 'Elegir esta fecha'}
                   </button>
                 </div>
               </>
