@@ -44,7 +44,7 @@ const PendingForm: React.FC<PendingFormProps> = ({
 
 				<div className="pending-card">
 					<div className="pending-card-hero" aria-hidden="true">
-						<AlertTriangle size={46} />
+						<AlertTriangle size={52} />
 					</div>
 
 					<div className="pending-card-content">
