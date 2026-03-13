@@ -168,6 +168,15 @@
     gap: 6px;
 }
 
+.subtask-edit-meta-item--overdue {
+    color: var(--warning-color);
+    font-weight: 700;
+    border: 1px solid var(--warning-color);
+    border-radius: 999px;
+    padding: 4px 10px;
+    background: var(--surface);
+}
+
 .subtask-edit-meta-item svg {
     width: 16px;
     height: 16px;

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
 import { useSubtaskEdit, type EditableSubtask } from '../Hooks/useSubtaskEdit';
 import BackButton from '../../ManageCreatePage/Components/BackButton';
@@ -15,6 +15,7 @@ import {
   validateSubtaskForm,
   hasValidationErrors,
 } from '../../ManageCreatePage/Utils/subtaskValidator';
+import { isDateBeforeToday } from '../Utils/subtaskEditUtils';
 import { useToast } from '../../../shared/Hooks/useToast';
 import ToastHost from '../../../shared/Components/ToastHost';
 
@@ -77,6 +78,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     show: toastShow,
   } = useToast();
   const [conflictToastId, setConflictToastId] = useState<number | null>(null);
+  const overdueWarningShownFor = useRef<string | null>(null);
 
   const [taskEditData, setTaskEditData] = useState({
     title: task?.title || taskTitle || '',
@@ -132,6 +134,35 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       startEditing(target);
     }
   }, [initialEditingSubtaskId, subtasks, editingId, startEditing]);
+
+  useEffect(() => {
+    const dueDate = taskEditData.due_date;
+    if (!dueDate) {
+      overdueWarningShownFor.current = null;
+      return;
+    }
+
+    if (
+      isDateBeforeToday(dueDate) &&
+      overdueWarningShownFor.current !== dueDate
+    ) {
+      toastShow({
+        title: 'Fecha de entrega vencida',
+        subtitle:
+          'Esta tarea tiene una fecha de entrega anterior a hoy. Te recomendamos reprogramarla.',
+        variant: 'warning',
+        duration: 0,
+        showProgress: false,
+        loading: false,
+      });
+      overdueWarningShownFor.current = dueDate;
+      return;
+    }
+
+    if (!isDateBeforeToday(dueDate)) {
+      overdueWarningShownFor.current = null;
+    }
+  }, [taskEditData.due_date, toastShow]);
 
   const computedTotalHours = useMemo(() => {
     if (typeof totalHours === 'number') return totalHours;
