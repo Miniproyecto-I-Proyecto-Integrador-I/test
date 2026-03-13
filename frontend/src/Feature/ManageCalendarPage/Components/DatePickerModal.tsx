@@ -36,7 +36,6 @@ const DatePickerModal = ({
   newSubtaskHours,
   pendingSubtasks = [],
   maxDate,
-  confirmLabel,
   excludeIds,
   originalDate,
 }: DatePickerModalProps) => {
@@ -300,9 +299,9 @@ const DatePickerModal = ({
                   >
                     {isSameAsOriginal
                       ? 'Ya está en este día'
-                      : isOver
-                        ? 'Resolver conflicto'
-                        : (confirmLabel ?? 'Añadir esta actividad')}
+                      : originalDate
+                        ? 'Modificar aquí'
+                        : 'Elegir esta fecha'}
                   </button>
                 </div>
               </>
