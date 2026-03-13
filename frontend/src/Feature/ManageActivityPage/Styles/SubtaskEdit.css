@@ -341,6 +341,22 @@
     min-width: 0;
 }
 
+.subtask-edit-overdue-badge {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--warning-color);
+    border-radius: 8px;
+    background: var(--secondary-light);
+    color: var(--warning-color);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
 .subtask-edit-item-title {
     margin: 0;
     font-size: var(--font-size-h3);
