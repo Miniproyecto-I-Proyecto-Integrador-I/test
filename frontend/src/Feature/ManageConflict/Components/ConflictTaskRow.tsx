@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Calendar } from 'lucide-react';
 import type { ConflictTask } from '../Types/conflict';
 import { formatDate, totalHours } from '../Utils/conflictUtils';
-import { MOCK_AVAILABLE_DATES } from '../Services/mockData';
+import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
 
 interface ConflictTaskRowProps {
   task: ConflictTask;
@@ -12,6 +12,7 @@ interface ConflictTaskRowProps {
   editableHours: boolean;
   editableDate: boolean;
   resolved?: boolean;
+  maxDate?: string;
   onChangeHours: (id: string, hours: number) => void;
   onChangeDate: (id: string, date: string) => void;
 }
@@ -24,6 +25,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
   editableHours,
   editableDate,
   resolved = false,
+  maxDate,
   onChangeHours,
   onChangeDate,
 }) => {
@@ -35,6 +37,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
   // Local raw string so we can handle intermediate typing states
   const [rawHours, setRawHours] = useState(String(task.hours));
   const [hoursError, setHoursError] = useState<string | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   // Keep rawHours in sync if parent updates the task (e.g. auto-resolve)
   useEffect(() => {
@@ -112,20 +115,33 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
         </div>
 
         {/* Date selector */}
-        <select
-          className="conflict-select"
-          value={task.date}
+        <button
+          type="button"
+          className="conflict-select conflict-date-btn"
           disabled={!editableDate}
-          onChange={(e) => onChangeDate(task.id, e.target.value)}
-          aria-label={`Fecha para ${task.title}`}
+          onClick={() => setIsDatePickerOpen(true)}
+          aria-label={`Cambiar fecha para ${task.title}`}
+          style={{ width: '130px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
-          {MOCK_AVAILABLE_DATES.map((d) => (
-            <option key={d} value={d}>
-              {formatDate(d)}
-            </option>
-          ))}
-        </select>
+          <span style={{ fontSize: '13px' }}>{formatDate(task.date)}</span>
+          <Calendar size={14} style={{ opacity: 0.6 }} />
+        </button>
       </div>
+
+      <DatePickerModal
+        isOpen={isDatePickerOpen}
+        onClose={() => setIsDatePickerOpen(false)}
+        onConfirm={(date) => {
+          onChangeDate(task.id, date);
+          setIsDatePickerOpen(false);
+        }}
+        newSubtaskDescription={task.title}
+        newSubtaskHours={task.hours}
+        excludeIds={!task.isNew ? [task.id] : []}
+        originalDate={task.date}
+        maxDate={maxDate}
+        blockConflict={true}
+      />
     </div>
   );
 };
