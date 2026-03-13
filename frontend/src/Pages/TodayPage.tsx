@@ -98,7 +98,7 @@ const TodayPage: React.FC = () => {
           <button 
             className="btn-primary"
             style={{ padding: '8px 16px', fontSize: '14px', borderRadius: '8px' }}
-            onClick={() => navigate('/create/formulario')}
+            onClick={() => navigate('/create')}
           >
             + Nueva Tarea
           </button>

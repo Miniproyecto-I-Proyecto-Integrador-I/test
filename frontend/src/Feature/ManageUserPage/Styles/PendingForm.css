@@ -1,0 +1,215 @@
+.pending-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    font-family: 'Inter', var(--font-family), 'Segoe UI', sans-serif;
+}
+
+.pending-overlay * {
+    font-family: 'Inter', var(--font-family), 'Segoe UI', sans-serif;
+}
+
+.pending-modal {
+    width: min(820px, 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: 20px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 24px 54px rgba(15, 23, 42, 0.22);
+}
+
+.pending-abort {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: #334155;
+    font-size: 20px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 16px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pending-abort:hover {
+    background: #eef2f7;
+    transform: scale(1.02);
+    box-shadow: 0 14px 26px rgba(15, 15, 15, 0.20);
+}
+
+.pending-card {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.pending-card-hero {
+    min-height: 170px;
+    background: #fdf0e6;
+    display: grid;
+    place-items: center;
+    color: #ee9f64;
+}
+
+.pending-card-content {
+    padding: 28px;
+}
+
+.pending-title {
+    margin: 0;
+    text-align: center;
+    font-size: clamp(22px, 3.2vw, 34px);
+    color: #0f172a;
+}
+
+.pending-subtitle {
+    margin: 12px auto 24px;
+    max-width: 650px;
+    text-align: center;
+    color: #64748b;
+    font-size: 17px;
+    line-height: 1.4;
+}
+
+.pending-list {
+    display: grid;
+    gap: 14px;
+}
+
+.pending-list-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    background: #f8fafc;
+}
+
+.pending-list-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #1e293b;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.pending-list-date svg {
+    color: #f97316;
+}
+
+.pending-action-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 24px;
+    background: #f97316;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 10px 22px rgba(249, 115, 22, 0.35);
+}
+
+.pending-action-btn:hover {
+    background: #ea580c;
+    transform: scale(1.05);
+    box-shadow: 0 14px 26px rgba(234, 88, 12, 0.38);
+}
+
+.pending-action-btn:active {
+    transform: translateY(1px);
+}
+
+.pending-action-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.pending-warning {
+    margin-top: 16px;
+    border: 1px solid #fdba74;
+    border-radius: 12px;
+    background: #fff7ed;
+    color: #f97316;
+    padding: 16px 20px;
+    font-style: italic;
+    font-weight: 700;
+    text-align: center;
+    font-size: 16px;
+}
+
+.pending-footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+.pending-footer .pending-action-btn {
+    min-width: 220px;
+}
+
+@media (max-width: 900px) {
+    .pending-abort {
+        font-size: 18px;
+    }
+
+    .pending-title {
+        font-size: 30px;
+    }
+
+    .pending-subtitle {
+        font-size: 16px;
+    }
+
+    .pending-list-date {
+        font-size: 18px;
+    }
+
+    .pending-action-btn {
+        font-size: 17px;
+        padding: 10px 18px;
+    }
+
+    .pending-warning {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .pending-overlay {
+        padding: 12px;
+    }
+
+    .pending-modal {
+        padding: 14px;
+    }
+
+    .pending-card-content {
+        padding: 18px;
+    }
+
+    .pending-list-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pending-action-btn {
+        width: 100%;
+    }
+}
