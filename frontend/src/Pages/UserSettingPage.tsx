@@ -4,7 +4,9 @@ import { useAuth } from '../Context/AuthContext';
 import InfoTooltip from '../shared/Components/InfoTooltip';
 import { useToast } from '../shared/Hooks/useToast';
 import ToastHost from '../shared/Components/ToastHost';
-import "../Feature/ManageUserPage/Styles/Usersettingstyle.css";
+import PendingForm from '../Feature/ManageUserPage/Styles/Components/PendingForm';
+import type { PendingConflictDay } from '../Feature/ManageUserPage/Types/pending.types';
+import '../Feature/ManageUserPage/Styles/Usersettingstyle.css';
 
 interface UserSetting {
     username: string;
@@ -15,11 +17,16 @@ interface UserSetting {
 const UserSettingPage: React.FC = () => {
     const { user , updateDailyLimit } = useAuth();
     const { toasts, success, error, dismiss } = useToast();
+    const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
+    const [isRetryingFromModal, setIsRetryingFromModal] = useState(false);
+    const [conflictDays, setConflictDays] = useState<PendingConflictDay[]>([]);
     const [userSetting, setUserSetting] = useState<UserSetting>({
         username: user?.username || '',
         email: user?.email || '',
         dailyLimit: user?.daily_hours|| 0,
     });
+
+    const initialDailyLimit = user?.daily_hours ?? 0;
 
     const handleClickPlus = () => {
         if(userSetting.dailyLimit < 16){
@@ -33,23 +40,51 @@ const UserSettingPage: React.FC = () => {
         }
     };
 
-    const handleSave = async () => {
+    const handleSave = async (fromModal = false) => {
         if (userSetting.dailyLimit === user?.daily_hours){
             success("¡Todo listo!", "No hay cambios para guardar.");
             return;
         }
+
+        if (fromModal) {
+            setIsRetryingFromModal(true);
+        }
+
         try {
             await updateDailyLimit(userSetting.dailyLimit);
+            setIsPendingModalOpen(false);
+            setConflictDays([]);
             success("¡Todo listo!", "Tus cambios se han guardado correctamente.");
         } catch (err: any) {
             if (err.response?.status === 409) {
-                error("Conflicto de planeación", "No puedes reducir el límite porque algunas tareas en tu agenda superarían las nuevas horas disponibles.");
+                const responseConflicts = Array.isArray(err.response?.data)
+                    ? (err.response.data as PendingConflictDay[])
+                    : [];
+
+                setConflictDays(responseConflicts);
+
+                if (fromModal) {
+                    error('Aun no has resuelto todos los conflictos!');
+                } else {
+                    setIsPendingModalOpen(true);
+                }
             } else {
                 error("Error al guardar", "Algo salió mal, por favor intenta de nuevo.");
             }
             console.error(err);
             console.log(err.response?.data);
+        } finally {
+            if (fromModal) {
+                setIsRetryingFromModal(false);
+            }
         }
+    };
+
+    const handleAbortPendingResolution = () => {
+        setUserSetting((prev) => ({ ...prev, dailyLimit: initialDailyLimit }));
+        setIsPendingModalOpen(false);
+        setConflictDays([]);
+        success('Resolucion abortada, no se aplicaron los cambios a tu limite diario');
     };
 
   return (
@@ -104,9 +139,16 @@ const UserSettingPage: React.FC = () => {
             <hr className='user-setting-divider' />
 
             <div className='user-setting-footer'>
-                <button className='save-button' onClick={handleSave}>Guardar Cambios</button>
+                <button className='save-button' onClick={() => handleSave(false)}>Guardar Cambios</button>
             </div>
         </div>
+        <PendingForm
+            isOpen={isPendingModalOpen}
+            conflictDays={conflictDays}
+            onAbort={handleAbortPendingResolution}
+            onSolve={() => handleSave(true)}
+            isSolving={isRetryingFromModal}
+        />
         <ToastHost toasts={toasts} onDismiss={dismiss} />
     </div>
   )

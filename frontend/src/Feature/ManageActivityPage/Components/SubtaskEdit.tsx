@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
 import { useSubtaskEdit, type EditableSubtask } from '../Hooks/useSubtaskEdit';
 import BackButton from '../../ManageCreatePage/Components/BackButton';
@@ -11,7 +11,11 @@ import SubtaskList from './SubtaskList';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import ConflictPage from '../../../Pages/ConflictPage';
 import type { SubtaskFormData } from '../../ManageCreatePage/Types/subtask.types';
-import { validateSubtaskForm, hasValidationErrors } from '../../ManageCreatePage/Utils/subtaskValidator';
+import {
+  validateSubtaskForm,
+  hasValidationErrors,
+} from '../../ManageCreatePage/Utils/subtaskValidator';
+import { isDateBeforeToday } from '../Utils/subtaskEditUtils';
 import { useToast } from '../../../shared/Hooks/useToast';
 import ToastHost from '../../../shared/Components/ToastHost';
 import type { ConflictTask } from '../../ManageConflict/Types/conflict';
@@ -19,6 +23,7 @@ import type { ConflictTask } from '../../ManageConflict/Types/conflict';
 interface SubtaskEditProps {
   taskId: number;
   initialSubtasks: EditableSubtask[];
+  initialEditingSubtaskId?: number;
   onSubtasksChange?: (subtasks: EditableSubtask[]) => void;
   onSaveIndividualSubtask?: (subtask: EditableSubtask) => Promise<void>;
   onCreateSubtask?: (data: SubtaskFormData) => Promise<void>;
@@ -43,6 +48,7 @@ interface SubtaskEditProps {
 const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   taskId,
   initialSubtasks,
+  initialEditingSubtaskId,
   onSubtasksChange,
   onSaveIndividualSubtask,
   onCreateSubtask,
@@ -65,8 +71,16 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
   const { user } = useAuth();
   const dailyHours = user?.daily_hours ?? 8;
-  const { toasts, dismiss, success: toastSuccess, error: toastError, loading: toastLoading, show: toastShow } = useToast();
+  const {
+    toasts,
+    dismiss,
+    success: toastSuccess,
+    error: toastError,
+    loading: toastLoading,
+    show: toastShow,
+  } = useToast();
   const [conflictToastId, setConflictToastId] = useState<number | null>(null);
+  const overdueWarningShownFor = useRef<string | null>(null);
 
   const [taskEditData, setTaskEditData] = useState({
     title: task?.title || taskTitle || '',
@@ -113,19 +127,61 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     cancelEditing();
   }, [initialSubtasksStr, setSubtasks, cancelEditing]);
 
+  useEffect(() => {
+    if (initialEditingSubtaskId == null || editingId !== null) return;
+    const target = subtasks.find(
+      (subtask) => Number(subtask.id) === Number(initialEditingSubtaskId),
+    );
+    if (target) {
+      startEditing(target);
+    }
+  }, [initialEditingSubtaskId, subtasks, editingId, startEditing]);
+
+  useEffect(() => {
+    const dueDate = taskEditData.due_date;
+    if (!dueDate) {
+      overdueWarningShownFor.current = null;
+      return;
+    }
+
+    if (
+      isDateBeforeToday(dueDate) &&
+      overdueWarningShownFor.current !== dueDate
+    ) {
+      toastShow({
+        title: 'Fecha de entrega vencida',
+        subtitle:
+          'Esta tarea tiene una fecha de entrega anterior a hoy. Te recomendamos reprogramarla.',
+        variant: 'warning',
+        duration: 0,
+        showProgress: false,
+        loading: false,
+      });
+      overdueWarningShownFor.current = dueDate;
+      return;
+    }
+
+    if (!isDateBeforeToday(dueDate)) {
+      overdueWarningShownFor.current = null;
+    }
+  }, [taskEditData.due_date, toastShow]);
+
   const computedTotalHours = useMemo(() => {
     if (typeof totalHours === 'number') return totalHours;
-    return subtasks.reduce((acc, item) => acc + (Number(item.needed_hours) || 0), 0);
+    return subtasks.reduce(
+      (acc, item) => acc + (Number(item.needed_hours) || 0),
+      0,
+    );
   }, [subtasks, totalHours]);
 
   const checkAndSaveSubtask = async () => {
     // Si no hay cambios, simplemente cancelar edición sin mostrar toast
     const original = subtasks.find((s) => s.id === editingId);
-    const hasChanged = original && (
-      original.description !== editData.description ||
-      original.planification_date !== editData.planification_date ||
-      Number(original.needed_hours) !== Number(editData.needed_hours)
-    );
+    const hasChanged =
+      original &&
+      (original.description !== editData.description ||
+        original.planification_date !== editData.planification_date ||
+        Number(original.needed_hours) !== Number(editData.needed_hours));
 
     if (!hasChanged) {
       handleCancelEditing();
@@ -135,21 +191,37 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     // Validar antes de procesar
     const validationErrors = validateSubtaskForm(editData);
     if (hasValidationErrors(validationErrors) || hourLimitError) {
-      toastError('Datos incompletos', 'Por favor, llena la descripción y el tiempo correctamente.');
+      toastError(
+        'Datos incompletos',
+        'Por favor, llena la descripción y el tiempo correctamente.',
+      );
       return;
     }
-    if (taskEditData.due_date && editData.planification_date > taskEditData.due_date) {
-      toastError('Fecha inválida', `La actividad no puede ser posterior a la entrega (${taskEditData.due_date})`);
+    if (
+      taskEditData.due_date &&
+      editData.planification_date > taskEditData.due_date
+    ) {
+      toastError(
+        'Fecha inválida',
+        `La actividad no puede ser posterior a la entrega (${taskEditData.due_date})`,
+      );
       return;
     }
     setIsCheckingConflict(true);
-    const loadId = toastLoading('Guardando actividad…', 'Verificando conflictos de horario');
+    const loadId = toastLoading(
+      'Guardando actividad…',
+      'Verificando conflictos de horario',
+    );
     try {
       const date = editData.planification_date;
       let url = `/api/subtasks/?planification_date=${date}`;
       if (editingId !== null) url += `&exclude_ids=${editingId}`;
-      const response = await apiClient.get<Array<{ needed_hours: number }>>(url);
-      const backendHours = response.data.reduce((sum, st) => sum + (Number(st.needed_hours) || 0), 0);
+      const response =
+        await apiClient.get<Array<{ needed_hours: number }>>(url);
+      const backendHours = response.data.reduce(
+        (sum, st) => sum + (Number(st.needed_hours) || 0),
+        0,
+      );
       const newHours = Number(editData.needed_hours) || 0;
       const total = parseFloat((backendHours + newHours).toFixed(2));
       if (total > dailyHours) {
@@ -186,7 +258,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         }
       }
       dismiss(loadId);
-      toastSuccess('¡Cambios guardados!', 'La actividad se ha actualizado correctamente.');
+      toastSuccess(
+        '¡Cambios guardados!',
+        'La actividad se ha actualizado correctamente.',
+      );
     } catch {
       dismiss(loadId);
       toastError('Error al guardar', 'No se pudo actualizar la actividad.');
@@ -196,7 +271,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     }
   };
 
-  const handleEditFieldChange = (field: keyof SubtaskFormData, value: string | number) => {
+  const handleEditFieldChange = (
+    field: keyof SubtaskFormData,
+    value: string | number,
+  ) => {
     if (conflictToastId) {
       dismiss(conflictToastId);
       setConflictToastId(null);
@@ -233,14 +311,16 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     const isMainTask = deleteTarget?.type === 'main-task';
     const loadId = toastLoading(
       isMainTask ? 'Eliminando tarea…' : 'Eliminando actividad…',
-      'Por favor espera'
+      'Por favor espera',
     );
     try {
       await originalConfirmDelete();
       dismiss(loadId);
       toastSuccess(
         isMainTask ? '¡Tarea eliminada!' : '¡Actividad eliminada!',
-        isMainTask ? 'La tarea se ha borrado correctamente.' : 'El paso se ha eliminado de la lista.'
+        isMainTask
+          ? 'La tarea se ha borrado correctamente.'
+          : 'El paso se ha eliminado de la lista.',
       );
     } catch (error) {
       dismiss(loadId);
@@ -260,7 +340,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       await onSaveTask({ ...taskEditData, due_date: formattedDate });
       setIsEditingTask(false);
       dismiss(loadId);
-      toastSuccess('¡Tarea guardada!', 'Los cambios se han aplicado correctamente.');
+      toastSuccess(
+        '¡Tarea guardada!',
+        'Los cambios se han aplicado correctamente.',
+      );
     } catch (error) {
       console.error('Error al guardar cambios de la tarea:', error);
       dismiss(loadId);
