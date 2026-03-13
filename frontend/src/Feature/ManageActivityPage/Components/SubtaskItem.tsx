@@ -70,7 +70,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               <div className="subtask-edit-item-title-row">
                 <p className="subtask-edit-item-title">{subtask.description}</p>
                 {isOverdue && (
-                  <span className="subtask-edit-overdue-badge">Atrasada</span>
+                  <span className="subtask-edit-overdue-badge">Vencida</span>
                 )}
               </div>
               <p className="subtask-edit-item-meta">
