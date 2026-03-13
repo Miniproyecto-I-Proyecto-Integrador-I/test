@@ -49,3 +49,4 @@ class SubtaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Subtask.objects.select_related('task').filter(task__user=self.request.user).order_by('planification_date', 'created_at')
+        

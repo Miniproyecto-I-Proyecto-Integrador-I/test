@@ -1,6 +1,9 @@
 import { Info, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../Context/AuthContext';
+import InfoTooltip from '../shared/Components/InfoTooltip';
+import { useToast } from '../shared/Hooks/useToast';
+import ToastHost from '../shared/Components/ToastHost';
 import "../Feature/ManageUserPage/Styles/Usersettingstyle.css";
 
 interface UserSetting {
@@ -9,10 +12,9 @@ interface UserSetting {
     dailyLimit: number;
 }
 
-
-
 const UserSettingPage: React.FC = () => {
     const { user , updateDailyLimit } = useAuth();
+    const { toasts, success, error, dismiss } = useToast();
     const [userSetting, setUserSetting] = useState<UserSetting>({
         username: user?.username || '',
         email: user?.email || '',
@@ -28,6 +30,25 @@ const UserSettingPage: React.FC = () => {
     const handleClickMinus = () => {
         if(userSetting.dailyLimit > 1){
             setUserSetting({...userSetting, dailyLimit: userSetting.dailyLimit - 1});
+        }
+    };
+
+    const handleSave = async () => {
+        if (userSetting.dailyLimit === user?.daily_hours){
+            success("¡Todo listo!", "No hay cambios para guardar.");
+            return;
+        }
+        try {
+            await updateDailyLimit(userSetting.dailyLimit);
+            success("¡Todo listo!", "Tus cambios se han guardado correctamente.");
+        } catch (err: any) {
+            if (err.response?.status === 409) {
+                error("Conflicto de planeación", "No puedes reducir el límite porque algunas tareas en tu agenda superarían las nuevas horas disponibles.");
+            } else {
+                error("Error al guardar", "Algo salió mal, por favor intenta de nuevo.");
+            }
+            console.error(err);
+            console.log(err.response?.data);
         }
     };
 
@@ -60,13 +81,18 @@ const UserSettingPage: React.FC = () => {
                     </div>
                     <span className='read-only-badge'>Solo lectura</span>
                 </div>
-                <p className='info-text'><Info size={15}/> Contacta a soporte para actualizar tu correo.</p>
+                <p className='info-text'><Info size={15}/> El correo de usuario no se puede cambiar.</p>
             </div>
 
             <hr className='user-setting-divider' />
 
             <div className='user-setting-section'>
-                <h2 className='user-setting-section-title'>Límite diario de horas</h2>
+                <div className="user-setting-title-row">
+                    <h2 className='user-setting-section-title'>Límite diario de horas</h2>
+                    <div className='user-setting-section-tooltip'>
+                        <InfoTooltip content="El límite diario establece la cantidad máxima de horas que deseas dedicar a tus actividades cada día" />
+                    </div>
+                </div>
                 <div className='user-setting-section-content'>
                     <button className='hour-button' onClick={handleClickMinus}>-</button>
                     <input className='hour-input' type="number" value={userSetting.dailyLimit} max={24} onChange={(e) => setUserSetting({...userSetting, dailyLimit: Number(e.target.value)})}/>
@@ -78,9 +104,10 @@ const UserSettingPage: React.FC = () => {
             <hr className='user-setting-divider' />
 
             <div className='user-setting-footer'>
-                <button className='save-button' onClick={() => updateDailyLimit(userSetting.dailyLimit)}>Guardar Cambios</button>
+                <button className='save-button' onClick={handleSave}>Guardar Cambios</button>
             </div>
         </div>
+        <ToastHost toasts={toasts} onDismiss={dismiss} />
     </div>
   )
 }

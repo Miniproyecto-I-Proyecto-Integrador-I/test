@@ -35,8 +35,20 @@
 .user-setting-section-title {
     font-size: var(--font-size-h3);
     font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: 0; /* Changed to 0 as it's now in a row */
     color: #334155;
+}
+
+.user-setting-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.user-setting-section-tooltip {
+    margin-bottom: 0;
+    margin-top: 20px;
 }
 
 .user-setting-section-content {
@@ -144,10 +156,12 @@
 .hour-input::-webkit-outer-spin-button,
 .hour-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 .hour-input[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .user-setting-section-content-text {
