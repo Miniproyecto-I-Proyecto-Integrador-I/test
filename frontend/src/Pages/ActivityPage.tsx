@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import SubtaskEdit from '../Feature/ManageActivityPage/Components/SubtaskEdit';
-import { deleteSubtask, updateSubtask, deleteTask as deleteMainTaskService } from '../Feature/ManageCreatePage/Services/subtaskService';
+import {
+  deleteSubtask,
+  updateSubtask,
+  deleteTask as deleteMainTaskService,
+} from '../Feature/ManageCreatePage/Services/subtaskService';
 import { updateTask } from '../Feature/ManageCreatePage/Services/taskService';
 import { createMultipleSubtasks } from '../Feature/ManageCreatePage/Services/subtaskService';
 import apiClient from '../Services/ApiClient';
@@ -14,8 +18,11 @@ import '../Feature/ManageCreatePage/Styles/CreatePage.css';
 const ActivityPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const focusSubtaskId = (location.state as { focusSubtaskId?: number } | null)
+    ?.focusSubtaskId;
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -63,16 +70,22 @@ const ActivityPage = () => {
   const handleCreateSubtask = async (subtaskData: SubtaskFormData) => {
     if (!task) return;
     try {
-      const createdSubtasks = await createMultipleSubtasks(task.id, [subtaskData]);
-      const normalized: EditableSubtask[] = createdSubtasks.map((item: any) => ({
-        id: item.id,
-        description: item.description,
-        planification_date: item.planification_date,
-        needed_hours: Number(item.needed_hours) || 0,
-        is_completed: item.is_completed,
-      }));
+      const createdSubtasks = await createMultipleSubtasks(task.id, [
+        subtaskData,
+      ]);
+      const normalized: EditableSubtask[] = createdSubtasks.map(
+        (item: any) => ({
+          id: item.id,
+          description: item.description,
+          planification_date: item.planification_date,
+          needed_hours: Number(item.needed_hours) || 0,
+          is_completed: item.is_completed,
+        }),
+      );
       setTask((prev) =>
-        prev ? { ...prev, subtasks: [...(prev.subtasks ?? []), ...normalized] } : prev,
+        prev
+          ? { ...prev, subtasks: [...(prev.subtasks ?? []), ...normalized] }
+          : prev,
       );
     } catch (error) {
       console.error('Error al crear subtarea:', error);
@@ -88,7 +101,9 @@ const ActivityPage = () => {
         if (!prev) return prev;
         return {
           ...prev,
-          subtasks: (prev.subtasks ?? []).filter((item) => item.id !== subtask.id),
+          subtasks: (prev.subtasks ?? []).filter(
+            (item) => item.id !== subtask.id,
+          ),
         };
       });
     } catch (error) {
@@ -104,7 +119,7 @@ const ActivityPage = () => {
       }
       navigate('/today');
     } catch (error) {
-       console.error('Error al eliminar tarea principal', error);
+      console.error('Error al eliminar tarea principal', error);
     }
   };
 
@@ -131,7 +146,7 @@ const ActivityPage = () => {
               priority: taskData.priority,
               due_date: taskData.due_date,
             }
-          : null
+          : null,
       );
     } catch (error) {
       console.error('Error al actualizar tarea:', error);
@@ -150,6 +165,7 @@ const ActivityPage = () => {
           <SubtaskEdit
             taskId={task.id}
             initialSubtasks={task.subtasks ?? []}
+            initialEditingSubtaskId={focusSubtaskId}
             taskTitle={task.title}
             taskDueDate={task.due_date ?? undefined}
             task={task}
@@ -163,7 +179,11 @@ const ActivityPage = () => {
         ) : (
           <div className="empty-state">
             <p>La tarea solicitada no existe o fue eliminada.</p>
-            <button className="btn-primary" onClick={() => navigate('/today')} style={{ marginTop: '16px' }}>
+            <button
+              className="btn-primary"
+              onClick={() => navigate('/today')}
+              style={{ marginTop: '16px' }}
+            >
               Volver al inicio
             </button>
           </div>
