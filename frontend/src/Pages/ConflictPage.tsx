@@ -65,7 +65,7 @@ export const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingM
       {/* ---- Existing tasks section ---- */}
       <div className="conflict-section">
         <p className="conflict-section__title">
-          {isNewTaskCase ? 'Actividades Existentes' : 'sub-Tareas del día'}
+          {isNewTaskCase ? 'Actividades Existentes' : 'Actividades del día'}
         </p>
         {existingTasks.map((task) => (
           <ConflictTaskRow

@@ -217,6 +217,7 @@ const DatePickerModal = ({
                 </div>
 
                 {/* Subtask list */}
+                <p className="dpm__list-title">Actividades del día</p>
                 <ul className="dpm__list">
                   {isLoading ? (
                     <>
