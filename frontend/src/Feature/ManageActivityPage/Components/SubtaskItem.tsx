@@ -124,9 +124,9 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
             <label>Tiempo a invertir</label>
             <input
               type="number"
-              min="0.1"
+              min="1"
               max={maxHours}
-              step="0.1"
+              step="1"
               value={editData.needed_hours || ''}
               onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
               className={errors.needed_hours ? 'error' : ''}

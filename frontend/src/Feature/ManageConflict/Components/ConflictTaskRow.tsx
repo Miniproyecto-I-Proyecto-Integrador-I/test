@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import type { ConflictTask } from '../Types/conflict';
 import { formatDate, totalHours } from '../Utils/conflictUtils';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
@@ -67,6 +67,36 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
     onChangeHours(task.id, parsed);
   };
 
+  const handleMinus = () => {
+    if (!editableHours) return;
+    const parsed = parseFloat(rawHours) || 0;
+    if (parsed > 1) {
+      const next = parsed - 1;
+      setRawHours(String(next));
+      setHoursError(null);
+      onChangeHours(task.id, next);
+    } else if (parsed <= 1 && parsed > 0) {
+      setRawHours('1');
+      setHoursError(null);
+      onChangeHours(task.id, 1);
+    }
+  };
+
+  const handlePlus = () => {
+    if (!editableHours) return;
+    const parsed = parseFloat(rawHours) || 0;
+    if (parsed < maxHoursPerDay) {
+      const next = parsed + 1;
+      setRawHours(String(next));
+      setHoursError(null);
+      onChangeHours(task.id, next);
+    } else if (parsed > maxHoursPerDay) {
+      setRawHours(String(maxHoursPerDay));
+      setHoursError(null);
+      onChangeHours(task.id, maxHoursPerDay);
+    }
+  };
+
   const rowClass = [
     'conflict-task',
     task.isNew
@@ -89,22 +119,35 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
       <div className="conflict-task__controls">
         {/* Hours input */}
         <div className="conflict-input-wrap">
-          <div
-            className={`conflict-input-field${hoursError ? ' conflict-input-field--error' : ''}${!editableHours ? ' conflict-input-field--disabled' : ''}`}
-          >
-            <Clock size={13} className="conflict-input-field__icon" />
+          <label className="conflict-input-label">TIEMPO A INVERTIR</label>
+          <div className="conflict-input-field">
+            <button
+              type="button"
+              className="conflict-hour-btn"
+              onClick={handleMinus}
+              disabled={!editableHours || parseFloat(rawHours) <= 1}
+            >
+              -
+            </button>
             <input
               type="number"
-              className="conflict-input"
+              className={`conflict-input ${hoursError ? 'conflict-input--error' : ''}`}
               value={rawHours}
-              min={0.5}
+              min={1}
               max={maxHoursPerDay}
-              step={0.5}
+              step={1}
               disabled={!editableHours}
               onChange={handleHoursChange}
               aria-label={`Horas para ${task.title}`}
             />
-            <span className="conflict-input-field__suffix">h</span>
+            <button
+              type="button"
+              className="conflict-hour-btn"
+              onClick={handlePlus}
+              disabled={!editableHours || parseFloat(rawHours) >= maxHoursPerDay}
+            >
+              +
+            </button>
           </div>
           {hoursError && <p className="conflict-input-error">{hoursError}</p>}
           {!hoursError && (
@@ -115,17 +158,20 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
         </div>
 
         {/* Date selector */}
-        <button
-          type="button"
-          className="conflict-select conflict-date-btn"
-          disabled={!editableDate}
-          onClick={() => setIsDatePickerOpen(true)}
-          aria-label={`Cambiar fecha para ${task.title}`}
-          style={{ width: '130px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-        >
-          <span style={{ fontSize: '13px' }}>{formatDate(task.date)}</span>
-          <Calendar size={14} style={{ opacity: 0.6 }} />
-        </button>
+        <div className="conflict-input-wrap">
+          <label className="conflict-input-label">DÍA DE REALIZACIÓN</label>
+          <button
+            type="button"
+            className="conflict-select conflict-date-btn"
+            disabled={!editableDate}
+            onClick={() => setIsDatePickerOpen(true)}
+            aria-label={`Cambiar fecha para ${task.title}`}
+            style={{ width: '130px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <span style={{ fontSize: '13px' }}>{formatDate(task.date)}</span>
+            <Calendar size={14} style={{ opacity: 0.6 }} />
+          </button>
+        </div>
       </div>
 
       <DatePickerModal
