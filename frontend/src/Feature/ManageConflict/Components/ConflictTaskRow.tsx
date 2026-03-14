@@ -44,6 +44,22 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
     setRawHours(String(task.hours));
   }, [task.hours]);
 
+  useEffect(() => {
+    if (!Number.isFinite(task.hours) || task.hours <= 0) {
+      setHoursError('Ingresa una cantidad de horas válida');
+      return;
+    }
+
+    if (task.hours > maxHoursPerDay) {
+      setHoursError(
+        `No puede exceder las ${maxHoursPerDay}h máximas del usuario`,
+      );
+      return;
+    }
+
+    setHoursError(null);
+  }, [task.hours, maxHoursPerDay]);
+
   const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     setRawHours(raw);
@@ -144,7 +160,9 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
               type="button"
               className="conflict-hour-btn"
               onClick={handlePlus}
-              disabled={!editableHours || parseFloat(rawHours) >= maxHoursPerDay}
+              disabled={
+                !editableHours || parseFloat(rawHours) >= maxHoursPerDay
+              }
             >
               +
             </button>
@@ -166,7 +184,12 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
             disabled={!editableDate}
             onClick={() => setIsDatePickerOpen(true)}
             aria-label={`Cambiar fecha para ${task.title}`}
-            style={{ width: '130px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+            style={{
+              width: '130px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
             <span style={{ fontSize: '13px' }}>{formatDate(task.date)}</span>
             <Calendar size={14} style={{ opacity: 0.6 }} />
@@ -187,6 +210,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
         originalDate={task.date}
         maxDate={maxDate}
         blockConflict={true}
+        maxDailyHours={maxHoursPerDay}
       />
     </div>
   );

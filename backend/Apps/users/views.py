@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -50,9 +51,11 @@ class UserViewSet(viewsets.ModelViewSet):
                 old_daily_hours = request.user.daily_hours
                 
                 if new_daily_hours < old_daily_hours:
+                    today = timezone.localdate()
                     # Buscar subtareas pendientes o en progreso del usuario
                     subtasks_queryset = Subtask.objects.filter(
                         task__user=request.user,
+                        planification_date__gte=today,
                         status__in=[Subtask.Status.PENDING, Subtask.Status.IN_PROGRESS]
                     )
                     
@@ -64,7 +67,7 @@ class UserViewSet(viewsets.ModelViewSet):
                     if conflicts_dates.exists():
                         # Obtener las subtareas específicas de esos días con conflicto
                         dates = [c['planification_date'] for c in conflicts_dates]
-                        conflicting_subtasks = subtasks_queryset.filter(planification_date__in=dates).order_by('planification_date')
+                        conflicting_subtasks = subtasks_queryset.select_related('task').filter(planification_date__in=dates).order_by('planification_date')
                         
                         # Agrupar por fecha
                         grouped_conflicts = {}
@@ -78,7 +81,9 @@ class UserViewSet(viewsets.ModelViewSet):
                             grouped_conflicts[date_key]["subtasks"].append({
                                 "id": s.id,
                                 "nombre": s.description,
-                                "horas": s.needed_hours
+                                "horas": s.needed_hours,
+                                "task_title": s.task.title,
+                                "task_due_date": s.task.due_date.isoformat() if s.task and s.task.due_date else None,
                             })
                         
                         return Response(list(grouped_conflicts.values()), status=status.HTTP_409_CONFLICT)

@@ -14,6 +14,16 @@ export function totalHours(tasks: ConflictTask[]): number {
 
 export function isResolved(tasks: ConflictTask[], maxHoursPerDay: number, conflictDate: string): boolean {
   const tasksOnDay = tasks.filter(t => t.date === conflictDate);
+  const hasInvalidTaskHours = tasks.some(
+    (task) =>
+      !Number.isFinite(task.hours) ||
+      task.hours <= 0 ||
+      task.hours > maxHoursPerDay,
+  );
+  if (hasInvalidTaskHours) {
+    return false;
+  }
+
   return totalHours(tasksOnDay) <= maxHoursPerDay;
 }
 
