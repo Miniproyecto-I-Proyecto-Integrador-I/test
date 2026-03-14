@@ -220,7 +220,13 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               <button
                 type="button"
                 className="subtask-edit-round-btn conflict"
-                onClick={() => onResolveConflict?.(formData)}
+                onClick={() => {
+                  if (conflictToastId) {
+                    dismiss(conflictToastId);
+                    setConflictToastId(null);
+                  }
+                  onResolveConflict?.(formData);
+                }}
                 aria-label="Resolver conflicto"
               >
                 Resolver conflicto

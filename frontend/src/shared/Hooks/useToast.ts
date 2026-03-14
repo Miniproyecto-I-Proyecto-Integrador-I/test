@@ -29,10 +29,19 @@ export function useToast() {
       duration = 4000,
       showProgress = true,
       loading = false,
-    }: Omit<ToastState, 'id'>): number => {
-      const id = nextId();
+      id: customId,
+    }: Omit<ToastState, 'id'> & { id?: number }): number => {
+      const id = customId ?? nextId();
       shownAt.current.set(id, Date.now());
-      setToasts((prev) => [...prev, { id, title, subtitle, variant, duration, showProgress, loading }]);
+      setToasts((prev) => {
+        const index = prev.findIndex((t) => t.id === id);
+        if (index >= 0) {
+          const next = [...prev];
+          next[index] = { id, title, subtitle, variant, duration, showProgress, loading };
+          return next;
+        }
+        return [...prev, { id, title, subtitle, variant, duration, showProgress, loading }];
+      });
       return id;
     },
     [],
