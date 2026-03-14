@@ -9,12 +9,15 @@ import type { Subtask } from '../../ManageTodayPage/Types/models';
 import type { SubtaskItem } from '../../ManageCreatePage/Types/subtask.types';
 import '../Styles/DatePickerModal.css';
 
+type PendingSubtaskWithTask = SubtaskItem & { taskTitle?: string };
+
 interface DatePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
   /** Called with the chosen 'YYYY-MM-DD' string when the user confirms. */
   onConfirm: (date: string) => void;
   newSubtaskDescription: string;
+  newSubtaskTaskTitle?: string;
   newSubtaskHours: number | string;
   /** Subtasks already added in this session (not yet saved to API). */
   pendingSubtasks?: SubtaskItem[];
@@ -37,6 +40,7 @@ const DatePickerModal = ({
   onClose,
   onConfirm,
   newSubtaskDescription,
+  newSubtaskTaskTitle,
   newSubtaskHours,
   pendingSubtasks = [],
   maxDate,
@@ -113,8 +117,10 @@ const DatePickerModal = ({
   const existingSubtasks: Subtask[] = selectedISO
     ? (subtasksByDate[selectedISO] ?? [])
     : [];
-  const pendingForDay: SubtaskItem[] = selectedISO
-    ? pendingSubtasks.filter((st) => st.planification_date === selectedISO)
+  const pendingForDay: PendingSubtaskWithTask[] = selectedISO
+    ? (pendingSubtasks as PendingSubtaskWithTask[]).filter(
+        (st) => st.planification_date === selectedISO,
+      )
     : [];
   const existingHours = existingSubtasks.reduce(
     (sum, st) => sum + st.needed_hours,
@@ -233,13 +239,20 @@ const DatePickerModal = ({
                           <span className="dpm__item-name">
                             {newSubtaskDescription || '(sin descripción)'}
                           </span>
+                          {newSubtaskTaskTitle && (
+                            <span className="dpm__item-task">
+                              {newSubtaskTaskTitle}
+                            </span>
+                          )}
+                        </div>
+                        <div className="dpm__item-right">
                           <span className="dpm__item-new-badge">
                             {originalDate ? 'Modificando' : 'Nueva'}
                           </span>
+                          <span className="dpm__item-hours dpm__item-hours--new">
+                            {newSubtaskHours}h
+                          </span>
                         </div>
-                        <span className="dpm__item-hours dpm__item-hours--new">
-                          {newSubtaskHours}h
-                        </span>
                       </li>
 
                       {/* Pending subtasks (added this session, not yet saved) */}
@@ -253,13 +266,20 @@ const DatePickerModal = ({
                             <span className="dpm__item-name">
                               {st.description}
                             </span>
+                            {st.taskTitle && (
+                              <span className="dpm__item-task">
+                                {st.taskTitle}
+                              </span>
+                            )}
+                          </div>
+                          <div className="dpm__item-right">
                             <span className="dpm__item-pending-badge">
-                              Recién agregada
+                              Sin guardar
+                            </span>
+                            <span className="dpm__item-hours dpm__item-hours--pending">
+                              {st.needed_hours}h
                             </span>
                           </div>
-                          <span className="dpm__item-hours dpm__item-hours--pending">
-                            {st.needed_hours}h
-                          </span>
                         </li>
                       ))}
 

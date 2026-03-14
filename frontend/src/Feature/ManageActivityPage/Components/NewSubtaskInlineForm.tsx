@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar, X, Check } from 'lucide-react';
-import type { SubtaskFormData, ValidationErrors } from '../../ManageCreatePage/Types/subtask.types';
+import type {
+  SubtaskFormData,
+  ValidationErrors,
+} from '../../ManageCreatePage/Types/subtask.types';
 import {
   validateSubtaskForm,
   hasValidationErrors,
@@ -12,6 +15,7 @@ import { useToast } from '../../../shared/Hooks/useToast';
 import ToastHost from '../../../shared/Components/ToastHost';
 
 interface NewSubtaskInlineFormProps {
+  taskTitle?: string;
   taskDueDate?: string;
   maxHours: number;
   onSave: (data: SubtaskFormData) => Promise<void>;
@@ -26,6 +30,7 @@ const EMPTY_FORM: SubtaskFormData = {
 };
 
 const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
+  taskTitle,
   taskDueDate,
   maxHours,
   onSave,
@@ -79,7 +84,10 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
     const validationErrors = validateSubtaskForm(formData);
     if (hasValidationErrors(validationErrors)) {
       setErrors(validationErrors);
-      toastError('Datos incompletos', 'Por favor, llena la descripción y el tiempo correctamente.');
+      toastError(
+        'Datos incompletos',
+        'Por favor, llena la descripción y el tiempo correctamente.',
+      );
       return;
     }
     if (hourLimitError) return;
@@ -97,12 +105,15 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
     setIsChecking(true);
     try {
       const url = `/api/subtasks/?planification_date=${formData.planification_date}`;
-      const response = await apiClient.get<Array<{ needed_hours: number }>>(url);
+      const response =
+        await apiClient.get<Array<{ needed_hours: number }>>(url);
       const backendHours = response.data.reduce(
         (sum, st) => sum + (Number(st.needed_hours) || 0),
         0,
       );
-      const total = parseFloat((backendHours + Number(formData.needed_hours)).toFixed(2));
+      const total = parseFloat(
+        (backendHours + Number(formData.needed_hours)).toFixed(2),
+      );
       if (total > maxHours) {
         const id = toastShow({
           title: 'Límite excedido',
@@ -161,7 +172,9 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               autoFocus
             />
             {activeErrors.description && (
-              <span className="subtask-edit-error">{activeErrors.description}</span>
+              <span className="subtask-edit-error">
+                {activeErrors.description}
+              </span>
             )}
           </div>
 
@@ -174,11 +187,15 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               max={maxHours}
               step="1"
               value={formData.needed_hours || ''}
-              onChange={(e) => handleHoursChange(parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                handleHoursChange(parseFloat(e.target.value) || 0)
+              }
               className={activeErrors.needed_hours ? 'error' : ''}
             />
             {activeErrors.needed_hours && (
-              <span className="subtask-edit-error">{activeErrors.needed_hours}</span>
+              <span className="subtask-edit-error">
+                {activeErrors.needed_hours}
+              </span>
             )}
           </div>
 
@@ -196,7 +213,9 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
                 : 'Elegir fecha'}
             </button>
             {activeErrors.planification_date && (
-              <span className="subtask-edit-error">{activeErrors.planification_date}</span>
+              <span className="subtask-edit-error">
+                {activeErrors.planification_date}
+              </span>
             )}
           </div>
 
@@ -259,6 +278,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
           setIsDatePickerOpen(false);
         }}
         newSubtaskDescription={formData.description}
+        newSubtaskTaskTitle={taskTitle}
         newSubtaskHours={formData.needed_hours}
         maxDate={taskDueDate || undefined}
         confirmLabel="Elegir esta fecha"

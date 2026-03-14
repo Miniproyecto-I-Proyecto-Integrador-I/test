@@ -23,6 +23,7 @@ interface SubtaskListProps {
   subtasks: EditableSubtask[];
   editingId: string | number | null;
   editData: SubtaskItemEditData;
+  taskTitle?: string;
   errors: SubtaskItemErrors;
   conflictWarning: boolean;
   isCheckingConflict: boolean;
@@ -44,6 +45,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
   subtasks,
   editingId,
   editData,
+  taskTitle,
   errors,
   conflictWarning,
   isCheckingConflict,
@@ -61,14 +63,26 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
   onHoursChange,
 }) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const { toasts, dismiss, loading: toastLoading, success: toastSuccess, error: toastError } = useToast();
+  const {
+    toasts,
+    dismiss,
+    loading: toastLoading,
+    success: toastSuccess,
+    error: toastError,
+  } = useToast();
 
   const handleSaveNew = async (data: SubtaskFormData) => {
-    const loadId = toastLoading('Creando actividad…', 'Guardando en la base de datos');
+    const loadId = toastLoading(
+      'Creando actividad…',
+      'Guardando en la base de datos',
+    );
     try {
       await onCreateSubtask(data);
       dismiss(loadId);
-      toastSuccess('¡Actividad creada!', 'El nuevo paso se ha agregado correctamente.');
+      toastSuccess(
+        '¡Actividad creada!',
+        'El nuevo paso se ha agregado correctamente.',
+      );
       setIsAddingNew(false);
     } catch {
       dismiss(loadId);
@@ -89,7 +103,9 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 className="subtask-edit-empty-icon"
                 strokeWidth={1.5}
               />
-              <p className="subtask-edit-empty-text">No hay subtareas creadas</p>
+              <p className="subtask-edit-empty-text">
+                No hay subtareas creadas
+              </p>
               <p className="subtask-edit-empty-hint">
                 Agrega un nuevo paso para comenzar a organizar tu tarea
               </p>
@@ -120,6 +136,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
           {/* Formulario inline — al final de la lista con animación pop */}
           {isAddingNew && (
             <NewSubtaskInlineForm
+              taskTitle={taskTitle}
               taskDueDate={taskDueDate}
               maxHours={maxHours}
               onSave={handleSaveNew}
