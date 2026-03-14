@@ -6,6 +6,8 @@ import { useToast } from '../shared/Hooks/useToast';
 import ToastHost from '../shared/Components/ToastHost';
 import PendingForm from '../Feature/ManageUserPage/Components/PendingForm';
 import type { PendingConflictDay } from '../Feature/ManageUserPage/Types/pending.types';
+import type { ConflictTask } from '../Feature/ManageConflict/Types/conflict';
+import apiClient from '../Services/ApiClient';
 import '../Feature/ManageUserPage/Styles/Usersettingstyle.css';
 
 interface UserSetting {
@@ -89,12 +91,36 @@ const UserSettingPage: React.FC = () => {
     }
   };
 
+  const handleDayResolved = async (fecha: string, resolvedTasks: ConflictTask[]) => {
+    const dayData = conflictDays.find((d) => d.fecha === fecha);
+    const originals = new Map(
+      (dayData?.subtasks ?? []).map((st) => [String(st.id), Number(st.horas)])
+    );
+
+    await Promise.all(
+      resolvedTasks.map((task) => {
+        const origHours = originals.get(task.id);
+        const changedHours = origHours !== undefined && task.hours !== origHours;
+        const changedDate = task.date !== fecha;
+        if (changedHours || changedDate) {
+          return apiClient.patch(`/api/subtasks/${task.id}/`, {
+            needed_hours: task.hours,
+            planification_date: task.date,
+          });
+        }
+        return Promise.resolve();
+      }),
+    );
+
+    setConflictDays((prev) => prev.filter((d) => d.fecha !== fecha));
+  };
+
   const handleAbortPendingResolution = () => {
     setUserSetting((prev) => ({ ...prev, dailyLimit: initialDailyLimit }));
     setIsPendingModalOpen(false);
     setConflictDays([]);
     success(
-      'Resolucion abortada, no se aplicaron los cambios a tu limite diario',
+      'Resolucion abortada', 'No se aplicaron los cambios a tu limite diario'
     );
   };
 
@@ -186,6 +212,7 @@ const UserSettingPage: React.FC = () => {
         newDailyLimit={userSetting.dailyLimit}
         onAbort={handleAbortPendingResolution}
         onSolve={() => handleSave(true)}
+        onDayResolved={handleDayResolved}
         isSolving={isRetryingFromModal}
       />
       <ToastHost toasts={toasts} onDismiss={dismiss} />

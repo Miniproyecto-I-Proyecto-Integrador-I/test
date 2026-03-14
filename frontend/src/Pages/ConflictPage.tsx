@@ -20,7 +20,7 @@ interface ConflictViewProps {
   onCancel?: () => void;
 }
 
-const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingMode, onSave, onCancel }) => {
+export const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingMode, onSave, onCancel }) => {
   const { tasks, updateTask, resolved, totalOnDay, maxHours } =
     useConflictState(scenario);
 

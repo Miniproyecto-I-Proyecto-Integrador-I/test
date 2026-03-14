@@ -18,7 +18,7 @@
 }
 
 .pending-modal {
-    width: min(820px, 100%);
+    width: min(1040px, 96vw);
     max-height: 100%;
     overflow: auto;
     padding: 20px;
@@ -26,6 +26,10 @@
     background: var(--surface);
     border: 1px solid var(--border-color);
     box-shadow: 0 24px 54px rgba(15, 23, 42, 0.22);
+}
+
+.pending-modal--conflict {
+    width: min(1320px, 98vw);
 }
 
 .pending-abort {
@@ -214,6 +218,7 @@
     }
 
     .pending-modal {
+        width: 100%;
         padding: 14px;
     }
 

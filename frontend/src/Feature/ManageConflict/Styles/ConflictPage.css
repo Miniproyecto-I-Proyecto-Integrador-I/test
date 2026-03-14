@@ -6,10 +6,12 @@
 
 .conflict-page {
   max-width: 100%;
+  width: 100%;
   margin: 0 auto;
-  padding: 40px 24px 64px;
+  padding: clamp(20px, 3vw, 40px) clamp(8px, 1.5vw, 16px) clamp(32px, 5vw, 64px);
   font-family: var(--font-family);
   color: var(--text-main);
+  box-sizing: border-box;
 }
 
 /* ============================================================
@@ -505,4 +507,133 @@
   background: var(--text-main);
   border-color: var(--text-main);
   color: #fff;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* ---- Large screens (≥1400px): nothing extra needed – max-width already caps it ---- */
+
+/* ---- Medium screens (≤1100px): tighten header typography a bit ---- */
+@media (max-width: 1100px) {
+  .conflict-header__title {
+    font-size: clamp(20px, 2.4vw, 28px);
+  }
+}
+
+/* ---- Tablet (≤900px): compact progress bar, allow task controls to stay inline ---- */
+@media (max-width: 900px) {
+  .conflict-progress {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 14px;
+    margin-bottom: 24px;
+  }
+
+  .conflict-progress__bar-wrap {
+    width: 100%;
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .conflict-progress__label {
+    order: 0;
+  }
+
+  .conflict-section {
+    margin-bottom: 20px;
+  }
+
+  .conflict-header {
+    margin-bottom: 24px;
+  }
+}
+
+/* ---- Small tablet / large mobile (≤720px): task row wraps ---- */
+@media (max-width: 720px) {
+  .conflict-task {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .conflict-task__info {
+    width: 100%;
+  }
+
+  .conflict-task__controls {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .conflict-task__title {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .conflict-autoresolve {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .conflict-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .conflict-btn-cancel,
+  .conflict-btn-save {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* ---- Mobile (≤480px): reduce all spacing, stack footer vertically ---- */
+@media (max-width: 480px) {
+  .conflict-header__title {
+    font-size: var(--font-size-h2);
+  }
+
+  .conflict-header__subtitle {
+    font-size: var(--font-size-small);
+  }
+
+  .conflict-section__title {
+    font-size: 11px;
+  }
+
+  .conflict-progress {
+    padding: 10px 12px;
+  }
+
+  .conflict-task {
+    padding: 10px 12px;
+  }
+
+  .conflict-input {
+    width: 38px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .conflict-hour-btn {
+    width: 24px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .conflict-footer {
+    flex-direction: column;
+    margin-top: 24px;
+  }
+
+  .conflict-btn-cancel,
+  .conflict-btn-save {
+    width: 100%;
+    text-align: center;
+  }
 }

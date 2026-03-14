@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import { AlertTriangle, ArrowLeft, Calendar, Clock3 } from 'lucide-react';
 import type { PendingConflictDay } from '../Types/pending.types';
+import type { ConflictScenario, ConflictTask } from '../../ManageConflict/Types/conflict';
+import { ConflictView } from '../../../Pages/ConflictPage';
 import '../Styles/PendingForm.css';
+import '../../ManageConflict/Styles/ConflictPage.css';
 
 interface PendingFormProps {
   isOpen: boolean;
@@ -8,6 +12,7 @@ interface PendingFormProps {
   newDailyLimit: number;
   onAbort: () => void;
   onSolve: () => void;
+  onDayResolved: (fecha: string, tasks: ConflictTask[]) => Promise<void>;
   isSolving?: boolean;
 }
 
@@ -32,12 +37,24 @@ const getDaySummary = (day: PendingConflictDay) => {
     (acc, subtask) => acc + (Number(subtask.horas) || 0),
     0,
   );
-
-  return {
-    taskCount,
-    totalHours,
-  };
+  return { taskCount, totalHours };
 };
+
+const buildScenario = (
+  day: PendingConflictDay,
+  maxHoursPerDay: number,
+): ConflictScenario => ({
+  case: 'day_overload',
+  conflictDate: day.fecha,
+  maxHoursPerDay,
+  existingTasks: day.subtasks.map((st) => ({
+    id: String(st.id),
+    title: st.nombre,
+    parentTask: 'Sin tarea',
+    hours: Number(st.horas),
+    date: day.fecha,
+  })),
+});
 
 const PendingForm: React.FC<PendingFormProps> = ({
   isOpen,
@@ -45,10 +62,51 @@ const PendingForm: React.FC<PendingFormProps> = ({
   newDailyLimit,
   onAbort,
   onSolve,
+  onDayResolved,
   isSolving = false,
 }) => {
+  const [activeDay, setActiveDay] = useState<PendingConflictDay | null>(null);
+  const [isSavingDay, setIsSavingDay] = useState(false);
+
   if (!isOpen) return null;
 
+  const handleConflictSave = async (tasks: ConflictTask[]) => {
+    if (!activeDay) return;
+    setIsSavingDay(true);
+    try {
+      await onDayResolved(activeDay.fecha, tasks);
+      setActiveDay(null);
+    } finally {
+      setIsSavingDay(false);
+    }
+  };
+
+  // ---- Inline conflict resolution view ----
+  if (activeDay) {
+    const scenario = buildScenario(activeDay, newDailyLimit);
+    return (
+      <div className="pending-overlay" role="dialog" aria-modal="true">
+        <div className="pending-modal pending-modal--conflict">
+          <button
+            type="button"
+            className="pending-abort"
+            onClick={() => setActiveDay(null)}
+            disabled={isSavingDay}
+          >
+            <ArrowLeft size={18} aria-hidden="true" />
+            Volver al resumen
+          </button>
+          <ConflictView
+            scenario={scenario}
+            onSave={handleConflictSave}
+            onCancel={() => setActiveDay(null)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Default list view ----
   return (
     <div className="pending-overlay" role="dialog" aria-modal="true">
       <div className="pending-modal">
@@ -91,7 +149,11 @@ const PendingForm: React.FC<PendingFormProps> = ({
                         </span>
                       </p>
                     </div>
-                    <button type="button" className="pending-action-btn">
+                    <button
+                      type="button"
+                      className="pending-action-btn"
+                      onClick={() => setActiveDay(day)}
+                    >
                       Ir a resolver conflicto
                     </button>
                   </article>
@@ -111,7 +173,7 @@ const PendingForm: React.FC<PendingFormProps> = ({
             type="button"
             className="pending-action-btn"
             onClick={onSolve}
-            disabled={isSolving}
+            disabled={isSolving || conflictDays.length > 0}
           >
             {isSolving ? 'Verificando...' : 'Confirmar resolución'}
           </button>
