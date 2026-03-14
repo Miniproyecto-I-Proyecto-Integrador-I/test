@@ -112,7 +112,7 @@ const PendingForm: React.FC<PendingFormProps> = ({
       <div className="pending-modal">
         <button type="button" className="pending-abort" onClick={onAbort}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Abortar cambio
+          Descartar cambios
         </button>
 
         <div className="pending-card">

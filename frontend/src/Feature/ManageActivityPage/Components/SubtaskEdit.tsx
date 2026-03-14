@@ -492,7 +492,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     <div className="subtask-edit-wrapper">
       <BackButton
         onClick={isEditingTask ? handleCancelTaskEdit : conflictData ? () => setConflictData(null) : onClose}
-        label={isEditingTask ? 'Volver sin editar' : conflictData ? 'Abortar cambios' : 'Volver a inicio'}
+        label={isEditingTask ? 'Volver sin editar' : conflictData ? 'Descartar cambios' : 'Volver a inicio'}
       />
 
       <div className="subtask-edit-container">
