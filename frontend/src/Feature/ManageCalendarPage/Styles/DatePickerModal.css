@@ -181,6 +181,15 @@
 }
 
 /* ── Subtask list ─────────────────────────────────────────── */
+.dpm__list-title {
+  margin: 8px 12px 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
 .dpm__list {
   list-style: none;
   margin: 0;
