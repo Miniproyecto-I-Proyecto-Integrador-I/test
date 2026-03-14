@@ -17,7 +17,6 @@ export type DeleteTarget = { type: 'main-task' } | { type: 'subtask'; subtask: E
 interface UseSubtaskEditProps {
   initialSubtasks: EditableSubtask[];
   onSubtasksChange?: (subtasks: EditableSubtask[]) => void;
-  onSaveChanges?: (subtasks: EditableSubtask[]) => Promise<void> | void;
   onDeleteSubtask?: (subtask: EditableSubtask) => Promise<void> | void;
   onTaskDeleted?: () => void;
   onClose?: () => void;
@@ -27,7 +26,6 @@ interface UseSubtaskEditProps {
 export function useSubtaskEdit({
   initialSubtasks,
   onSubtasksChange,
-  onSaveChanges,
   onDeleteSubtask,
   onTaskDeleted,
   onClose,
@@ -42,7 +40,6 @@ export function useSubtaskEdit({
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Sync back to parent if subtasks change
@@ -149,23 +146,12 @@ export function useSubtaskEdit({
     }
   }, [deleteTarget, taskId, onTaskDeleted, onClose, onDeleteSubtask, subtasks, reportChange, editingId, cancelEditing]);
 
-  const handleSaveChanges = useCallback(async () => {
-    if (!onSaveChanges) return;
-    setIsSaving(true);
-    try {
-      await onSaveChanges(subtasks);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [onSaveChanges, subtasks]);
-
   return {
     subtasks,
     setSubtasks: reportChange,
     editingId,
     editData,
     errors,
-    isSaving,
     isDeleting,
     deleteTarget,
     startEditing,
@@ -176,6 +162,5 @@ export function useSubtaskEdit({
     openDeleteMainTaskModal,
     closeDeleteModal,
     confirmDelete,
-    handleSaveChanges,
   };
 }

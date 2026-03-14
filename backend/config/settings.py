@@ -139,8 +139,9 @@ if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True,  # fuerza sslmode=require
+            conn_max_age=60, 
+            conn_health_checks=True,
+            ssl_require=True,
         )
     }
 elif USE_LOCAL_POSTGRES:
@@ -152,6 +153,11 @@ elif USE_LOCAL_POSTGRES:
             "PASSWORD": config("POSTGRES_PASSWORD", default="contrasena"),
             "HOST": config("POSTGRES_HOST", default="db"),
             "PORT": config("POSTGRES_PORT", default="5432"),
+            "CONN_MAX_AGE": 120,  # Mantener conexiones 60 segundos (balance entre performance y pool)
+            "CONN_HEALTH_CHECKS": True,  # Verificar salud de conexiones
+            "OPTIONS": {
+                "connect_timeout": 30,
+            }
         }
     }
 else:

@@ -151,8 +151,19 @@
     color: #ef4444;
 }
 
+.setting-btn {
+    color: var( --text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .logout-btn:hover {
     background-color: #fef2f2;
+}
+
+.setting-btn:hover {
+    background-color: #f1f5f9;
 }
 
 @keyframes fadeInPopover {

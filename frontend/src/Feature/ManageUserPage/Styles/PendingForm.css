@@ -1,0 +1,237 @@
+.pending-overlay {
+    --pending-radius-lg: calc(var(--border-radius-base) );
+    --pending-radius-xl: calc(var(--border-radius-base) );
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    font-family: var(--font-family);
+}
+
+.pending-overlay * {
+    font-family: var(--font-family);
+}
+
+.pending-modal {
+    width: min(1040px, 96vw);
+    max-height: 100%;
+    overflow: auto;
+    padding: 20px;
+    border-radius: var(--pending-radius-xl);
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 24px 54px rgba(15, 23, 42, 0.22);
+}
+
+.pending-modal--conflict {
+    width: min(1320px, 98vw);
+}
+
+.pending-abort {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: var(--font-size-body);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 24px;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-base);
+    transition: all 0.2s ease;
+}
+
+.pending-abort:hover {
+    color: var(--primary-hover);
+    background: var(--surface);
+    transform: translateX(-4px);
+}
+
+.pending-card {
+    border-radius: var(--pending-radius-lg);
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+}
+
+.pending-card-hero {
+    min-height: 150px;
+    background: color-mix(in srgb, var(--warning-color) 18%, transparent);
+    display: grid;
+    place-items: center;
+    color: var(--warning-color);
+}
+
+.pending-card-content {
+    padding: 22px;
+}
+
+.pending-title {
+    margin: 0;
+    text-align: center;
+    font-size: var(--font-size-h2);
+    color: var(--text-main);
+}
+
+.pending-subtitle {
+    margin: 10px auto 18px;
+    max-width: 650px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: var(--font-size-body);
+    line-height: 1.4;
+}
+
+.pending-list {
+    display: grid;
+    gap: 12px;
+}
+
+.pending-list-item {
+    border: 1px solid var(--border-color);
+    border-radius: calc(var(--border-radius-base) * 1.5);
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-base);
+}
+
+.pending-list-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.pending-list-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: var(--font-size-body);
+}
+
+.pending-list-date svg {
+    color: var(--warning-color);
+}
+
+.pending-list-summary {
+    margin: 0;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-small);
+    line-height: 1.4;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pending-list-summary-hours {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pending-action-btn {
+    border: none;
+    border-radius: var(--border-radius-base);
+    padding: 10px 18px;
+    background: var(--warning-color);
+    color: var(--surface);
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, filter 0.2s ease;
+}
+
+.pending-action-btn:hover {
+    filter: brightness(0.9);
+}
+
+.pending-action-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.pending-warning {
+    margin-top: 12px;
+    border: 1px solid var(--warning-color);
+    border-radius: calc(var(--border-radius-base) * 1.5);
+    background: var(--secondary-light);
+    color: var(--warning-color);
+    padding: 12px 16px;
+    font-style: italic;
+    font-weight: 700;
+    text-align: center;
+    font-size: var(--font-size-body);
+}
+
+.pending-footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+}
+
+.pending-footer .pending-action-btn {
+    min-width: 220px;
+}
+
+@media (max-width: 900px) {
+    .pending-abort {
+        font-size: var(--font-size-body);
+    }
+
+    .pending-title {
+        font-size: var(--font-size-h2);
+    }
+
+    .pending-subtitle {
+        font-size: var(--font-size-body);
+    }
+
+    .pending-list-date {
+        font-size: var(--font-size-h3);
+    }
+
+    .pending-action-btn {
+        font-size: var(--font-size-body);
+        padding: 10px 18px;
+    }
+
+    .pending-warning {
+        font-size: var(--font-size-small);
+    }
+}
+
+@media (max-width: 640px) {
+    .pending-overlay {
+        padding: 12px;
+    }
+
+    .pending-modal {
+        width: 100%;
+        padding: 14px;
+    }
+
+    .pending-card-content {
+        padding: 18px;
+    }
+
+    .pending-list-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pending-action-btn {
+        width: 100%;
+    }
+}

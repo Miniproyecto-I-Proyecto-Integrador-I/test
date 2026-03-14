@@ -5,9 +5,12 @@ import RegisterPage from '../Pages/RegisterPage';
 import ProgressPage from '../Pages/ProgressPage';
 import TodayPage from '../Pages/TodayPage';
 import ActivityPage from '../Pages/ActivityPage';
+import CalendarPage from '../Pages/CalendarPage';
+import ConflictPage from '../Pages/ConflictPage';
 import Layout from '../shared/Components/Layout';
 import { AuthProvider } from '../Context/AuthContext';
 import ProtectedRoute from '../shared/Components/Auth/ProtectedRoute';
+import UserSettingPage from '../Pages/UserSettingPage';
 
 const AppRoutes = () => {
   return (
@@ -41,6 +44,14 @@ const AppRoutes = () => {
               }
             />
             <Route
+              path="/usersetting"
+              element={
+                <ProtectedRoute>
+                  <UserSettingPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/activity/:id"
               element={
                 <ProtectedRoute>
@@ -48,6 +59,10 @@ const AppRoutes = () => {
                 </ProtectedRoute>
               }
             />
+            {/* Hidden dev route — no NavBar link */}
+            <Route path="/calendar" element={<CalendarPage />} />
+            {/* Conflict resolution — no NavBar link */}
+            <Route path="/conflict" element={<ConflictPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

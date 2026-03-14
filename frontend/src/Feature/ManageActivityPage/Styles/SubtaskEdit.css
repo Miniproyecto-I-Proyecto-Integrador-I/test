@@ -5,10 +5,36 @@
     font-family: var(--font-family);
 }
 
+.subtask-edit-unsaved-toast {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-color);
+    color: var(--surface);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 0;
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.28);
+}
+
 .subtask-edit-container {
     width: 100%;
     max-width: 100%;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.subtask-edit-parent-card,
+.subtask-edit-subtasks-card {
     background: var(--surface);
     border: 1px solid var(--border-color);
     border-radius: 10px;
@@ -21,6 +47,13 @@
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+    flex-wrap: wrap;
+}
+
+.subtask-edit-title-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
@@ -99,7 +132,6 @@
 
 .subtask-edit-task-row {
     padding: 16px 26px;
-    border-bottom: 1px solid var(--border-color);
 }
 
 .subtask-edit-title {
@@ -121,8 +153,8 @@
 .subtask-edit-category {
     font-size: var(--font-size-small);
     font-weight: 700;
-    color: var(--primary-hover);
-    background: var(--primary-light);
+    color: var(--text-tertiary);
+    background: var(--secondary-light);
     border-radius: 999px;
     padding: 4px 9px;
     letter-spacing: 0.03em;
@@ -136,6 +168,15 @@
     gap: 6px;
 }
 
+.subtask-edit-meta-item--overdue {
+    color: var(--warning-color);
+    font-weight: 700;
+    border: 1px solid var(--warning-color);
+    border-radius: 999px;
+    padding: 4px 10px;
+    background: var(--surface);
+}
+
 .subtask-edit-meta-item svg {
     width: 16px;
     height: 16px;
@@ -146,6 +187,41 @@
     stroke-linejoin: round;
 }
 
+.subtask-edit-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        var(--border-color) 20%,
+        var(--border-color) 80%,
+        transparent
+    );
+    margin: 12px 0 0;
+    opacity: 0.7;
+}
+
+.subtask-edit-description-row {
+    margin-top: 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: 'Inter', var(--font-family);
+    color: var(--text-secondary);
+    font-size: var(--font-size-body);
+    line-height: 1.5;
+}
+
+.subtask-edit-description-label {
+    font-weight: 700;
+}
+
+.subtask-edit-description-text {
+    font-weight: 400;
+    color: var(--text-tertiary);
+    word-break: break-word;
+}
+
 .subtask-edit-list-section {
     padding: 24px 26px 16px;
 }
@@ -154,7 +230,8 @@
     margin: 0 0 14px;
     font-size: var(--font-size-h3);
     color: var(--text-secondary);
-    font-weight: 500;
+    font-weight: 600;
+    font-family: 'Inter', var(--font-family);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -217,6 +294,26 @@
     padding: 20px;
 }
 
+.subtask-edit-item.is-editing.has-conflict {
+    border-color: var(--warning-color);
+    box-shadow: 0 2px 12px rgba(245, 158, 11, 0.2);
+}
+
+@keyframes subtask-pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.subtask-new-form {
+    animation: subtask-pop-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 .subtask-edit-item-left {
     display: flex;
     align-items: center;
@@ -236,12 +333,65 @@
     min-width: 0;
 }
 
+.subtask-edit-item-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.subtask-edit-overdue-badge {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--warning-color);
+    border-radius: 8px;
+    background: var(--secondary-light);
+    color: var(--warning-color);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
 .subtask-edit-item-title {
     margin: 0;
     font-size: var(--font-size-h3);
     line-height: 24px;
     color: var(--text-main);
     font-weight: 500;
+    font-family: 'Inter', var(--font-family);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.subtask-edit-unsaved-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--primary-hover);
+    background: none;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 4px;
+    padding: 1px 6px;
+    line-height: 1.6;
+    user-select: none;
+}
+
+.subtask-edit-unsaved-badge svg {
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .subtask-edit-item-meta {
@@ -292,8 +442,9 @@
 .subtask-edit-inline-form {
     width: 100%;
     display: grid;
-    grid-template-columns: 3fr 180px 120px auto;
-    gap: 80px;
+    grid-template-columns: 1fr 120px 220px auto;
+    column-gap: 60px;
+    row-gap: 12px;
     align-items: start;
 }
 
@@ -312,7 +463,8 @@
     color: var(--text-tertiary);
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
 }
 
 .subtask-edit-input-group input {
@@ -333,6 +485,33 @@
 }
 
 .subtask-edit-input-group input.error {
+    border-color: var(--error-color);
+    background: #fef2f2;
+}
+
+.subtask-edit-date-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    padding: var(--padding-input);
+    font-size: var(--font-size-body);
+    color: var(--text-main);
+    background: var(--bg-base);
+    font-family: var(--font-family);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.subtask-edit-date-btn:hover {
+    border-color: var(--primary-color);
+    background: var(--surface);
+}
+
+.subtask-edit-date-btn.error {
     border-color: var(--error-color);
     background: #fef2f2;
 }
@@ -394,6 +573,37 @@
     stroke-linejoin: round;
 }
 
+.subtask-edit-round-btn.conflict {
+    width: auto;
+    padding: 0 10px;
+    background: var(--warning-color);
+    border-color: var(--warning-color);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.subtask-edit-round-btn.conflict:hover {
+    background: #d97706;
+    border-color: #d97706;
+    transform: scale(1.02);
+}
+
+.subtask-edit-conflict-warning {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: var(--font-size-small);
+    font-weight: 600;
+}
+
 .subtask-edit-add-row {
     margin-top: 12px;
     width: 100%;
@@ -410,6 +620,7 @@
 .subtask-edit-footer {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 12px;
     border-top: 1px solid var(--border-color);
     padding: 16px 26px;
@@ -442,6 +653,7 @@
 .subtask-edit-save {
     background: var(--primary-color);
     color: var(--surface);
+    transition: background 0.25s ease, opacity 0.25s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .subtask-edit-save:not(:disabled):hover {
@@ -451,8 +663,44 @@
 }
 
 .subtask-edit-save:disabled {
-    opacity: 0.6;
+    background: none;
+    color: var(--text-tertiary);
+    opacity: 1;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.subtask-edit-add-actions {
+    display: flex;
+    justify-content: center;
+    padding: 0 26px 14px;
+}
+
+.subtask-edit-add-footer {
+    width: 100%;
+    max-width: 980px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px dashed var(--border-color);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: var(--font-size-body);
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.subtask-edit-add-footer:hover {
+    background: #ecfdf5;
+    border-color: #34d399;
+    color: #059669;
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 8px 18px rgba(16, 185, 129, 0.18);
 }
 
 .subtask-edit-modal-overlay {

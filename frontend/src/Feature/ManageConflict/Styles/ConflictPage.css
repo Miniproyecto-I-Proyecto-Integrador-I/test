@@ -1,0 +1,639 @@
+@import '../../../shared/Styles/Variables.css';
+
+/* ============================================================
+   PAGE LAYOUT
+   ============================================================ */
+
+.conflict-page {
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 40px) clamp(8px, 1.5vw, 16px) clamp(32px, 5vw, 64px);
+  font-family: var(--font-family);
+  color: var(--text-main);
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.conflict-header {
+  margin-bottom: 32px;
+}
+
+.conflict-header__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-small);
+  color: var(--error-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.conflict-header__back--resolved {
+  color: var(--primary-hover);
+}
+
+.conflict-header__title {
+  font-size: var(--font-size-h1);
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.conflict-header__subtitle {
+  font-size: var(--font-size-body);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ============================================================
+   PROGRESS BAR (hours indicator)
+   ============================================================ */
+
+.conflict-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+}
+
+.conflict-progress__bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-base);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.conflict-progress__bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.conflict-progress__bar--ok {
+  background: var(--primary-color);
+}
+
+.conflict-progress__bar--error {
+  background: var(--error-color);
+}
+
+.conflict-progress__label {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.conflict-progress__label--ok {
+  color: var(--primary-color);
+}
+
+.conflict-progress__label--error {
+  color: var(--error-color);
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+
+.conflict-section {
+  margin-bottom: 28px;
+}
+
+.conflict-section__title {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+  margin: 0 0 14px;
+}
+
+/* ============================================================
+   TASK ROW
+   ============================================================ */
+
+.conflict-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  transition: box-shadow 0.18s ease;
+}
+
+.conflict-task:last-child {
+  margin-bottom: 0;
+}
+
+.conflict-task:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* Highlighted card — new task causing the conflict */
+.conflict-task--new {
+  border-color: var(--error-color);
+}
+
+/* New task card when conflict is resolved */
+.conflict-task--new-resolved {
+  border-color: var(--border-color);
+  background: var(--surface);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+/* A task that is still in conflict on the selected day */
+.conflict-task--overflow {
+  border-color: var(--warning-color);
+}
+
+.conflict-task__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.conflict-task__tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--error-color);
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.conflict-task__tag--resolved {
+  color: var(--primary-hover);
+}
+
+.conflict-task__title {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conflict-task__parent {
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.conflict-task__warning {
+  font-size: var(--font-size-small);
+  color: var(--error-color);
+  margin-top: 4px;
+}
+
+.conflict-task__controls {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SELECT (hours & date)
+   ============================================================ */
+
+.conflict-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  background: var(--bg-base);
+  font-size: var(--font-size-small);
+  font-family: var(--font-family);
+  color: var(--text-main);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.conflict-select:hover,
+.conflict-select:focus {
+  border-color: var(--primary-color);
+}
+
+/* ============================================================
+   HOURS INPUT (numeric, replaces select)
+   ============================================================ */
+
+.conflict-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.conflict-input-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.conflict-input-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.conflict-hour-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--primary-color);
+  transition: all 0.2s;
+}
+
+.conflict-hour-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: var(--primary-color);
+}
+
+.conflict-hour-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--text-tertiary);
+}
+
+.conflict-input {
+  width: 44px;
+  height: 28px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-base);
+  font-size: var(--font-size-small);
+  font-family: var(--font-family);
+  color: var(--text-main);
+  outline: none;
+  /* hide browser spinner arrows */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.conflict-input::-webkit-outer-spin-button,
+.conflict-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.conflict-input:focus {
+  border-color: var(--primary-color);
+}
+
+.conflict-input--error {
+  border-color: var(--error-color);
+  background: #FFF5F5;
+}
+
+.conflict-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.conflict-input-field__suffix {
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+}
+
+
+
+.conflict-input:disabled {
+  cursor: not-allowed;
+}
+
+.conflict-input-error {
+  font-size: 11px;
+  color: var(--error-color);
+  margin: 0;
+  white-space: nowrap;
+  max-width: 180px;
+  text-align: right;
+}
+
+.conflict-input-error--placeholder {
+  visibility: hidden;
+}
+
+/* ============================================================
+   AUTO-RESOLVE BUTTON
+   ============================================================ */
+
+.conflict-autoresolve {
+  margin-top: 32px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 1px solid var(--warning-color);
+  border-radius: var(--border-radius-base);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.conflict-autoresolve__icon {
+  flex-shrink: 0;
+  color: var(--warning-color);
+  margin-top: 2px;
+}
+
+.conflict-autoresolve__body {
+  flex: 1;
+}
+
+.conflict-autoresolve__label {
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  color: var(--warning-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 4px;
+}
+
+.conflict-autoresolve__desc {
+  font-size: var(--font-size-body);
+  color: var(--text-main);
+  margin: 0 0 12px;
+}
+
+.conflict-autoresolve__btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--warning-color);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: var(--font-family);
+}
+
+.conflict-autoresolve__btn:hover {
+  color: #D97706;
+}
+
+/* ============================================================
+   FOOTER ACTIONS
+   ============================================================ */
+
+.conflict-footer {
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.conflict-btn-cancel {
+  padding: 10px 22px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--border-radius-base);
+  background: var(--surface);
+  font-size: var(--font-size-body);
+  font-family: var(--font-family);
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.conflict-btn-cancel:hover {
+  background: var(--btn-sec-hover);
+}
+
+.conflict-btn-save {
+  padding: 10px 22px;
+  border: none;
+  border-radius: var(--border-radius-base);
+  background: var(--primary-color);
+  font-size: var(--font-size-body);
+  font-family: var(--font-family);
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.conflict-btn-save:hover {
+  background: var(--primary-hover);
+}
+
+.conflict-btn-save:disabled {
+  background: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   RESOLVED BANNER
+   ============================================================ */
+
+.conflict-resolved-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--primary-light);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-base);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--primary-hover);
+  margin-bottom: 24px;
+}
+
+/* ============================================================
+   CASE SWITCHER (dev only — visible for demo)
+   ============================================================ */
+
+.conflict-case-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.conflict-case-tab {
+  padding: 7px 16px;
+  border-radius: 99px;
+  border: 1px solid var(--border-color);
+  background: var(--surface);
+  font-size: var(--font-size-small);
+  font-family: var(--font-family);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.conflict-case-tab--active {
+  background: var(--text-main);
+  border-color: var(--text-main);
+  color: #fff;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* ---- Large screens (≥1400px): nothing extra needed – max-width already caps it ---- */
+
+/* ---- Medium screens (≤1100px): tighten header typography a bit ---- */
+@media (max-width: 1100px) {
+  .conflict-header__title {
+    font-size: clamp(20px, 2.4vw, 28px);
+  }
+}
+
+/* ---- Tablet (≤900px): compact progress bar, allow task controls to stay inline ---- */
+@media (max-width: 900px) {
+  .conflict-progress {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 14px;
+    margin-bottom: 24px;
+  }
+
+  .conflict-progress__bar-wrap {
+    width: 100%;
+    flex-basis: 100%;
+    order: 1;
+  }
+
+  .conflict-progress__label {
+    order: 0;
+  }
+
+  .conflict-section {
+    margin-bottom: 20px;
+  }
+
+  .conflict-header {
+    margin-bottom: 24px;
+  }
+}
+
+/* ---- Small tablet / large mobile (≤720px): task row wraps ---- */
+@media (max-width: 720px) {
+  .conflict-task {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .conflict-task__info {
+    width: 100%;
+  }
+
+  .conflict-task__controls {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  .conflict-task__title {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .conflict-autoresolve {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  .conflict-footer {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .conflict-btn-cancel,
+  .conflict-btn-save {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* ---- Mobile (≤480px): reduce all spacing, stack footer vertically ---- */
+@media (max-width: 480px) {
+  .conflict-header__title {
+    font-size: var(--font-size-h2);
+  }
+
+  .conflict-header__subtitle {
+    font-size: var(--font-size-small);
+  }
+
+  .conflict-section__title {
+    font-size: 11px;
+  }
+
+  .conflict-progress {
+    padding: 10px 12px;
+  }
+
+  .conflict-task {
+    padding: 10px 12px;
+  }
+
+  .conflict-input {
+    width: 38px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .conflict-hour-btn {
+    width: 24px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .conflict-footer {
+    flex-direction: column;
+    margin-top: 24px;
+  }
+
+  .conflict-btn-cancel,
+  .conflict-btn-save {
+    width: 100%;
+    text-align: center;
+  }
+}

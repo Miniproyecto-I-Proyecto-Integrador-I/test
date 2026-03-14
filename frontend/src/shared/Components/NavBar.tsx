@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import './NavBar.css';
 import Logo from '../../assets/Logo StaskM.png';
 import { User } from 'lucide-react';
 import { useAuth } from '../../Context/AuthContext';
+import {Settings} from 'lucide-react';
 
 const NavBar = () => {
   const { isAuthenticated, logout } = useAuth();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -105,6 +107,17 @@ const NavBar = () => {
 
           {isAuthenticated && isProfileMenuOpen && (
             <div className="profile-popover" onClick={(e) => e.stopPropagation()}>
+               <button
+                type="button"
+                className="popover-btn setting-btn"
+                onClick={() => {
+                  setIsProfileMenuOpen(false);
+                  navigate('/usersetting');
+                }}
+              >
+                <Settings size={15}/>
+                Ajustes
+              </button>
               <button
                 type="button"
                 className="popover-btn logout-btn"
@@ -115,6 +128,7 @@ const NavBar = () => {
               >
                 Cerrar sesión
               </button>
+             
             </div>
           )}
         </div>

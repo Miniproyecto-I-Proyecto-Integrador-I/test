@@ -1,0 +1,196 @@
+.user-setting-container {
+    max-width: 100%;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: var(--font-family);
+    color: var(--text-main);
+}
+
+.user-setting-title {
+    font-size: var(--font-size-h1);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1e293b;
+}
+
+.user-setting-description {
+    font-size: var(--font-size-h3);
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+}
+
+/* Card Styling */
+.user-setting-card {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.user-setting-section {
+    margin-bottom: 24px;
+}
+
+.user-setting-section-title {
+    font-size: var(--font-size-h3);
+    font-weight: 600;
+    margin-bottom: 0; /* Changed to 0 as it's now in a row */
+    color: #334155;
+}
+
+.user-setting-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.user-setting-section-tooltip {
+    margin-bottom: 0;
+    margin-top: 20px;
+}
+
+.user-setting-section-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+/* Input with Icon Container */
+.input-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-tertiary);
+    pointer-events: none;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-base);
+    background-color: #f8fafc;
+    color: var(--text-secondary);
+    font-size: var(--font-size-body);
+    transition: all 0.2s;
+}
+
+.input-container input:disabled {
+    cursor: not-allowed;
+}
+
+/* Badge for Read-only */
+.read-only-badge {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: var(--font-size-small);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Info help text below sections */
+.info-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--font-size-small);
+    color: #64748b;
+    margin: 0;
+}
+
+.info-text svg {
+    color: #94a3b8;
+}
+
+/* Horizontal Divider */
+.user-setting-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+    margin: 24px -32px;
+}
+
+/* Hour control specific */
+.hour-button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--primary-color);
+    transition: all 0.2s;
+}
+
+.hour-button:hover {
+    background: #f8fafc;
+    border-color: var(--primary-color);
+}
+
+.hour-input {
+    width: 70px;
+    height: 36px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* Remove arrows from number input */
+.hour-input::-webkit-outer-spin-button,
+.hour-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+.hour-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.user-setting-section-content-text {
+    font-size: var(--font-size-body);
+    color: var(--text-secondary);
+    margin: 0;
+    margin-left: 12px;
+}
+
+/* Footer and Save Button */
+.user-setting-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.save-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.save-button:hover {
+    background: var(--primary-hover);
+}
+
