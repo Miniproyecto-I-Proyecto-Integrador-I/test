@@ -237,9 +237,9 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       const newHours = Number(editData.needed_hours) || 0;
       const total = parseFloat((backendHours + newHours).toFixed(2));
       if (total > dailyHours) {
-        dismiss(loadId);
         setConflictWarning(true);
         const id = toastShow({
+          id: loadId,
           title: 'Límite excedido',
           subtitle: 'Has superado las horas disponibles para este día.',
           variant: 'warning',
@@ -491,8 +491,8 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   return (
     <div className="subtask-edit-wrapper">
       <BackButton
-        onClick={isEditingTask ? handleCancelTaskEdit : onClose}
-        label={isEditingTask ? 'Volver sin editar' : 'Volver a inicio'}
+        onClick={isEditingTask ? handleCancelTaskEdit : conflictData ? () => setConflictData(null) : onClose}
+        label={isEditingTask ? 'Volver sin editar' : conflictData ? 'Descartar cambios' : 'Volver a inicio'}
       />
 
       <div className="subtask-edit-container">
@@ -542,18 +542,26 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                   onOpenDatePicker={() => setIsDatePickerOpen(true)}
                   onCancelEditing={handleCancelEditing}
                   onSaveSubtask={checkAndSaveSubtask}
-                  onResolveConflict={() =>
+                  onResolveConflict={() => {
+                    if (conflictToastId) {
+                      dismiss(conflictToastId);
+                      setConflictToastId(null);
+                    }
                     setConflictData({
                       isNew: false,
                       taskData: {
                         ...editData,
                         id: editingId as string | number,
                       } as EditableSubtask,
-                    })
-                  }
-                  onResolveConflictNew={(data) =>
-                    setConflictData({ isNew: true, taskData: data })
-                  }
+                    });
+                  }}
+                  onResolveConflictNew={(data) => {
+                    if (conflictToastId) {
+                      dismiss(conflictToastId);
+                      setConflictToastId(null);
+                    }
+                    setConflictData({ isNew: true, taskData: data });
+                  }}
                   onHoursChange={(value) => {
                     if (value <= 0 || isNaN(value)) {
                       setHourLimitError(
