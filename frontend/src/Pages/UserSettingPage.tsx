@@ -15,10 +15,11 @@ interface UserSetting {
   email: string;
   dailyLimit: number;
 }
+const TOAST_TRANSITION_GAP_MS = 850;
 
 const UserSettingPage: React.FC = () => {
   const { user, updateDailyLimit } = useAuth();
-  const { toasts, success, error, dismiss } = useToast();
+  const { toasts, success, error, loading: toastLoading, dismiss } = useToast();
   const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
   const [isRetryingFromModal, setIsRetryingFromModal] = useState(false);
   const [conflictDays, setConflictDays] = useState<PendingConflictDay[]>([]);
@@ -91,28 +92,57 @@ const UserSettingPage: React.FC = () => {
     }
   };
 
-  const handleDayResolved = async (fecha: string, resolvedTasks: ConflictTask[]) => {
+  const handleDayResolved = async (
+    fecha: string,
+    resolvedTasks: ConflictTask[],
+  ) => {
+    const loadId = toastLoading(
+      'Guardando resolución…',
+      'Aplicando cambios en el backend',
+    );
+
     const dayData = conflictDays.find((d) => d.fecha === fecha);
     const originals = new Map(
-      (dayData?.subtasks ?? []).map((st) => [String(st.id), Number(st.horas)])
+      (dayData?.subtasks ?? []).map((st) => [String(st.id), Number(st.horas)]),
     );
 
-    await Promise.all(
-      resolvedTasks.map((task) => {
-        const origHours = originals.get(task.id);
-        const changedHours = origHours !== undefined && task.hours !== origHours;
-        const changedDate = task.date !== fecha;
-        if (changedHours || changedDate) {
-          return apiClient.patch(`/api/subtasks/${task.id}/`, {
-            needed_hours: task.hours,
-            planification_date: task.date,
-          });
-        }
-        return Promise.resolve();
-      }),
-    );
+    try {
+      await Promise.all(
+        resolvedTasks.map((task) => {
+          const origHours = originals.get(task.id);
+          const changedHours =
+            origHours !== undefined && task.hours !== origHours;
+          const changedDate = task.date !== fecha;
+          if (changedHours || changedDate) {
+            return apiClient.patch(`/api/subtasks/${task.id}/`, {
+              needed_hours: task.hours,
+              planification_date: task.date,
+            });
+          }
+          return Promise.resolve();
+        }),
+      );
 
-    setConflictDays((prev) => prev.filter((d) => d.fecha !== fecha));
+      setConflictDays((prev) => prev.filter((d) => d.fecha !== fecha));
+      dismiss(loadId);
+      await new Promise((resolve) =>
+        setTimeout(resolve, TOAST_TRANSITION_GAP_MS),
+      );
+      success(
+        '¡Conflicto resuelto!',
+        'Los cambios del día se guardaron correctamente.',
+      );
+    } catch (err) {
+      dismiss(loadId);
+      await new Promise((resolve) =>
+        setTimeout(resolve, TOAST_TRANSITION_GAP_MS),
+      );
+      error(
+        'Error al guardar conflicto',
+        'Ocurrió un error inesperado al guardar los cambios del día.',
+      );
+      throw err;
+    }
   };
 
   const handleAbortPendingResolution = () => {
@@ -120,7 +150,8 @@ const UserSettingPage: React.FC = () => {
     setIsPendingModalOpen(false);
     setConflictDays([]);
     success(
-      'Resolucion abortada', 'No se aplicaron los cambios a tu limite diario'
+      'Resolucion abortada',
+      'No se aplicaron los cambios a tu limite diario',
     );
   };
 

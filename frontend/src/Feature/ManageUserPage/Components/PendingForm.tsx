@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { AlertTriangle, ArrowLeft, Calendar, Clock3 } from 'lucide-react';
 import type { PendingConflictDay } from '../Types/pending.types';
-import type { ConflictScenario, ConflictTask } from '../../ManageConflict/Types/conflict';
+import type {
+  ConflictScenario,
+  ConflictTask,
+} from '../../ManageConflict/Types/conflict';
 import { ConflictView } from '../../../Pages/ConflictPage';
 import '../Styles/PendingForm.css';
 import '../../ManageConflict/Styles/ConflictPage.css';
@@ -50,9 +53,12 @@ const buildScenario = (
   existingTasks: day.subtasks.map((st) => ({
     id: String(st.id),
     title: st.nombre,
-    parentTask: 'Sin tarea',
+    parentTask: st.task_title || 'Sin tarea',
     hours: Number(st.horas),
     date: day.fecha,
+    parentDueDate: st.task_due_date
+      ? String(st.task_due_date).split('T')[0]
+      : undefined,
   })),
 });
 
@@ -76,6 +82,8 @@ const PendingForm: React.FC<PendingFormProps> = ({
     try {
       await onDayResolved(activeDay.fecha, tasks);
       setActiveDay(null);
+    } catch (err) {
+      console.error('Error guardando resolución de conflicto:', err);
     } finally {
       setIsSavingDay(false);
     }

@@ -28,6 +28,8 @@ interface DatePickerModalProps {
   originalDate?: string;
   /** If true, blocks the selection of a date if it causes a time overload conflict. */
   blockConflict?: boolean;
+  /** Optional override for daily max hours (e.g., conflict resolution with a new limit). */
+  maxDailyHours?: number;
 }
 
 const DatePickerModal = ({
@@ -41,6 +43,7 @@ const DatePickerModal = ({
   excludeIds,
   originalDate,
   blockConflict = false,
+  maxDailyHours,
 }: DatePickerModalProps) => {
   const today = new Date();
   const todayISO = toISODate(today);
@@ -55,7 +58,7 @@ const DatePickerModal = ({
     excludeIds,
   );
   const { user } = useAuth();
-  const dailyHours = user?.daily_hours ?? 8;
+  const dailyHours = maxDailyHours ?? user?.daily_hours ?? 8;
 
   const SKELETON_FADE_MS = 350;
   const [showSkeleton, setShowSkeleton] = useState(false);
