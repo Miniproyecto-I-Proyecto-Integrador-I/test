@@ -45,7 +45,7 @@ export const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingM
       {isNewTaskCase && newTask && (
         <div className="conflict-section">
           <p className="conflict-section__title">
-            {isEditingMode ? 'Tarea en Edición' : 'Nueva sub-Tarea'}
+            {isEditingMode ? 'Actividad en Edición' : 'Nueva sub-Tarea'}
           </p>
           <ConflictTaskRow
             task={newTask}
@@ -65,7 +65,7 @@ export const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingM
       {/* ---- Existing tasks section ---- */}
       <div className="conflict-section">
         <p className="conflict-section__title">
-          {isNewTaskCase ? 'Sub-Tareas Existentes' : 'sub-Tareas del día'}
+          {isNewTaskCase ? 'Actividades Existentes' : 'sub-Tareas del día'}
         </p>
         {existingTasks.map((task) => (
           <ConflictTaskRow
@@ -86,9 +86,10 @@ export const ConflictView: React.FC<ConflictViewProps> = ({ scenario, isEditingM
       {/* ---- Auto resolve ---- */}
       {!resolved && (
         <AutoResolveCard
-          onAutoResolve={() => {
-            /* feature not yet implemented */
-          }}
+          overflowHours={totalOnDay - maxHours}
+          newTaskHours={newTask ? newTask.hours : undefined}
+          totalTasksCount={tasksOnConflictDay.length}
+          maxHours={maxHours}
         />
       )}
 

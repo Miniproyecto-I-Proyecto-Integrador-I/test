@@ -34,7 +34,7 @@ const ConflictHeader: React.FC<ConflictHeaderProps> = ({
         <AlertTriangle size={13} />
         {resolved ? 'Conflicto resuelto' : 'Conflicto detectado'}
       </div>
-      <h1 className="conflict-header__title">Resolver conflicto de tareas</h1>
+      <h1 className="conflict-header__title">Resolver conflictos de Actividades</h1>
       <p className="conflict-header__subtitle">
         <strong style={{ fontWeight: 600 }}>
           {formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)}
