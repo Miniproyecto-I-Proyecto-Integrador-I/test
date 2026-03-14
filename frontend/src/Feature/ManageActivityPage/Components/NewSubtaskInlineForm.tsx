@@ -170,9 +170,9 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
             <label>Tiempo a invertir</label>
             <input
               type="number"
-              min="0.1"
+              min="1"
               max={maxHours}
-              step="0.1"
+              step="1"
               value={formData.needed_hours || ''}
               onChange={(e) => handleHoursChange(parseFloat(e.target.value) || 0)}
               className={activeErrors.needed_hours ? 'error' : ''}

@@ -134,6 +134,7 @@ const ConflictPage: React.FC<ConflictPageProps> = ({ activityTasks, editingTask,
   // Todo: Use real data when fully implemented natively
   console.log('--- CONFLICT PAGE MOUNT ---');
   console.log('editingTask (La "Nueva" o "En Edición" recibida):', editingTask);
+  console.log('activityTasks (Lista del board base):', activityTasks);
 
   useEffect(() => {
     if (!editingTask || !editingTask.planification_date) {
