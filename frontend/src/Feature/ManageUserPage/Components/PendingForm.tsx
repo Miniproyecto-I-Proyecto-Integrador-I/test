@@ -5,6 +5,7 @@ import '../Styles/PendingForm.css';
 interface PendingFormProps {
   isOpen: boolean;
   conflictDays: PendingConflictDay[];
+  newDailyLimit: number;
   onAbort: () => void;
   onSolve: () => void;
   isSolving?: boolean;
@@ -41,6 +42,7 @@ const getDaySummary = (day: PendingConflictDay) => {
 const PendingForm: React.FC<PendingFormProps> = ({
   isOpen,
   conflictDays,
+  newDailyLimit,
   onAbort,
   onSolve,
   isSolving = false,
@@ -63,8 +65,9 @@ const PendingForm: React.FC<PendingFormProps> = ({
           <div className="pending-card-content">
             <h2 className="pending-title">¡Conflictos de Agenda!</h2>
             <p className="pending-subtitle">
-              Hemos detectado inconsistencias en tu calendario semanal que
-              requieren tu atencion.
+              Para cambiar el límite de horas máximas a {newDailyLimit}h,
+              primero debes resolver los conflictos detectados en los días
+              listados a continuación.
             </p>
 
             <div className="pending-list">

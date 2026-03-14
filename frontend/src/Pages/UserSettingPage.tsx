@@ -183,6 +183,7 @@ const UserSettingPage: React.FC = () => {
       <PendingForm
         isOpen={isPendingModalOpen}
         conflictDays={conflictDays}
+        newDailyLimit={userSetting.dailyLimit}
         onAbort={handleAbortPendingResolution}
         onSolve={() => handleSave(true)}
         isSolving={isRetryingFromModal}
