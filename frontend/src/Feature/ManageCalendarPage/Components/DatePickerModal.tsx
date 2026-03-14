@@ -296,13 +296,17 @@ const DatePickerModal = ({
                     </p>
                   )}
                   <button
-                    className={`dpm__confirm-btn${isSameAsOriginal ? ' dpm__confirm-btn--disabled' : (isOver && blockConflict) ? ' dpm__confirm-btn--conflict' : ''}`}
-                    onClick={isSameAsOriginal || (isOver && blockConflict) ? undefined : handleConfirm}
+                    className={`dpm__confirm-btn${isSameAsOriginal ? ' dpm__confirm-btn--disabled' : isOver ? ' dpm__confirm-btn--conflict' : ''}`}
+                    onClick={
+                      isSameAsOriginal || (isOver && blockConflict)
+                        ? undefined
+                        : handleConfirm
+                    }
                     disabled={isSameAsOriginal || (isOver && blockConflict)}
                   >
                     {isSameAsOriginal
                       ? 'Ya está en este día'
-                      : (isOver && blockConflict)
+                      : isOver && blockConflict
                         ? 'Sobrecarga de horas'
                         : originalDate
                           ? 'Modificar aquí'
