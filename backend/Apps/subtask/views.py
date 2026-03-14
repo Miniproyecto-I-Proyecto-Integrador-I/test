@@ -29,10 +29,17 @@ class SubtaskFilter(filters.FilterSet):
         """Excluye los ids provistos en una lista CSV."""
         if not value:
             return queryset
-        try:
-            ids = [int(s) for s in value.split(',') if s.strip()]
-        except ValueError:
-            return queryset
+
+        ids = []
+        for token in value.split(','):
+            token = token.strip()
+            if not token:
+                continue
+            try:
+                ids.append(int(token))
+            except ValueError:
+                continue
+
         if ids:
             return queryset.exclude(id__in=ids)
         return queryset

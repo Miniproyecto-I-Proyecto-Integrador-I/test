@@ -3,11 +3,13 @@ import { Calendar } from 'lucide-react';
 import type { ConflictTask } from '../Types/conflict';
 import { formatDate, totalHours } from '../Utils/conflictUtils';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
+import type { SubtaskItem } from '../../ManageCreatePage/Types/subtask.types';
 
 interface ConflictTaskRowProps {
   task: ConflictTask;
   conflictDate: string;
   allTasksOnDay: ConflictTask[];
+  allLocalTasks: ConflictTask[];
   maxHoursPerDay: number;
   editableHours: boolean;
   editableDate: boolean;
@@ -21,6 +23,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
   task,
   conflictDate,
   allTasksOnDay,
+  allLocalTasks,
   maxHoursPerDay,
   editableHours,
   editableDate,
@@ -125,6 +128,25 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
     .filter(Boolean)
     .join(' ');
 
+  const pendingSubtasks: Array<SubtaskItem & { taskTitle?: string }> =
+    allLocalTasks
+      .filter((localTask) => localTask.id !== task.id)
+      .map((localTask) => ({
+        id: String(localTask.id),
+        description: localTask.title,
+        planification_date: localTask.date,
+        needed_hours: Number(localTask.hours) || 0,
+        taskTitle: localTask.parentTask,
+      }));
+
+  const excludeIds = allLocalTasks
+    .map((localTask) =>
+      typeof localTask.id === 'number' || /^\d+$/.test(String(localTask.id))
+        ? String(localTask.id)
+        : null,
+    )
+    .filter((id): id is string => id !== null);
+
   return (
     <div className={rowClass}>
       <div className="conflict-task__info">
@@ -205,8 +227,10 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
           setIsDatePickerOpen(false);
         }}
         newSubtaskDescription={task.title}
+        newSubtaskTaskTitle={task.parentTask}
         newSubtaskHours={task.hours}
-        excludeIds={!task.isNew ? [task.id] : []}
+        pendingSubtasks={pendingSubtasks}
+        excludeIds={excludeIds}
         originalDate={task.date}
         maxDate={maxDate}
         blockConflict={true}

@@ -547,6 +547,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                   subtasks={subtasks}
                   editingId={editingId}
                   editData={editData}
+                  taskTitle={taskEditData.title}
                   errors={{
                     ...errors,
                     description: descriptionError || errors.description,
@@ -621,6 +622,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
           setIsDatePickerOpen(false);
         }}
         newSubtaskDescription={editData.description}
+        newSubtaskTaskTitle={taskEditData.title}
         newSubtaskHours={editData.needed_hours}
         maxDate={taskEditData.due_date || undefined}
         confirmLabel="Modificar aquí"
