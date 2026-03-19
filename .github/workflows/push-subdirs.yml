@@ -1,7 +1,7 @@
 name: Push subdirs to frontend/backend repos
 on:
   push:
-    branches: ["develop"]
+    branches: ["main"]
 
 permissions:
   contents: write
