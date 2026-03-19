@@ -57,28 +57,27 @@ export function useToast() {
     }, remaining);
   }, []);
 
-  /** Convenience helpers */
   const success = useCallback(
-    (title: string, subtitle?: string, duration?: number) =>
-      show({ title, subtitle, variant: 'success', duration: duration ?? 4000, showProgress: true, loading: false }),
+    (title: string, subtitle?: string, duration?: number, id?: number) =>
+      show({ title, subtitle, variant: 'success', duration: duration ?? 4000, showProgress: true, loading: false, id }),
     [show],
   );
 
   const error = useCallback(
-    (title: string, subtitle?: string, duration?: number) =>
-      show({ title, subtitle, variant: 'error', duration: duration ?? 5000, showProgress: true, loading: false }),
+    (title: string, subtitle?: string, duration?: number, id?: number) =>
+      show({ title, subtitle, variant: 'error', duration: duration ?? 5000, showProgress: true, loading: false, id }),
     [show],
   );
 
   const loading = useCallback(
-    (title: string, subtitle?: string): number =>
-      show({ title, subtitle, variant: 'loading', duration: 0, showProgress: false, loading: true }),
+    (title: string, subtitle?: string, id?: number): number =>
+      show({ title, subtitle, variant: 'loading', duration: 0, showProgress: false, loading: true, id }),
     [show],
   );
 
   const warning = useCallback(
-    (title: string, subtitle?: string, duration?: number) =>
-      show({ title, subtitle, variant: 'warning', duration: duration ?? 4500, showProgress: true, loading: false }),
+    (title: string, subtitle?: string, duration?: number, id?: number) =>
+      show({ title, subtitle, variant: 'warning', duration: duration ?? 4500, showProgress: true, loading: false, id }),
     [show],
   );
 

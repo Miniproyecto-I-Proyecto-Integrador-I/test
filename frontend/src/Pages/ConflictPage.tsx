@@ -10,6 +10,7 @@ import ConflictTaskRow from '../Feature/ManageConflict/Components/ConflictTaskRo
 import AutoResolveCard from '../Feature/ManageConflict/Components/AutoResolveCard';
 import { useAuth } from '../Context/AuthContext';
 import apiClient from '../Services/ApiClient';
+import LoadingScreen from '../shared/Components/LoadingScreen';
 import '../Feature/ManageConflict/Styles/ConflictPage.css';
 
 // ---------------------------------------------------------------------------
@@ -235,7 +236,7 @@ const ConflictPage: React.FC<ConflictPageProps> = ({
           minHeight: '300px',
         }}
       >
-        <p>Cargando detalles de conflicto...</p>
+        <LoadingScreen message="" />
       </div>
     );
   }

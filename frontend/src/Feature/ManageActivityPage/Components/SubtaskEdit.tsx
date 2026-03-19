@@ -20,8 +20,6 @@ import { useToast } from '../../../shared/Hooks/useToast';
 import ToastHost from '../../../shared/Components/ToastHost';
 import type { ConflictTask } from '../../ManageConflict/Types/conflict';
 
-const TOAST_TRANSITION_GAP_MS = 850;
-
 interface SubtaskEditProps {
   taskId: number;
   initialSubtasks: EditableSubtask[];
@@ -99,13 +97,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     priority: task?.priority || 'medium',
     due_date: (task?.due_date || taskDueDate || '').split('T')[0],
   });
-
-  const dismissAndWait = async (toastId: number) => {
-    dismiss(toastId);
-    await new Promise((resolve) =>
-      setTimeout(resolve, TOAST_TRANSITION_GAP_MS),
-    );
-  };
 
   const {
     subtasks,
@@ -264,8 +255,6 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         setConflictToastId(null);
       }
       setConflictWarning(false);
-      // Guardar en estado local
-      saveEditedSubtask();
       // Persistir en BD si hay callback
       if (onSaveIndividualSubtask && editingId !== null) {
         const updatedSubtask = subtasks.find((st) => st.id === editingId);
@@ -278,15 +267,17 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
           });
         }
       }
-      await dismissAndWait(loadId);
+
+      saveEditedSubtask();
+
       toastSuccess(
         '¡Cambios guardados!',
         'La actividad se ha actualizado correctamente.',
+        undefined,
+        loadId
       );
     } catch {
-      await dismissAndWait(loadId);
-      toastError('Error al guardar', 'No se pudo actualizar la actividad.');
-      saveEditedSubtask();
+      toastError('Error al guardar', 'No se pudo actualizar la actividad.', undefined, loadId);
     } finally {
       setIsCheckingConflict(false);
     }
@@ -350,16 +341,16 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     );
     try {
       await originalConfirmDelete();
-      await dismissAndWait(loadId);
       toastSuccess(
         isMainTask ? '¡Tarea eliminada!' : '¡Actividad eliminada!',
         isMainTask
           ? 'La tarea se ha borrado correctamente.'
           : 'El paso se ha eliminado de la lista.',
+        undefined,
+        loadId
       );
     } catch (error) {
-      await dismissAndWait(loadId);
-      toastError('Error al eliminar', 'No se pudo completar la operación.');
+      toastError('Error al eliminar', 'No se pudo completar la operación.', undefined, loadId);
     }
   };
 
@@ -374,15 +365,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       }
       await onSaveTask({ ...taskEditData, due_date: formattedDate });
       setIsEditingTask(false);
-      await dismissAndWait(loadId);
       toastSuccess(
         '¡Tarea guardada!',
         'Los cambios se han aplicado correctamente.',
+        undefined,
+        loadId
       );
     } catch (error) {
       console.error('Error al guardar cambios de la tarea:', error);
-      await dismissAndWait(loadId);
-      toastError('Error al guardar', 'No se pudo actualizar la tarea.');
+      toastError('Error al guardar', 'No se pudo actualizar la tarea.', undefined, loadId);
     } finally {
       setIsSavingTask(false);
     }
@@ -475,10 +466,11 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
       setSubtasks(nextSubtasks);
 
-      await dismissAndWait(loadId);
       toastSuccess(
         '¡Conflicto Resuelto!',
         'Los horarios se ajustaron correctamente.',
+        undefined,
+        loadId
       );
 
       // Cleanup UI
@@ -492,8 +484,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       cancelEditing();
     } catch (err) {
       console.error(err);
-      await dismissAndWait(loadId);
-      toastError('Error', 'No se pudieron aplicar todos los cambios resueltos');
+      toastError('Error', 'No se pudieron aplicar todos los cambios resueltos', undefined, loadId);
     }
   };
 

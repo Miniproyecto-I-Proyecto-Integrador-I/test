@@ -52,24 +52,20 @@ class UserViewSet(viewsets.ModelViewSet):
                 
                 if new_daily_hours < old_daily_hours:
                     today = timezone.localdate()
-                    # Buscar subtareas pendientes o en progreso del usuario
                     subtasks_queryset = Subtask.objects.filter(
                         task__user=request.user,
                         planification_date__gte=today,
                         status__in=[Subtask.Status.PENDING, Subtask.Status.IN_PROGRESS]
                     )
                     
-                    # Agrupar por fecha y sumar horas
                     conflicts_dates = subtasks_queryset.values('planification_date').annotate(
                         total_day_hours=Sum('needed_hours')
                     ).filter(total_day_hours__gt=new_daily_hours)
                     
                     if conflicts_dates.exists():
-                        # Obtener las subtareas específicas de esos días con conflicto
                         dates = [c['planification_date'] for c in conflicts_dates]
                         conflicting_subtasks = subtasks_queryset.select_related('task').filter(planification_date__in=dates).order_by('planification_date')
                         
-                        # Agrupar por fecha
                         grouped_conflicts = {}
                         for s in conflicting_subtasks:
                             date_key = s.planification_date.isoformat()

@@ -78,15 +78,15 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
     );
     try {
       await onCreateSubtask(data);
-      dismiss(loadId);
       toastSuccess(
         '¡Actividad creada!',
         'El nuevo paso se ha agregado correctamente.',
+        undefined,
+        loadId
       );
       setIsAddingNew(false);
     } catch {
-      dismiss(loadId);
-      toastError('Error al crear', 'No se pudo guardar la nueva actividad.');
+      toastError('Error al crear', 'No se pudo guardar la nueva actividad.', undefined, loadId);
     }
   };
 
