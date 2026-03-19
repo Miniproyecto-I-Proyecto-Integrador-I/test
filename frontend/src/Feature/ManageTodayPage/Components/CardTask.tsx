@@ -3,6 +3,8 @@ import { Clock, Calendar } from 'lucide-react';
 import type { Subtask } from '../Types/models';
 import { buildBadgeLabel, type CardVariant } from '../Utils/BadgeLabels';
 import '../Styles/CardTasks.css';
+import apiClient from '../../../Services/ApiClient';
+
 
 interface CardTaskProps {
   sub: Subtask;
@@ -33,10 +35,21 @@ const CardTask: React.FC<CardTaskProps> = ({
       : formattedDate;
   }
 
-  const handleCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCheckChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    setChecked(e.target.checked);
+    const isChecked = e.target.checked;
+    setChecked(isChecked); 
+
+    try {
+      await apiClient.patch(`/api/subtasks/${sub.id}/`, {
+        status: isChecked ? 'completed' : 'pending'
+      });
+    } catch (error) {
+      console.error("Error al guardar estado de la tarea", error);
+      setChecked(!isChecked); 
+    }
   };
+
 
   return (
     <div

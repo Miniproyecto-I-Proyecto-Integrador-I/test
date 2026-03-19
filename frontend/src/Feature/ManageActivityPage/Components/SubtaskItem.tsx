@@ -65,10 +65,19 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
       {!isEditing ? (
         <>
           <div className="subtask-edit-item-left">
-            <span className="subtask-edit-item-circle" aria-hidden="true" />
+            <span 
+              className="subtask-edit-item-circle" 
+              style={subtask.status === 'completed' ? { backgroundColor: '#10b981', borderColor: '#10b981', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' } : {}}
+              aria-hidden="true"
+            >
+              {subtask.status === 'completed' && <Check size={12} strokeWidth={3} />}
+            </span>
+
             <div className="subtask-edit-item-content">
               <div className="subtask-edit-item-title-row">
-                <p className="subtask-edit-item-title">{subtask.description}</p>
+                <p className="subtask-edit-item-title" style={{ textDecoration: subtask.status === 'completed' ? 'line-through' : 'none', color: subtask.status === 'completed' ? '#9ca3af' : 'inherit' }}>
+                  {subtask.description}
+                </p>
                 {isOverdue && (
                   <span className="subtask-edit-overdue-badge">Vencida</span>
                 )}

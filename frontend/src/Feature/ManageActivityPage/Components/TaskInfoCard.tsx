@@ -20,6 +20,7 @@ interface TaskInfoCardProps {
   type?: string;
   priority: string;
   due_date: string;
+  progress_percentage: number;
   computedTotalHours: number;
   onEdit: () => void;
   onDelete: () => void;
@@ -32,6 +33,7 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({
   type,
   priority,
   due_date,
+  progress_percentage = 0,
   computedTotalHours,
   onEdit,
   onDelete,
@@ -98,6 +100,25 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({
               ESTIMADO: {computedTotalHours.toFixed(1)} Horas totales
             </span>
           </div>
+          {/*Barra de progreso*/}
+                    {/* INICIO DE BARRA DE PROGRESO */}
+          <div style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.85rem', color: '#6b7280', fontWeight: '500' }}>
+              <span>Progreso de la actividad</span>
+              <span>{Math.round(progress_percentage)}%</span>
+            </div>
+            <div style={{ width: '100%', height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
+              <div 
+                style={{
+                  height: '100%',
+                  backgroundColor: progress_percentage === 100 ? '#10b981' : '#3b82f6',
+                  width: `${progress_percentage}%`,
+                  transition: 'width 0.5s ease-in-out'
+                }}
+              />
+            </div>
+          </div>
+          {/* FIN DE BARRA DE PROGRESO */}
 
           <hr className="subtask-edit-divider" />
           <div className="subtask-edit-description-row">
