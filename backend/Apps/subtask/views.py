@@ -46,7 +46,7 @@ class SubtaskFilter(filters.FilterSet):
     
     class Meta:
         model = Subtask
-        fields = ['planification_date', 'planification_date_gte', 'planification_date_lte', 'status', 'needed_hours', 'subject', 'type', 'priority', 'task', 'task_title', 'exclude_ids']
+        fields = ['planification_date', 'planification_date_gte', 'planification_date_lte', 'status', 'needed_hours', 'subject', 'type', 'priority', 'task', 'task_title', 'exclude_ids', 'note']
 
 
 class SubtaskViewSet(viewsets.ModelViewSet):
