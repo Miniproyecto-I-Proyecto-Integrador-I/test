@@ -328,6 +328,35 @@
     border-radius: 999px;
     border: 1.5px solid var(--border-color);
     flex-shrink: 0;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    outline: none;
+    color: transparent;
+}
+
+.subtask-edit-item-circle:hover {
+    border-color: #10b981;
+}
+
+.subtask-edit-item-circle .hover-check {
+    opacity: 0;
+    color: #10b981;
+    transition: opacity 0.2s ease;
+}
+
+.subtask-edit-item-circle:hover .hover-check {
+    opacity: 0.5;
+}
+
+.subtask-edit-item-circle.completed {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: white;
 }
 
 .subtask-edit-item-content {

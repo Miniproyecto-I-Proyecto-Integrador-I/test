@@ -36,6 +36,7 @@ interface SubtaskItemProps {
   onSave: () => void;
   onResolveConflict: () => void;
   onHoursChange: (value: number) => void;
+  onToggleComplete?: () => void;
 }
 
 const SubtaskItem: React.FC<SubtaskItemProps> = ({
@@ -54,9 +55,11 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
   onSave,
   onResolveConflict,
   onHoursChange,
+  onToggleComplete,
 }) => {
+  const isCompleted = subtask.status === 'completed';
   const isOverdue =
-    isDateBeforeToday(subtask.planification_date) && !subtask.is_completed;
+    isDateBeforeToday(subtask.planification_date) && !isCompleted && !subtask.is_completed;
 
   return (
     <div
@@ -65,17 +68,26 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
       {!isEditing ? (
         <>
           <div className="subtask-edit-item-left">
-            <span 
-              className="subtask-edit-item-circle" 
-              style={subtask.status === 'completed' ? { backgroundColor: '#10b981', borderColor: '#10b981', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' } : {}}
-              aria-hidden="true"
+            <button 
+              type="button"
+              className={`subtask-edit-item-circle ${isCompleted ? 'completed' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleComplete?.();
+              }}
+              title={isCompleted ? "Marcar como pendiente" : "Marcar como completada"}
+              aria-label={isCompleted ? "Marcar como pendiente" : "Marcar como completada"}
             >
-              {subtask.status === 'completed' && <Check size={12} strokeWidth={3} />}
-            </span>
+              {isCompleted ? (
+                <Check size={12} strokeWidth={3} />
+              ) : (
+                <Check size={12} strokeWidth={3} className="hover-check" />
+              )}
+            </button>
 
             <div className="subtask-edit-item-content">
               <div className="subtask-edit-item-title-row">
-                <p className="subtask-edit-item-title" style={{ textDecoration: subtask.status === 'completed' ? 'line-through' : 'none', color: subtask.status === 'completed' ? '#9ca3af' : 'inherit' }}>
+                <p className="subtask-edit-item-title" style={{ textDecoration: isCompleted ? 'line-through' : 'none', color: isCompleted ? '#9ca3af' : 'inherit' }}>
                   {subtask.description}
                 </p>
                 {isOverdue && (

@@ -39,6 +39,7 @@ interface SubtaskListProps {
   onResolveConflict: () => void;
   onResolveConflictNew: (data: SubtaskFormData) => void;
   onHoursChange: (value: number) => void;
+  onToggleComplete: (subtask: EditableSubtask) => void;
 }
 
 const SubtaskList: React.FC<SubtaskListProps> = ({
@@ -61,6 +62,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
   onResolveConflict,
   onResolveConflictNew,
   onHoursChange,
+  onToggleComplete,
 }) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const {
@@ -129,6 +131,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 onSave={onSaveSubtask}
                 onResolveConflict={onResolveConflict}
                 onHoursChange={onHoursChange}
+                onToggleComplete={() => onToggleComplete(subtask)}
               />
             ))
           )}

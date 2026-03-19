@@ -19,6 +19,7 @@ import { isDateBeforeToday } from '../Utils/subtaskEditUtils';
 import { useToast } from '../../../shared/Hooks/useToast';
 import ToastHost from '../../../shared/Components/ToastHost';
 import type { ConflictTask } from '../../ManageConflict/Types/conflict';
+import { updateSubtask } from '../../ManageCreatePage/Services/subtaskService';
 
 interface SubtaskEditProps {
   taskId: number;
@@ -187,6 +188,14 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     );
   }, [subtasks, totalHours]);
 
+  const computedProgressPercentage = useMemo(() => {
+    if (subtasks.length === 0) return task?.progress_percentage ?? 0;
+    const completedCount = subtasks.filter(
+      (st) => st.status === 'completed' || st.is_completed
+    ).length;
+    return (completedCount / subtasks.length) * 100;
+  }, [subtasks, task?.progress_percentage]);
+
   const checkAndSaveSubtask = async () => {
     // Si no hay cambios, simplemente cancelar edición sin mostrar toast
     const original = subtasks.find((s) => s.id === editingId);
@@ -281,6 +290,27 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       toastError('Error al guardar', 'No se pudo actualizar la actividad.', undefined, loadId);
     } finally {
       setIsCheckingConflict(false);
+    }
+  };
+
+  const handleToggleComplete = async (subtaskToToggle: EditableSubtask) => {
+    const isCompleted = subtaskToToggle.status === 'completed' || subtaskToToggle.is_completed;
+    const newStatus = isCompleted ? 'pending' : 'completed';
+    
+    // Actualización optimista de la interfaz
+    setSubtasks(subtasks.map(s => 
+      s.id === subtaskToToggle.id ? { ...s, status: newStatus, is_completed: newStatus === 'completed' } : s
+    ));
+
+    try {
+      await updateSubtask(Number(subtaskToToggle.id), { status: newStatus });
+      // No mandamos toast de éxito; la actualización visual es suficiente confirmación.
+    } catch (e) {
+      // Revertir si la actualización en la BD falla
+      setSubtasks(subtasks.map(s => 
+        s.id === subtaskToToggle.id ? { ...s, status: isCompleted ? 'completed' : 'pending', is_completed: Boolean(isCompleted) } : s
+      ));
+      toastError('Error al guardar', 'No se pudo registrar el cambio en la actividad.');
     }
   };
 
@@ -531,7 +561,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                   priority={taskEditData.priority}
                   due_date={taskEditData.due_date}
                   computedTotalHours={computedTotalHours}
-                  progress_percentage={task?.progress_percentage ?? 0}
+                  progress_percentage={computedProgressPercentage}
                   onEdit={() => setIsEditingTask(true)}
                   onDelete={openDeleteMainTaskModal}
                 />
@@ -591,6 +621,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                     }
                     handleEditFieldChange('needed_hours', value);
                   }}
+                  onToggleComplete={handleToggleComplete}
                 />
               </>
             )}

@@ -32,6 +32,9 @@ class Subtask(models.Model):
     #Campo para guardar notas sobre las subtareas
     note = models.TextField(blank=True,null=True)
 
+    class Meta:
+        ordering = ['planification_date', 'created_at']
+
     # --- NUEVA LÓGICA DE VALIDACIÓN ---
     def clean(self):
         """Valida que la fecha de la subtarea no sea mayor a la de la tarea padre."""
