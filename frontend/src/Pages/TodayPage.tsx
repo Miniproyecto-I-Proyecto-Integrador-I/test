@@ -27,6 +27,11 @@ const TodayPage: React.FC = () => {
     today: true,
     upcoming: false,
   });
+  const [previousViewOptions, setPreviousViewOptions] = useState<{
+    overdue: boolean;
+    today: boolean;
+    upcoming: boolean;
+  } | null>(null);
   const [showViewMenu, setShowViewMenu] = useState(false);
 
   const { user } = useAuth();
@@ -178,13 +183,14 @@ const TodayPage: React.FC = () => {
             {!viewOptions.overdue && rawOverdue.length > 0 && (
               <OverdueTasksAlert
                 count={rawOverdue.length}
-                onSolve={() =>
+                onSolve={() => {
+                  setPreviousViewOptions(viewOptions);
                   setViewOptions({
                     overdue: true,
                     today: false,
                     upcoming: false,
-                  })
-                }
+                  });
+                }}
               />
             )}
 
@@ -207,13 +213,18 @@ const TodayPage: React.FC = () => {
                   </div>
                   <button
                     className="overdue-return-button"
-                    onClick={() =>
-                      setViewOptions({
-                        overdue: false,
-                        today: true,
-                        upcoming: true,
-                      })
-                    }
+                    onClick={() => {
+                      if (previousViewOptions) {
+                        setViewOptions(previousViewOptions);
+                        setPreviousViewOptions(null);
+                      } else {
+                        setViewOptions({
+                          overdue: false,
+                          today: true,
+                          upcoming: true,
+                        });
+                      }
+                    }}
                   >
                     <ArrowLeft size={16} />
                     Volver a mi día
