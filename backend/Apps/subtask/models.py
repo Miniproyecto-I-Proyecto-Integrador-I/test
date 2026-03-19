@@ -9,6 +9,8 @@ class Subtask(models.Model):
         PENDING = "pending", "Pendiente"
         IN_PROGRESS = "in_progress", "En Progreso"
         COMPLETED = "completed", "Completado"
+        #Estado para cuando se pospone una subtarea
+        POSTPONED = "postponed", "Pospuesta"
 
     task = models.ForeignKey(
         Task, 
@@ -27,6 +29,8 @@ class Subtask(models.Model):
     planification_date = models.DateField() 
     needed_hours = models.FloatField(validators=[MinValueValidator(0.0)])
     created_at = models.DateTimeField(auto_now_add=True)
+    #Campo para guardar notas sobre las subtareas
+    note = models.TextField(blank=True,null=True)
 
     # --- NUEVA LÓGICA DE VALIDACIÓN ---
     def clean(self):

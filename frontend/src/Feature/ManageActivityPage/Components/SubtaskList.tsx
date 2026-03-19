@@ -104,7 +104,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 strokeWidth={1.5}
               />
               <p className="subtask-edit-empty-text">
-                No hay subtareas creadas
+                Aún no tienes subtareas...
               </p>
               <p className="subtask-edit-empty-hint">
                 Agrega un nuevo paso para comenzar a organizar tu tarea

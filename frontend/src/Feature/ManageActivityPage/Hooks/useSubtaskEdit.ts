@@ -9,6 +9,7 @@ export interface EditableSubtask {
   description: string;
   planification_date: string;
   needed_hours: number;
+  status?: string;
   is_completed?: boolean;
 }
 

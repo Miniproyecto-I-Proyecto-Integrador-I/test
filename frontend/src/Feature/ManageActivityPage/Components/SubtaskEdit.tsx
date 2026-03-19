@@ -42,6 +42,7 @@ interface SubtaskEditProps {
     type?: string;
     priority?: string;
     due_date?: string;
+    progress_percentage?: number;
   };
 }
 
@@ -530,6 +531,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
                   priority={taskEditData.priority}
                   due_date={taskEditData.due_date}
                   computedTotalHours={computedTotalHours}
+                  progress_percentage={task?.progress_percentage ?? 0}
                   onEdit={() => setIsEditingTask(true)}
                   onDelete={openDeleteMainTaskModal}
                 />
