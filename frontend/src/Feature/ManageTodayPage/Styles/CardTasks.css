@@ -144,6 +144,11 @@
   gap: 4px;
 }
 
+.task-card__body--postponed {
+  justify-content: center;
+  gap: 2px;
+}
+
 .task-card__title {
   font-family: var(--font-family);
   font-size: 15px;
@@ -155,6 +160,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+}
+
+.task-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.task-card__title-row .task-card__title {
+  width: auto;
+  flex: 0 1 auto;
+  max-width: 72%;
 }
 
 .task-card--done .task-card__title {
@@ -192,6 +211,10 @@
   max-width: 65%;
 }
 
+.task-card__parent-task--full {
+  max-width: 100%;
+}
+
 /* =============================================
    BADGE (right side)
    ============================================= */
@@ -205,6 +228,20 @@
   align-items: center;
   gap: 4px;
   margin-top: 0; 
+}
+
+.task-card__badge--left-time {
+  justify-content: flex-start;
+}
+
+.task-card__badge--postponed-right {
+  min-width: 20px;
+  justify-content: flex-start;
+}
+
+.task-card__badge--action-aligned {
+  min-width: 20px;
+  justify-content: flex-start;
 }
 
 /* Overdue badge — red text */
@@ -241,6 +278,12 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-shrink: 0;
+}
+
+.task-card__actions--postponed {
+  min-width: 0;
+  justify-content: flex-end;
 }
 
 .task-card__action-btn {
@@ -254,13 +297,113 @@
   border: 1px solid transparent;
 }
 
-.archive-btn {
-  background-color: var(--primary-color);
-  color: white;
+.postpone-btn {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.archive-btn:hover {
-  background-color: var(--primary-hover);
+.postpone-btn:hover {
+  background-color: var(--surface);
+  border-color: var(--text-secondary);
+  color: var(--text-main);
+}
+
+.postpone-btn--disabled,
+.postpone-btn--disabled:hover {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0;
+  box-shadow: none;
+  cursor: default;
+  transition: none;
+  transform: none;
+  min-width: 102px;
+  justify-content: center;
+  text-align: center;
+}
+
+.postpone-btn--disabled:disabled {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.task-card__note-icon-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff7ed;
+  color: #f97316;
+  cursor: pointer;
+  transition: transform 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+  flex-shrink: 0;
+}
+
+.task-card__note-icon-btn--overdue {
+  border-color: #fecaca;
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.task-card__note-icon-btn--today {
+  border-color: #a7f3d0;
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+.task-card__note-icon-btn--upcoming {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.task-card__note-icon-btn--postponed {
+  border-color: #fed7aa;
+  background-color: #fff7ed;
+  color: #f97316;
+}
+
+.task-card__note-icon-btn--inline {
+  width: 30px;
+  height: 30px;
+  margin-left: 8px;
+}
+
+.task-card__note-icon-btn:hover {
+  transform: scale(1.08);
+}
+
+.task-card__note-icon-btn--overdue:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.task-card__note-icon-btn--today:hover {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.task-card__note-icon-btn--upcoming:hover {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.task-card__note-icon-btn--postponed:hover {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+.task-card__note-icon-btn:focus-visible {
+  outline: 2px solid #fb923c;
+  outline-offset: 2px;
 }
 
 .reschedule-btn {
@@ -278,5 +421,15 @@
 @media (max-width: 768px) {
   .grouped-cards {
     flex-direction: column;
+  }
+
+  .task-card {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .task-card__actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

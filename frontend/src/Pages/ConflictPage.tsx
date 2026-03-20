@@ -178,6 +178,10 @@ const ConflictPage: React.FC<ConflictPageProps> = ({
         const editingTaskId = 'id' in editingTask ? editingTask.id : undefined;
 
         const existingTasks = dbSubtasks
+          .filter((st) => {
+            const hasNote = Boolean(st.note && String(st.note).trim() !== '');
+            return st.status !== 'postponed' && !hasNote;
+          })
           .filter(
             (st) => editingTaskId === undefined || st.id !== editingTaskId,
           ) // Avoid duplicates

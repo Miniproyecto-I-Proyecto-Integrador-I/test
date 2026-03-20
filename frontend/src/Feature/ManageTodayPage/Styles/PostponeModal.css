@@ -1,0 +1,158 @@
+@import '../../../shared/Styles/Variables.css';
+
+.postpone-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.postpone-modal-card {
+  width: min(420px, 100%);
+  background: #f8fafc;
+  border-radius: 12px;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
+  border: 1px solid #e2e8f0;
+  padding: 20px;
+  animation: postpone-modal-enter 0.2s ease;
+}
+
+.postpone-modal-header h3 {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: 23px;
+  color: #1e293b;
+}
+
+.postpone-modal-header p {
+  margin: 8px 0 0;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.postpone-modal-subtask {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-family: var(--font-family);
+  font-size: 13px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.postpone-modal-subtask-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.postpone-modal-label {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  color: #475569;
+}
+
+.postpone-modal-textarea {
+  margin-top: 8px;
+  width: 100%;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  min-height: 110px;
+  padding: 12px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.postpone-modal-textarea:focus {
+  outline: none;
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+}
+
+.postpone-modal-textarea[readonly] {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.postpone-modal-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.postpone-modal-confirm,
+.postpone-modal-close,
+.postpone-modal-cancel {
+  border-radius: 8px;
+  border: none;
+  padding: 11px 12px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.postpone-modal-confirm {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.24);
+}
+
+.postpone-modal-confirm:hover {
+  background: #059669;
+}
+
+.postpone-modal-close {
+  background: #10b981;
+  color: white;
+}
+
+.postpone-modal-close:hover {
+  background: #059669;
+}
+
+.postpone-modal-cancel {
+  background: transparent;
+  color: #64748b;
+}
+
+.postpone-modal-cancel:hover {
+  color: #334155;
+}
+
+.postpone-modal-confirm:disabled,
+.postpone-modal-cancel:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@keyframes postpone-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -29,6 +29,25 @@ class SubtaskSerializer(serializers.ModelSerializer):
         model = Subtask
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        note = validated_data.get('note', serializers.empty)
+        incoming_status = validated_data.get('status', serializers.empty)
+
+        if note is not serializers.empty and isinstance(note, str):
+            normalized_note = note.strip()
+            validated_data['note'] = normalized_note if normalized_note else None
+
+        # Si se guarda una nota sin enviar status explícito,
+        # interpretamos la acción como una posposición.
+        if (
+            note is not serializers.empty
+            and validated_data.get('note')
+            and incoming_status is serializers.empty
+        ):
+            validated_data['status'] = Subtask.Status.POSTPONED
+
+        return super().update(instance, validated_data)
+
     # Agregamos esta función para modificar cómo se ENVÍAN los datos (GET)
     def to_representation(self, instance):
         # Obtenemos el diccionario original (donde 'task' es solo el ID)

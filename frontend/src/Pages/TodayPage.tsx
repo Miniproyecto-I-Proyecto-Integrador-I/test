@@ -44,10 +44,16 @@ const TodayPage: React.FC = () => {
     rawUpcoming,
     loading,
     allCourses,
+    reloadSubtasks,
   } = useGroupedSubtasks(filters);
 
   const hasAnyTasks =
     rawOverdue.length > 0 || rawToday.length > 0 || rawUpcoming.length > 0;
+
+  const summaryTodaySubtasks = rawToday.filter((sub) => {
+    const hasNote = Boolean(sub.note && sub.note.trim() !== '');
+    return sub.status !== 'postponed' && !hasNote;
+  });
 
   const allThreeSelected =
     viewOptions.overdue &&
@@ -170,6 +176,7 @@ const TodayPage: React.FC = () => {
             <CardsGrid
               onSubtaskClick={handleSubtaskClick}
               onRescheduleSubtask={handleRescheduleSubtask}
+              onSubtaskUpdated={reloadSubtasks}
               overdue={overdue}
               today={today}
               upcoming={upcoming}
@@ -232,10 +239,10 @@ const TodayPage: React.FC = () => {
                 </div>
               )}
 
-            {rawToday.length > 0 && (
+            {summaryTodaySubtasks.length > 0 && (
               <TodaySummaryCard
-                pendingCount={rawToday.length}
-                totalNeededHours={rawToday.reduce(
+                pendingCount={summaryTodaySubtasks.length}
+                totalNeededHours={summaryTodaySubtasks.reduce(
                   (acc, curr) => acc + (curr.needed_hours || 0),
                   0,
                 )}

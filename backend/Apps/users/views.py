@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -56,6 +57,8 @@ class UserViewSet(viewsets.ModelViewSet):
                         task__user=request.user,
                         planification_date__gte=today,
                         status__in=[Subtask.Status.PENDING, Subtask.Status.IN_PROGRESS]
+                    ).filter(
+                        Q(note__isnull=True) | Q(note='')
                     )
                     
                     conflicts_dates = subtasks_queryset.values('planification_date').annotate(

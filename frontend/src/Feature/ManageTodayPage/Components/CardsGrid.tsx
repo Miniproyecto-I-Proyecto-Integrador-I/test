@@ -15,6 +15,7 @@ import '../Styles/CardTasks.css';
 interface CardsGridProps {
   onSubtaskClick: (sub: Subtask) => void;
   onRescheduleSubtask?: (sub: Subtask) => void;
+  onSubtaskUpdated?: () => Promise<void>;
   overdue: Subtask[];
   today: Subtask[];
   upcoming: Subtask[];
@@ -51,6 +52,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 const CardsGrid: React.FC<CardsGridProps> = ({
   onSubtaskClick,
   onRescheduleSubtask,
+  onSubtaskUpdated,
   overdue,
   today,
   upcoming,
@@ -118,6 +120,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               sub={sub}
               variant="today" // Use today variant for standard visualization of completed items (since it shows duration)
               onClick={() => onSubtaskClick(sub)}
+              onSubtaskUpdated={onSubtaskUpdated}
             />
           ))}
         </section>
@@ -143,6 +146,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               variant="overdue"
               onClick={() => onSubtaskClick(sub)}
               onRescheduleClick={() => onRescheduleSubtask?.(sub)}
+              onSubtaskUpdated={onSubtaskUpdated}
             />
           ))}
         </section>
@@ -163,6 +167,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               sub={sub}
               variant="today"
               onClick={() => onSubtaskClick(sub)}
+              onSubtaskUpdated={onSubtaskUpdated}
             />
           ))}
         </section>
@@ -183,6 +188,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               sub={sub}
               variant="upcoming"
               onClick={() => onSubtaskClick(sub)}
+              onSubtaskUpdated={onSubtaskUpdated}
             />
           ))}
         </section>
