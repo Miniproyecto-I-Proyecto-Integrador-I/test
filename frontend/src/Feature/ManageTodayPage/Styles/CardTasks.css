@@ -77,6 +77,45 @@
   transform: translateY(-1px);
 }
 
+.task-card--pop-out {
+  animation: task-card-pop-out 220ms ease-out forwards;
+  pointer-events: none;
+}
+
+.task-card--pop-in {
+  animation: task-card-pop-in 260ms ease-out;
+}
+
+@keyframes task-card-pop-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes task-card-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Remove hover effects for overdue items as they have explicit call-to-action buttons */
 .task-section--overdue .task-card:hover,
 .task-section--overdue .task-card {

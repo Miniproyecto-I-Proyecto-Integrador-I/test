@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Clock, Calendar, Clock3, StickyNote } from 'lucide-react';
 import type { Subtask } from '../Types/models';
 import { buildBadgeLabel, type CardVariant } from '../Utils/BadgeLabels';
@@ -12,6 +12,9 @@ interface CardTaskProps {
   onClick: () => void;
   onRescheduleClick?: () => void;
   onSubtaskUpdated?: () => Promise<void>;
+  onActionError?: (title: string, subtitle?: string) => void;
+  onMarkedCompleted?: (subtaskId: number) => void;
+  animateUndoPopIn?: boolean;
 }
 
 const CardTask: React.FC<CardTaskProps> = ({
@@ -20,12 +23,21 @@ const CardTask: React.FC<CardTaskProps> = ({
   onClick,
   onRescheduleClick,
   onSubtaskUpdated,
+  onActionError,
+  onMarkedCompleted,
+  animateUndoPopIn = false,
 }) => {
+  const POP_OUT_DURATION_MS = 220;
+  const POP_IN_DURATION_MS = 260;
   const [checked, setChecked] = useState(sub.status === 'completed');
+  const [isPoppingOut, setIsPoppingOut] = useState(false);
+  const [isPoppingIn, setIsPoppingIn] = useState(false);
   const [isPostponeModalOpen, setIsPostponeModalOpen] = useState(false);
   const [isReadNoteModalOpen, setIsReadNoteModalOpen] = useState(false);
   const [postponeNote, setPostponeNote] = useState('');
   const [isSubmittingPostpone, setIsSubmittingPostpone] = useState(false);
+  const popOutTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const popInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const parentTaskTitle = sub.task?.title || 'Sin tarea asiganda';
   const timeInfo = sub.needed_hours ? `${sub.needed_hours}h` : '';
@@ -35,10 +47,11 @@ const CardTask: React.FC<CardTaskProps> = ({
     [sub.note],
   );
   const noteText = sub.note?.trim() || '';
-  const showPostponeAction = variant === 'today' && sub.status !== 'completed';
-  const isPostponeDisabled = sub.status === 'postponed' || hasNote;
-  const isPostponedCard = variant === 'today' && isPostponeDisabled;
-  const isActivePostponeCard = showPostponeAction && !isPostponeDisabled;
+  const isCurrentlyPostponed = sub.status === 'postponed';
+  const showPostponeAction = variant === 'today' && !isCurrentlyPostponed;
+  const showPostponeStatus = variant === 'today' && isCurrentlyPostponed;
+  const isPostponedCard = variant === 'today' && isCurrentlyPostponed;
+  const isActivePostponeCard = variant === 'today' && showPostponeAction;
   const noteToneClass =
     sub.status === 'postponed'
       ? 'task-card__note-icon-btn--postponed'
@@ -58,7 +71,34 @@ const CardTask: React.FC<CardTaskProps> = ({
 
   useEffect(() => {
     setChecked(sub.status === 'completed');
+    if (sub.status !== 'completed') {
+      setIsPoppingOut(false);
+    }
   }, [sub.status]);
+
+  useEffect(() => {
+    return () => {
+      if (popOutTimeoutRef.current) {
+        clearTimeout(popOutTimeoutRef.current);
+      }
+      if (popInTimeoutRef.current) {
+        clearTimeout(popInTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!animateUndoPopIn) return;
+
+    setIsPoppingIn(true);
+    if (popInTimeoutRef.current) {
+      clearTimeout(popInTimeoutRef.current);
+    }
+
+    popInTimeoutRef.current = setTimeout(() => {
+      setIsPoppingIn(false);
+    }, POP_IN_DURATION_MS);
+  }, [animateUndoPopIn]);
 
   const handleCheckChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -70,16 +110,34 @@ const CardTask: React.FC<CardTaskProps> = ({
         sub.id,
         isChecked ? 'completed' : 'pending',
       );
+
+      if (isChecked) {
+        onMarkedCompleted?.(sub.id);
+        setIsPoppingOut(true);
+        popOutTimeoutRef.current = setTimeout(() => {
+          void onSubtaskUpdated?.();
+        }, POP_OUT_DURATION_MS);
+        return;
+      }
+
+      setIsPoppingOut(false);
       await onSubtaskUpdated?.();
     } catch (error) {
       console.error('Error al guardar estado de la tarea', error);
       setChecked(!isChecked);
+      setIsPoppingOut(false);
+      onActionError?.(
+        'Error al actualizar estado',
+        isChecked
+          ? 'No se pudo marcar la subtarea como completada. No se realizaron cambios.'
+          : 'No se pudo desmarcar la subtarea. No se realizaron cambios.',
+      );
     }
   };
 
   const handleOpenPostponeModal = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    setPostponeNote('');
+    setPostponeNote(noteText);
     setIsPostponeModalOpen(true);
   };
 
@@ -92,6 +150,10 @@ const CardTask: React.FC<CardTaskProps> = ({
       await onSubtaskUpdated?.();
     } catch (error) {
       console.error('Error al posponer subtarea:', error);
+      onActionError?.(
+        'Error al posponer',
+        'No se pudo posponer la subtarea. No se realizaron cambios.',
+      );
     } finally {
       setIsSubmittingPostpone(false);
     }
@@ -108,7 +170,7 @@ const CardTask: React.FC<CardTaskProps> = ({
   return (
     <>
       <div
-        className={`task-card${checked ? ' task-card--done' : ''}`}
+        className={`task-card${checked ? ' task-card--done' : ''}${isPoppingOut ? ' task-card--pop-out' : ''}${isPoppingIn ? ' task-card--pop-in' : ''}`}
         onClick={onClick}
       >
         {variant !== 'overdue' && (
@@ -201,27 +263,25 @@ const CardTask: React.FC<CardTaskProps> = ({
           </span>
         )}
 
-        {variant === 'overdue' && (
-          <div className="task-card__actions" onClick={(event) => event.stopPropagation()}>
-            <button
-              className="task-card__action-btn reschedule-btn"
-              onClick={(event) => {
-                event.stopPropagation();
-                onRescheduleClick?.();
-              }}
-              aria-label={`Reprogramar "${sub.description}"`}
-            >
-              Reprogramar
-            </button>
-          </div>
-        )}
-
-        {showPostponeAction && (
+        {(variant === 'overdue' || showPostponeAction || showPostponeStatus) && (
           <div
-            className={`task-card__actions${isPostponeDisabled ? ' task-card__actions--postponed' : ''}`}
+            className={`task-card__actions${showPostponeStatus ? ' task-card__actions--postponed' : ''}`}
             onClick={(event) => event.stopPropagation()}
           >
-            {isPostponeDisabled ? (
+            {variant === 'overdue' && (
+              <button
+                className="task-card__action-btn reschedule-btn"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onRescheduleClick?.();
+                }}
+                aria-label={`Reprogramar "${sub.description}"`}
+              >
+                Reprogramar
+              </button>
+            )}
+
+            {showPostponeStatus ? (
               <button
                 className="task-card__action-btn postpone-btn postpone-btn--disabled"
                 type="button"
@@ -230,7 +290,7 @@ const CardTask: React.FC<CardTaskProps> = ({
               >
                 Pospuesta
               </button>
-            ) : (
+            ) : showPostponeAction ? (
               <button
                 className="task-card__action-btn postpone-btn"
                 onClick={handleOpenPostponeModal}
@@ -239,7 +299,7 @@ const CardTask: React.FC<CardTaskProps> = ({
                 <Clock3 size={14} />
                 Posponer
               </button>
-            )}
+            ) : null}
           </div>
         )}
       </div>

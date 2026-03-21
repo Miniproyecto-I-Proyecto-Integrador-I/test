@@ -1,7 +1,9 @@
-import React from 'react';
-import { Edit2, Trash2, Calendar, X, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Edit2, Trash2, Calendar, X, Check, StickyNote } from 'lucide-react';
 import type { EditableSubtask } from '../Hooks/useSubtaskEdit';
 import type { SubtaskFormData } from '../../ManageCreatePage/Types/subtask.types';
+import type { Subtask } from '../../ManageTodayPage/Types/models';
+import PostponeModal from '../../ManageTodayPage/Components/PostponeModal';
 import {
   formatShortDate,
   formatHours,
@@ -57,16 +59,54 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
   onHoursChange,
   onToggleComplete,
 }) => {
+  const [isReadNoteModalOpen, setIsReadNoteModalOpen] = useState(false);
   const isCompleted = subtask.status === 'completed';
+  const isPostponed = subtask.status === 'postponed';
+  const hasNote = Boolean(subtask.note && subtask.note.trim() !== '');
+  const noteText = subtask.note?.trim() || '';
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  const subtaskDate = new Date(subtask.planification_date + 'T00:00:00');
+  const isUpcoming =
+    !isPostponed &&
+    !isCompleted &&
+    subtaskDate > todayDate;
+  const modalSubtask: Subtask = {
+    id: Number(subtask.id) || 0,
+    description: subtask.description,
+    status: subtask.status || (subtask.is_completed ? 'completed' : 'pending'),
+    planification_date: subtask.planification_date,
+    needed_hours: Number(subtask.needed_hours) || 0,
+    note: subtask.note ?? null,
+  };
   const isOverdue =
-    isDateBeforeToday(subtask.planification_date) && !isCompleted && !subtask.is_completed;
+    isDateBeforeToday(subtask.planification_date) &&
+    !isCompleted &&
+    !subtask.is_completed &&
+    !isPostponed;
+  const noteToneClass = isPostponed
+    ? 'subtask-edit-note-btn--postponed'
+    : isOverdue
+      ? 'subtask-edit-note-btn--overdue'
+      : isUpcoming
+        ? 'subtask-edit-note-btn--upcoming'
+        : 'subtask-edit-note-btn--today';
+
+  const handleOpenReadNoteModal = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (!hasNote) {
+      return;
+    }
+    setIsReadNoteModalOpen(true);
+  };
 
   return (
-    <div
-      className={`subtask-edit-item ${isEditing ? 'is-editing' : ''} ${conflictWarning ? 'has-conflict' : ''}`}
-    >
-      {!isEditing ? (
-        <>
+    <>
+      <div
+        className={`subtask-edit-item ${isEditing ? 'is-editing' : ''} ${conflictWarning ? 'has-conflict' : ''}`}
+      >
+        {!isEditing ? (
+          <>
           <div className="subtask-edit-item-left">
             <button 
               type="button"
@@ -90,6 +130,20 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
                 <p className="subtask-edit-item-title" style={{ textDecoration: isCompleted ? 'line-through' : 'none', color: isCompleted ? '#9ca3af' : 'inherit' }}>
                   {subtask.description}
                 </p>
+                {hasNote && (
+                  <button
+                    type="button"
+                    className={`subtask-edit-note-btn ${noteToneClass}`}
+                    onClick={handleOpenReadNoteModal}
+                    title={noteText}
+                    aria-label="Ver nota de subtarea"
+                  >
+                    <StickyNote size={14} />
+                  </button>
+                )}
+                {isPostponed && (
+                  <span className="subtask-edit-postponed-badge">Pospuesta</span>
+                )}
                 {isOverdue && (
                   <span className="subtask-edit-overdue-badge">Vencida</span>
                 )}
@@ -118,13 +172,13 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               <Trash2 size={16} />
             </button>
           </div>
-        </>
-      ) : (
-        <div
-          className="subtask-edit-inline-form"
-          role="group"
-          aria-label="Editar subtarea"
-        >
+          </>
+        ) : (
+          <div
+            className="subtask-edit-inline-form"
+            role="group"
+            aria-label="Editar subtarea"
+          >
           {/* Banner de conflicto eliminado según solicitud - ahora se usa Toast persistente */}
 
           <div className="subtask-edit-input-group grow">
@@ -206,9 +260,18 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               </button>
             )}
           </div>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+
+      <PostponeModal
+        isOpen={isReadNoteModalOpen}
+        mode="read"
+        subtask={modalSubtask}
+        noteValue={noteText}
+        onClose={() => setIsReadNoteModalOpen(false)}
+      />
+    </>
   );
 };
 

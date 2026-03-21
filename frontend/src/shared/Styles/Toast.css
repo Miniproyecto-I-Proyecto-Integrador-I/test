@@ -108,6 +108,24 @@
   line-height: 1.4;
 }
 
+.toast__action {
+  margin-top: 8px;
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--primary-color);
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toast__action:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
 /* ── Close button ─────────────────────────────── */
 .toast__close {
   position: absolute;

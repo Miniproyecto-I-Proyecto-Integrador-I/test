@@ -50,10 +50,9 @@ const TodayPage: React.FC = () => {
   const hasAnyTasks =
     rawOverdue.length > 0 || rawToday.length > 0 || rawUpcoming.length > 0;
 
-  const summaryTodaySubtasks = rawToday.filter((sub) => {
-    const hasNote = Boolean(sub.note && sub.note.trim() !== '');
-    return sub.status !== 'postponed' && !hasNote;
-  });
+  const summaryTodaySubtasks = rawToday.filter(
+    (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
+  );
 
   const allThreeSelected =
     viewOptions.overdue &&
@@ -166,9 +165,9 @@ const TodayPage: React.FC = () => {
           {/* Main Column */}
           <div className="today-main-column">
             <StatusCardGrid
-              defeatedSubTask={rawOverdue[0]}
-              todaySubTask={rawToday[0]}
-              nextSubTask={rawUpcoming[0]}
+              defeatedSubTask={overdue[0]}
+              todaySubTask={today[0]}
+              nextSubTask={upcoming[0]}
               viewOptions={viewOptions}
               onSubtaskClick={handleSubtaskClick}
             />

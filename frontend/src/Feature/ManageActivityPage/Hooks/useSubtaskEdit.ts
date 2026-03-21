@@ -11,6 +11,7 @@ export interface EditableSubtask {
   needed_hours: number;
   status?: string;
   is_completed?: boolean;
+  note?: string | null;
 }
 
 export type DeleteTarget = { type: 'main-task' } | { type: 'subtask'; subtask: EditableSubtask };

@@ -68,7 +68,7 @@ const PostponeModal: React.FC<PostponeModalProps> = ({
 					value={noteValue}
 					onChange={(event) => onNoteChange?.(event.target.value)}
 					readOnly={mode === 'read'}
-					rows={4}
+					rows={7}
 				/>
 
 				<div className="postpone-modal-actions">

@@ -79,7 +79,9 @@ const ActivityPage = () => {
           description: item.description,
           planification_date: item.planification_date,
           needed_hours: Number(item.needed_hours) || 0,
+          status: item.status,
           is_completed: item.is_completed,
+          note: item.note ?? null,
         }),
       );
       setTask((prev) =>

@@ -387,6 +387,91 @@
     flex-shrink: 0;
 }
 
+.subtask-edit-postponed-badge {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #f97316;
+    border-radius: 8px;
+    background: #fff7ed;
+    color: #ea580c;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.subtask-edit-note-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff7ed;
+    color: #f97316;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+}
+
+.subtask-edit-note-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.subtask-edit-note-btn:hover {
+    transform: scale(1.08);
+}
+
+.subtask-edit-note-btn--overdue {
+    border-color: #fecaca;
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+.subtask-edit-note-btn--today {
+    border-color: #a7f3d0;
+    background-color: #ecfdf5;
+    color: #10b981;
+}
+
+.subtask-edit-note-btn--upcoming {
+    border-color: #bfdbfe;
+    background-color: #eff6ff;
+    color: #3b82f6;
+}
+
+.subtask-edit-note-btn--postponed {
+    border-color: #fed7aa;
+    background-color: #fff7ed;
+    color: #f97316;
+}
+
+.subtask-edit-note-btn--overdue:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.subtask-edit-note-btn--today:hover {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.subtask-edit-note-btn--upcoming:hover {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.subtask-edit-note-btn--postponed:hover {
+    background-color: #ffedd5;
+    color: #ea580c;
+}
+
 .subtask-edit-item-title {
     margin: 0;
     font-size: var(--font-size-h3);

@@ -12,12 +12,12 @@
 }
 
 .postpone-modal-card {
-  width: min(420px, 100%);
+  width: min(640px, 100%);
   background: #f8fafc;
   border-radius: 12px;
   box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
   border: 1px solid #e2e8f0;
-  padding: 20px;
+  padding: 24px;
   animation: postpone-modal-enter 0.2s ease;
 }
 
@@ -69,12 +69,12 @@
 
 .postpone-modal-textarea {
   margin-top: 8px;
-  width: 100%;
+  width: 96%;
   resize: none;
   border-radius: 8px;
   border: 1px solid #cbd5e1;
   background: #ffffff;
-  min-height: 110px;
+  min-height: 180px;
   padding: 12px;
   font-family: var(--font-family);
   font-size: 14px;

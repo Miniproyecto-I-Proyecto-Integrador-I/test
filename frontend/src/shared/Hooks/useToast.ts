@@ -9,6 +9,8 @@ export interface ToastState {
   duration: number;
   showProgress: boolean;
   loading: boolean;
+  actionLabel?: string;
+  onAction?: () => void | Promise<void>;
 }
 
 /** Min time a toast is visible before it can be auto-dismissed (ms) */
@@ -29,6 +31,8 @@ export function useToast() {
       duration = 4000,
       showProgress = true,
       loading = false,
+      actionLabel,
+      onAction,
       id: customId,
     }: Omit<ToastState, 'id'> & { id?: number }): number => {
       const id = customId ?? nextId();
@@ -37,10 +41,33 @@ export function useToast() {
         const index = prev.findIndex((t) => t.id === id);
         if (index >= 0) {
           const next = [...prev];
-          next[index] = { id, title, subtitle, variant, duration, showProgress, loading };
+          next[index] = {
+            id,
+            title,
+            subtitle,
+            variant,
+            duration,
+            showProgress,
+            loading,
+            actionLabel,
+            onAction,
+          };
           return next;
         }
-        return [...prev, { id, title, subtitle, variant, duration, showProgress, loading }];
+        return [
+          ...prev,
+          {
+            id,
+            title,
+            subtitle,
+            variant,
+            duration,
+            showProgress,
+            loading,
+            actionLabel,
+            onAction,
+          },
+        ];
       });
       return id;
     },

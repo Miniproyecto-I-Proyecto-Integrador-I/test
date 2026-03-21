@@ -26,6 +26,8 @@ const ToastHost: React.FC<ToastHostProps> = ({ toasts, onDismiss }) => {
           duration={t.duration}
           showProgress={t.showProgress}
           loading={t.loading}
+          actionLabel={t.actionLabel}
+          onAction={t.onAction}
           onClose={() => onDismiss(t.id)}
         />
       ))}

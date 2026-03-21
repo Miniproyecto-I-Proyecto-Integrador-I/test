@@ -179,8 +179,7 @@ const ConflictPage: React.FC<ConflictPageProps> = ({
 
         const existingTasks = dbSubtasks
           .filter((st) => {
-            const hasNote = Boolean(st.note && String(st.note).trim() !== '');
-            return st.status !== 'postponed' && !hasNote;
+            return st.status !== 'postponed';
           })
           .filter(
             (st) => editingTaskId === undefined || st.id !== editingTaskId,

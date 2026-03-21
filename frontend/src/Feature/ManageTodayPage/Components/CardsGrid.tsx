@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
   CalendarCheck,
@@ -9,6 +9,9 @@ import {
 import type { Subtask } from '../Types/models';
 import CardTask from './CardTask';
 import InfoTooltip from '../../../shared/Components/InfoTooltip';
+import { useToast } from '../../../shared/Hooks/useToast';
+import ToastHost from '../../../shared/Components/ToastHost';
+import { todayService } from '../Services/todayService';
 
 import '../Styles/CardTasks.css';
 
@@ -59,6 +62,62 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   filters,
   viewOptions = { overdue: true, today: true, upcoming: true },
 }) => {
+  const {
+    toasts,
+    dismiss,
+    show: toastShow,
+    error: toastError,
+    success: toastSuccess,
+  } = useToast();
+  const [undoPopInId, setUndoPopInId] = useState<number | null>(null);
+  const undoPopInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (undoPopInTimeoutRef.current) {
+        clearTimeout(undoPopInTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const triggerUndoPopIn = useCallback((subtaskId: number) => {
+    if (undoPopInTimeoutRef.current) {
+      clearTimeout(undoPopInTimeoutRef.current);
+    }
+    setUndoPopInId(subtaskId);
+    undoPopInTimeoutRef.current = setTimeout(() => {
+      setUndoPopInId(null);
+    }, 320);
+  }, []);
+
+  const handleMarkedCompleted = useCallback(
+    (subtaskId: number) => {
+      toastShow({
+        title: 'Subtarea marcada como completa!',
+        variant: 'success',
+        duration: 5000,
+        showProgress: true,
+        loading: false,
+        actionLabel: 'Deshacer',
+        onAction: async () => {
+          try {
+            await todayService.updateSubtaskStatus(subtaskId, 'pending');
+            triggerUndoPopIn(subtaskId);
+            await onSubtaskUpdated?.();
+            toastSuccess('Cambios revertidos', 'La subtarea volvió a tus pendientes.');
+          } catch (error) {
+            console.error('Error al deshacer completado:', error);
+            toastError(
+              'Error al deshacer',
+              'No se pudo revertir el estado. Intenta de nuevo.',
+            );
+          }
+        },
+      });
+    },
+    [onSubtaskUpdated, toastError, toastShow, toastSuccess, triggerUndoPopIn],
+  );
+
   const isEmpty =
     (!viewOptions.overdue || overdue.length === 0) &&
     (!viewOptions.today || today.length === 0) &&
@@ -121,79 +180,95 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               variant="today" // Use today variant for standard visualization of completed items (since it shows duration)
               onClick={() => onSubtaskClick(sub)}
               onSubtaskUpdated={onSubtaskUpdated}
+              onActionError={toastError}
+              onMarkedCompleted={handleMarkedCompleted}
+              animateUndoPopIn={undoPopInId === sub.id}
             />
           ))}
         </section>
+        <ToastHost toasts={toasts} onDismiss={dismiss} />
       </div>
     );
   }
 
   return (
-    <div className="grouped-cards">
-      {/* ── VENCIDAS ─────────────────────────────────────── */}
-      {viewOptions.overdue && overdue.length > 0 && (
-        <section className="task-section task-section--overdue">
-          <SectionHeader
-            icon={<AlertCircle size={18} />}
-            label="Vencidas"
-            count={overdue.length}
-            tooltipInfo="Organizadas desde la más antigua a la más reciente."
-          />
-          {overdue.map((sub) => (
-            <CardTask
-              key={sub.id}
-              sub={sub}
-              variant="overdue"
-              onClick={() => onSubtaskClick(sub)}
-              onRescheduleClick={() => onRescheduleSubtask?.(sub)}
-              onSubtaskUpdated={onSubtaskUpdated}
+    <>
+      <div className="grouped-cards">
+        {/* ── VENCIDAS ─────────────────────────────────────── */}
+        {viewOptions.overdue && overdue.length > 0 && (
+          <section className="task-section task-section--overdue">
+            <SectionHeader
+              icon={<AlertCircle size={18} />}
+              label="Vencidas"
+              count={overdue.length}
+              tooltipInfo="Organizadas desde la más antigua a la más reciente."
             />
-          ))}
-        </section>
-      )}
+            {overdue.map((sub) => (
+              <CardTask
+                key={sub.id}
+                sub={sub}
+                variant="overdue"
+                onClick={() => onSubtaskClick(sub)}
+                onRescheduleClick={() => onRescheduleSubtask?.(sub)}
+                onSubtaskUpdated={onSubtaskUpdated}
+                onActionError={toastError}
+                onMarkedCompleted={handleMarkedCompleted}
+                animateUndoPopIn={undoPopInId === sub.id}
+              />
+            ))}
+          </section>
+        )}
 
-      {/* ── PARA HOY ─────────────────────────────────────── */}
-      {viewOptions.today && today.length > 0 && (
-        <section className="task-section task-section--today">
-          <SectionHeader
-            icon={<CalendarCheck size={18} />}
-            label="Para hoy"
-            count={today.length}
-            tooltipInfo="Organizadas por el menor esfuerzo o tiempo requerido."
-          />
-          {today.map((sub) => (
-            <CardTask
-              key={sub.id}
-              sub={sub}
-              variant="today"
-              onClick={() => onSubtaskClick(sub)}
-              onSubtaskUpdated={onSubtaskUpdated}
+        {/* ── PARA HOY ─────────────────────────────────────── */}
+        {viewOptions.today && today.length > 0 && (
+          <section className="task-section task-section--today">
+            <SectionHeader
+              icon={<CalendarCheck size={18} />}
+              label="Para hoy"
+              count={today.length}
+              tooltipInfo="Organizadas por el menor esfuerzo o tiempo requerido."
             />
-          ))}
-        </section>
-      )}
+            {today.map((sub) => (
+              <CardTask
+                key={sub.id}
+                sub={sub}
+                variant="today"
+                onClick={() => onSubtaskClick(sub)}
+                onSubtaskUpdated={onSubtaskUpdated}
+                onActionError={toastError}
+                onMarkedCompleted={handleMarkedCompleted}
+                animateUndoPopIn={undoPopInId === sub.id}
+              />
+            ))}
+          </section>
+        )}
 
-      {/* ── PRÓXIMAS ─────────────────────────────────────── */}
-      {viewOptions.upcoming && upcoming.length > 0 && (
-        <section className="task-section task-section--upcoming">
-          <SectionHeader
-            icon={<CalendarClock size={18} />}
-            label="Próximas"
-            count={upcoming.length}
-            tooltipInfo="Organizadas para que la más próxima esté primero."
-          />
-          {upcoming.map((sub) => (
-            <CardTask
-              key={sub.id}
-              sub={sub}
-              variant="upcoming"
-              onClick={() => onSubtaskClick(sub)}
-              onSubtaskUpdated={onSubtaskUpdated}
+        {/* ── PRÓXIMAS ─────────────────────────────────────── */}
+        {viewOptions.upcoming && upcoming.length > 0 && (
+          <section className="task-section task-section--upcoming">
+            <SectionHeader
+              icon={<CalendarClock size={18} />}
+              label="Próximas"
+              count={upcoming.length}
+              tooltipInfo="Organizadas para que la más próxima esté primero."
             />
-          ))}
-        </section>
-      )}
-    </div>
+            {upcoming.map((sub) => (
+              <CardTask
+                key={sub.id}
+                sub={sub}
+                variant="upcoming"
+                onClick={() => onSubtaskClick(sub)}
+                onSubtaskUpdated={onSubtaskUpdated}
+                onActionError={toastError}
+                onMarkedCompleted={handleMarkedCompleted}
+                animateUndoPopIn={undoPopInId === sub.id}
+              />
+            ))}
+          </section>
+        )}
+      </div>
+      <ToastHost toasts={toasts} onDismiss={dismiss} />
+    </>
   );
 };
 
