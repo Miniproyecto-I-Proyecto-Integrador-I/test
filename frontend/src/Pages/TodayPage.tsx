@@ -15,9 +15,12 @@ import TodaySummaryCard from '@/Feature/ManageTodayPage/Components/TodaySummaryC
 import { ArrowLeft } from 'lucide-react';
 import LoadingScreen from '../shared/Components/LoadingScreen';
 import EmptyState from '@/Feature/ManageTodayPage/Components/EmptyState';
+import { useToast } from '../shared/Hooks/useToast';
+import ToastHost from '../shared/Components/ToastHost';
 
 const TodayPage: React.FC = () => {
   const navigate = useNavigate();
+  const toast = useToast();
 
   /** Filters driven by SelectedFilter; passed down to CardsGrid → useGroupedSubtasks */
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -99,7 +102,12 @@ const TodayPage: React.FC = () => {
   };
 
   if (loading) {
-    return <LoadingScreen message="Cargando tus actividades del día..." />;
+    return (
+      <>
+        <LoadingScreen message="Cargando tus actividades del día..." />
+        <ToastHost toasts={toast.toasts} onDismiss={toast.dismiss} />
+      </>
+    );
   }
 
   return (
@@ -181,6 +189,7 @@ const TodayPage: React.FC = () => {
               upcoming={upcoming}
               filters={filters}
               viewOptions={viewOptions}
+              toast={toast}
             />
           </div>
 
@@ -259,6 +268,8 @@ const TodayPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ToastHost toasts={toast.toasts} onDismiss={toast.dismiss} />
     </div>
   );
 };

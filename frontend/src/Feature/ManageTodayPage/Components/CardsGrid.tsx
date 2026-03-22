@@ -9,9 +9,8 @@ import {
 import type { Subtask } from '../Types/models';
 import CardTask from './CardTask';
 import InfoTooltip from '../../../shared/Components/InfoTooltip';
-import { useToast } from '../../../shared/Hooks/useToast';
-import ToastHost from '../../../shared/Components/ToastHost';
 import { todayService } from '../Services/todayService';
+import type { ToastState } from '../../../shared/Hooks/useToast';
 
 import '../Styles/CardTasks.css';
 
@@ -24,6 +23,21 @@ interface CardsGridProps {
   upcoming: Subtask[];
   filters?: Record<string, string>;
   viewOptions?: { overdue: boolean; today: boolean; upcoming: boolean };
+  toast: {
+    show: (options: Omit<ToastState, 'id'> & { id?: number }) => number;
+    error: (
+      title: string,
+      subtitle?: string,
+      duration?: number,
+      id?: number,
+    ) => number;
+    success: (
+      title: string,
+      subtitle?: string,
+      duration?: number,
+      id?: number,
+    ) => number;
+  };
 }
 
 /* ── Section header ─────────────────────────────────────── */
@@ -61,14 +75,8 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   upcoming,
   filters,
   viewOptions = { overdue: true, today: true, upcoming: true },
+  toast,
 }) => {
-  const {
-    toasts,
-    dismiss,
-    show: toastShow,
-    error: toastError,
-    success: toastSuccess,
-  } = useToast();
   const [undoPopInId, setUndoPopInId] = useState<number | null>(null);
   const undoPopInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -92,7 +100,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
 
   const handleMarkedCompleted = useCallback(
     (subtaskId: number) => {
-      toastShow({
+      toast.show({
         title: 'Subtarea marcada como completa!',
         variant: 'success',
         duration: 5000,
@@ -104,10 +112,10 @@ const CardsGrid: React.FC<CardsGridProps> = ({
             await todayService.updateSubtaskStatus(subtaskId, 'pending');
             triggerUndoPopIn(subtaskId);
             await onSubtaskUpdated?.();
-            toastSuccess('Cambios revertidos', 'La subtarea volvió a tus pendientes.');
+            toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.');
           } catch (error) {
             console.error('Error al deshacer completado:', error);
-            toastError(
+            toast.error(
               'Error al deshacer',
               'No se pudo revertir el estado. Intenta de nuevo.',
             );
@@ -115,7 +123,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
         },
       });
     },
-    [onSubtaskUpdated, toastError, toastShow, toastSuccess, triggerUndoPopIn],
+    [onSubtaskUpdated, toast, triggerUndoPopIn],
   );
 
   const isEmpty =
@@ -180,13 +188,12 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               variant="today" // Use today variant for standard visualization of completed items (since it shows duration)
               onClick={() => onSubtaskClick(sub)}
               onSubtaskUpdated={onSubtaskUpdated}
-              onActionError={toastError}
+              onActionError={toast.error}
               onMarkedCompleted={handleMarkedCompleted}
               animateUndoPopIn={undoPopInId === sub.id}
             />
           ))}
         </section>
-        <ToastHost toasts={toasts} onDismiss={dismiss} />
       </div>
     );
   }
@@ -211,7 +218,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
                 onClick={() => onSubtaskClick(sub)}
                 onRescheduleClick={() => onRescheduleSubtask?.(sub)}
                 onSubtaskUpdated={onSubtaskUpdated}
-                onActionError={toastError}
+                onActionError={toast.error}
                 onMarkedCompleted={handleMarkedCompleted}
                 animateUndoPopIn={undoPopInId === sub.id}
               />
@@ -235,7 +242,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
                 variant="today"
                 onClick={() => onSubtaskClick(sub)}
                 onSubtaskUpdated={onSubtaskUpdated}
-                onActionError={toastError}
+                onActionError={toast.error}
                 onMarkedCompleted={handleMarkedCompleted}
                 animateUndoPopIn={undoPopInId === sub.id}
               />
@@ -259,7 +266,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
                 variant="upcoming"
                 onClick={() => onSubtaskClick(sub)}
                 onSubtaskUpdated={onSubtaskUpdated}
-                onActionError={toastError}
+                onActionError={toast.error}
                 onMarkedCompleted={handleMarkedCompleted}
                 animateUndoPopIn={undoPopInId === sub.id}
               />
@@ -267,7 +274,6 @@ const CardsGrid: React.FC<CardsGridProps> = ({
           </section>
         )}
       </div>
-      <ToastHost toasts={toasts} onDismiss={dismiss} />
     </>
   );
 };
