@@ -138,7 +138,7 @@
   flex-direction: column;
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
-  min-height: 320px;
+  height: 320px;
 }
 .progress-card:hover {  
   transform: translateY(-4px);
@@ -218,6 +218,9 @@
   border-radius: var(--border-radius-base);
   padding: 1.25rem;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .progress-card-subtasks-title {
@@ -225,6 +228,7 @@
   font-weight: 600;
   color: var(--text-tertiary);
   margin: 0 0 1rem 0;
+  flex-shrink: 0;
 }
 
 .progress-empty-subtasks {
@@ -242,28 +246,52 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
+  padding-right: 0.35rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.progress-card-subtasks-list::-webkit-scrollbar {
+  width: 4px;
+}
+.progress-card-subtasks-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.progress-card-subtasks-list::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 4px;
 }
 
 .progress-pill {
+  position: relative;
   display: inline-flex;
   align-items: center;
   width: max-content;
-  max-width: 100%;
+  max-width: 240px; /* Ancho máximo estricto para forzar el corte */
   font-size: var(--font-size-small);
   font-weight: 700;
   padding: 0.4rem 0.75rem;
   border-radius: 4px;
   letter-spacing: 0.03em;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.progress-pill-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  gap: 0.5rem;
+  display: block;
 }
 
 .progress-pill-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 /* --- TEMAS DE COLOR (Green, Blue, Red) --- */

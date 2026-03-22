@@ -48,7 +48,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
               return (
                 <div key={sub.id} className={`progress-pill ${isDone ? 'completed' : ''}`}>
                   <div className="progress-pill-dot" />
-                  <span>{sub.description.toUpperCase()}</span>
+                  <span className="progress-pill-text">{sub.description.toUpperCase()}</span>
                 </div>
               );
             })}
