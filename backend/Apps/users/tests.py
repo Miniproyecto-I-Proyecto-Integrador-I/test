@@ -1,5 +1,13 @@
 from django.test import TestCase
+from django.utils import timezone
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.test import APIClient
+
+from Apps.subtask.models import Subtask
+from Apps.task.models import Task
+
+from .models import CustomUser
 from .auth_serializers import RegisterSerializer
 
 class RegisterValidationTests(TestCase):
@@ -67,3 +75,40 @@ class RegisterValidationTests(TestCase):
         for password in invalid_passwords:
             with self.assertRaises(ValidationError):
                 self.serializer.validate_password(password)
+
+
+class UpdateMeConflictDetectionTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create_user(
+            username="conflict.user",
+            email="conflict@example.com",
+            password="StrongPass123!",
+            daily_hours=8,
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_pending_subtask_with_note_still_triggers_conflict(self):
+        """Una subtarea pendiente con nota debe contarse para conflicto de límite."""
+        task = Task.objects.create(
+            title="Task con conflicto",
+            due_date=timezone.now(),
+            user=self.user,
+        )
+
+        Subtask.objects.create(
+            task=task,
+            description="Subtarea pendiente con nota",
+            status=Subtask.Status.PENDING,
+            planification_date=timezone.localdate(),
+            needed_hours=6,
+            note="nota previa",
+        )
+
+        response = self.client.put(
+            "/api/user/update/",
+            {"daily_hours": 4},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
