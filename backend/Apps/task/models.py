@@ -69,8 +69,14 @@ class Task(models.Model):
         else:
             self.progress = 0.0
 
+        # 3. Automatización de estados basada en el progreso
+        if self.progress >= 100.0:
+            self.status = self.Status.COMPLETED
+        elif self.status == self.Status.COMPLETED and self.progress < 100.0:
+            self.status = self.Status.IN_PROGRESS
+
         # Guardamos solo los campos afectados para no disparar señales innecesarias
-        self.save(update_fields=['total_hours', 'progress'])
+        self.save(update_fields=['total_hours', 'progress', 'status'])
 
     def __str__(self):
         return f"{self.title} - {self.status}"
