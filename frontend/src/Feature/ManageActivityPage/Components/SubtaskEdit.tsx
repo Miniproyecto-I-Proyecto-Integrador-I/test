@@ -191,7 +191,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
   const computedProgressPercentage = useMemo(() => {
     if (subtasks.length === 0) return task?.progress_percentage ?? 0;
     const completedCount = subtasks.filter(
-      (st) => st.status === 'completed' || st.is_completed
+      (st) => st.status === 'completed' || st.is_completed,
     ).length;
     return (completedCount / subtasks.length) * 100;
   }, [subtasks, task?.progress_percentage]);
@@ -284,33 +284,54 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         '¡Cambios guardados!',
         'La actividad se ha actualizado correctamente.',
         undefined,
-        loadId
+        loadId,
       );
     } catch {
-      toastError('Error al guardar', 'No se pudo actualizar la actividad.', undefined, loadId);
+      toastError(
+        'Error al guardar',
+        'No se pudo actualizar la actividad.',
+        undefined,
+        loadId,
+      );
     } finally {
       setIsCheckingConflict(false);
     }
   };
 
   const handleToggleComplete = async (subtaskToToggle: EditableSubtask) => {
-    const isCompleted = subtaskToToggle.status === 'completed' || subtaskToToggle.is_completed;
+    const isCompleted =
+      subtaskToToggle.status === 'completed' || subtaskToToggle.is_completed;
     const newStatus = isCompleted ? 'pending' : 'completed';
-    
+
     // Actualización optimista de la interfaz
-    setSubtasks(subtasks.map(s => 
-      s.id === subtaskToToggle.id ? { ...s, status: newStatus, is_completed: newStatus === 'completed' } : s
-    ));
+    setSubtasks(
+      subtasks.map((s) =>
+        s.id === subtaskToToggle.id
+          ? { ...s, status: newStatus, is_completed: newStatus === 'completed' }
+          : s,
+      ),
+    );
 
     try {
       await updateSubtask(Number(subtaskToToggle.id), { status: newStatus });
       // No mandamos toast de éxito; la actualización visual es suficiente confirmación.
     } catch (e) {
       // Revertir si la actualización en la BD falla
-      setSubtasks(subtasks.map(s => 
-        s.id === subtaskToToggle.id ? { ...s, status: isCompleted ? 'completed' : 'pending', is_completed: Boolean(isCompleted) } : s
-      ));
-      toastError('Error al guardar', 'No se pudo registrar el cambio en la actividad.');
+      setSubtasks(
+        subtasks.map((s) =>
+          s.id === subtaskToToggle.id
+            ? {
+                ...s,
+                status: isCompleted ? 'completed' : 'pending',
+                is_completed: Boolean(isCompleted),
+              }
+            : s,
+        ),
+      );
+      toastError(
+        'Error al guardar',
+        'No se pudo registrar el cambio en la actividad.',
+      );
     }
   };
 
@@ -378,10 +399,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
           ? 'La tarea se ha borrado correctamente.'
           : 'El paso se ha eliminado de la lista.',
         undefined,
-        loadId
+        loadId,
       );
     } catch (error) {
-      toastError('Error al eliminar', 'No se pudo completar la operación.', undefined, loadId);
+      toastError(
+        'Error al eliminar',
+        'No se pudo completar la operación.',
+        undefined,
+        loadId,
+      );
     }
   };
 
@@ -400,11 +426,16 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         '¡Tarea guardada!',
         'Los cambios se han aplicado correctamente.',
         undefined,
-        loadId
+        loadId,
       );
     } catch (error) {
       console.error('Error al guardar cambios de la tarea:', error);
-      toastError('Error al guardar', 'No se pudo actualizar la tarea.', undefined, loadId);
+      toastError(
+        'Error al guardar',
+        'No se pudo actualizar la tarea.',
+        undefined,
+        loadId,
+      );
     } finally {
       setIsSavingTask(false);
     }
@@ -430,9 +461,33 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     try {
       let nextSubtasks = [...subtasks];
       const isEditingMode = conflictData ? !conflictData.isNew : false;
+      const tasksPendingDelete = resolvedTasks.filter(
+        (task) => task.pendingDelete && !task.isNew,
+      );
+      const tasksToPersist = resolvedTasks.filter(
+        (task) => !task.pendingDelete,
+      );
+
+      for (const taskToDelete of tasksPendingDelete) {
+        const numericId = parseInt(taskToDelete.id, 10);
+        if (!onDeleteSubtask || Number.isNaN(numericId)) continue;
+
+        await onDeleteSubtask({
+          id: numericId,
+          description: taskToDelete.title,
+          needed_hours: taskToDelete.hours,
+          planification_date: taskToDelete.date,
+        });
+
+        nextSubtasks = nextSubtasks.filter(
+          (oldSubtask) =>
+            oldSubtask.id !== numericId &&
+            oldSubtask.id !== String(taskToDelete.id),
+        );
+      }
 
       // Find the modified tasks to save
-      for (const t of resolvedTasks) {
+      for (const t of tasksToPersist) {
         if (t.isNew && conflictData) {
           const finalSubtaskData: SubtaskFormData = {
             description: t.title,
@@ -501,7 +556,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
         '¡Conflicto Resuelto!',
         'Los horarios se ajustaron correctamente.',
         undefined,
-        loadId
+        loadId,
       );
 
       // Cleanup UI
@@ -515,7 +570,12 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       cancelEditing();
     } catch (err) {
       console.error(err);
-      toastError('Error', 'No se pudieron aplicar todos los cambios resueltos', undefined, loadId);
+      toastError(
+        'Error',
+        'No se pudieron aplicar todos los cambios resueltos',
+        undefined,
+        loadId,
+      );
     }
   };
 

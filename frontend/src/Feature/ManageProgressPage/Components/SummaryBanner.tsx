@@ -10,7 +10,7 @@ const SummaryBanner = ({ totalPending, totalCompleted }: SummaryBannerProps) => 
     <div className="progress-summary-banner">
       <div className="progress-summary-left">
         <div className="progress-summary-left-title">
-          <span>Estado General del Proyecto</span>
+          <span>Estado General</span>
         </div>
         <p>Tienes {totalPending} tareas <strong>por completar para</strong> este {getMonthName()}.</p>
       </div>
