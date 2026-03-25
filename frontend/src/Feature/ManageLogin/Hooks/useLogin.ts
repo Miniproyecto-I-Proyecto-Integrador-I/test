@@ -17,8 +17,12 @@ export const useLogin = () => {
       const tokens = await loginUser({ email, password });
       await loginToContext(tokens.access, tokens.refresh);
       navigate('/today');
-    } catch (err) {
-      setError('Invalid credentials or server error');
+    } catch (err: any) {
+      if (err?.isNetworkError || !err?.response) {
+        setError('Estamos teniendo problemas técnicos. Vuelve más tarde.');
+      } else {
+        setError('Credenciales invalidas');
+      }
       console.error(err);
     } finally {
       setLoading(false);

@@ -11,6 +11,7 @@ interface GroupedSubtasks {
   rawToday: Subtask[];
   rawUpcoming: Subtask[];
   loading: boolean;
+  hasError: boolean;
   allCourses: string[];
   reloadSubtasks: () => Promise<void>;
 }
@@ -31,6 +32,7 @@ export const useGroupedSubtasks = (
   const [rawToday, setRawToday] = useState<Subtask[]>([]);
   const [rawUpcoming, setRawUpcoming] = useState<Subtask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const hasLoadedOnceRef = useRef(false);
 
   const areSubtasksEquivalent = useCallback((a: Subtask, b: Subtask) => {
@@ -101,6 +103,7 @@ export const useGroupedSubtasks = (
     }
 
     try {
+      setHasError(false);
       const [overdueData, todayData, upcomingData] = await Promise.all([
         todayService.getFilterSubtasks({ planification_date_lte: fechaAyer }),
         todayService.getFilterSubtasks({ planification_date: fechaToday }),
@@ -115,6 +118,7 @@ export const useGroupedSubtasks = (
       hasLoadedOnceRef.current = true;
     } catch (error) {
       console.error('Error al cargar subtareas agrupadas:', error);
+      setHasError(true);
     } finally {
       setLoading(false);
     }
@@ -199,6 +203,7 @@ export const useGroupedSubtasks = (
     rawToday,
     rawUpcoming,
     loading,
+    hasError,
     allCourses,
     reloadSubtasks,
   };

@@ -15,6 +15,7 @@ import TodaySummaryCard from '@/Feature/ManageTodayPage/Components/TodaySummaryC
 import { ArrowLeft } from 'lucide-react';
 import LoadingScreen from '../shared/Components/LoadingScreen';
 import EmptyState from '@/Feature/ManageTodayPage/Components/EmptyState';
+import ErrorState from '@/Feature/ManageTodayPage/Components/ErrorState';
 import { useToast } from '../shared/Hooks/useToast';
 import ToastHost from '../shared/Components/ToastHost';
 
@@ -46,6 +47,7 @@ const TodayPage: React.FC = () => {
     rawToday,
     rawUpcoming,
     loading,
+    hasError,
     allCourses,
     reloadSubtasks,
   } = useGroupedSubtasks(filters);
@@ -144,7 +146,20 @@ const TodayPage: React.FC = () => {
         </div>
       </header>
 
-      {isGridEmpty && !isFiltered ? (
+      {hasError ? (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            padding: '60px 20px',
+            flexGrow: 1,
+          }}
+        >
+          <ErrorState />
+        </div>
+      ) : isGridEmpty && !isFiltered ? (
         <div
           style={{
             display: 'flex',
