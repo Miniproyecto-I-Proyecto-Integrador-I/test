@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingScreen from '../shared/Components/LoadingScreen';
 import { useProgressTasks } from '../Feature/ManageProgressPage/Hooks/useProgressTasks';
@@ -14,7 +14,13 @@ import '../Feature/ManageProgressPage/Styles/ProgressPage.css';
 
 const ProgressPage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [statusFilter, setStatusFilter] = useState('active');
+  const [statusFilter, setStatusFilter] = useState<string>(() => {
+    try {
+      return sessionStorage.getItem('progress.statusFilter') || 'active';
+    } catch (e) {
+      return 'active';
+    }
+  });
 
   const { tasks, loading, hasError } = useProgressTasks();
 
@@ -40,6 +46,41 @@ const ProgressPage = () => {
       scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
     }
   };
+
+  // Persist filter changes
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('progress.statusFilter', statusFilter);
+    } catch (e) {
+      // ignore
+    }
+  }, [statusFilter]);
+
+  // Save scroll position when user scrolls
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      try {
+        sessionStorage.setItem(
+          'progress.scrollLeft',
+          String(scrollRef.current.scrollLeft),
+        );
+      } catch (e) {
+        // ignore
+      }
+    }
+  };
+
+  // Restore scroll position after tasks load
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('progress.scrollLeft');
+      if (saved && scrollRef.current) {
+        scrollRef.current.scrollLeft = parseFloat(saved);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [tasks.length]);
 
   if (loading) {
     return <LoadingScreen message="Cargando el progreso de tus tareas..." />;
@@ -101,7 +142,11 @@ const ProgressPage = () => {
             </div>
           </div>
 
-          <div className="progress-cards-container" ref={scrollRef}>
+          <div
+            className="progress-cards-container"
+            ref={scrollRef}
+            onScroll={handleScroll}
+          >
             {filteredTasks.length === 0 ? (
               <div
                 style={{

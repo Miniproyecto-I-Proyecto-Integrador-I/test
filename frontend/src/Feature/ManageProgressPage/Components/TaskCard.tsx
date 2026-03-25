@@ -11,11 +11,30 @@ interface TaskCardProps {
 const TaskCard = ({ task }: TaskCardProps) => {
   const navigate = useNavigate();
   const subs = task.subtasks || [];
-  const completedSubsCount = subs.filter(s => s.status === 'completed').length;
+  const completedSubsCount = subs.filter(
+    (s) => s.status === 'completed',
+  ).length;
   const pct = Math.round(task.progress_percentage || 0);
 
+  const handleClick = () => {
+    try {
+      const container = document.querySelector(
+        '.progress-cards-container',
+      ) as HTMLElement | null;
+      if (container) {
+        sessionStorage.setItem(
+          'progress.scrollLeft',
+          String(container.scrollLeft),
+        );
+      }
+    } catch (e) {
+      // ignore
+    }
+    navigate(`/activity/${task.id}`);
+  };
+
   return (
-    <div className="progress-card" onClick={() => navigate(`/activity/${task.id}`)}>
+    <div className="progress-card" onClick={handleClick}>
       <div className="progress-card-header">
         <div className="progress-card-header-left">
           <h3>{task.title}</h3>
@@ -35,7 +54,9 @@ const TaskCard = ({ task }: TaskCardProps) => {
       </div>
 
       <div className="progress-card-subtasks-wrapper">
-        <p className="progress-card-subtasks-title">ACTIVIDADES ({completedSubsCount}/{subs.length})</p>
+        <p className="progress-card-subtasks-title">
+          ACTIVIDADES ({completedSubsCount}/{subs.length})
+        </p>
         {subs.length === 0 ? (
           <div className="progress-empty-subtasks">
             <PlusCircle size={14} />
@@ -43,12 +64,17 @@ const TaskCard = ({ task }: TaskCardProps) => {
           </div>
         ) : (
           <div className="progress-card-subtasks-list">
-            {subs.map(sub => {
+            {subs.map((sub) => {
               const isDone = sub.status === 'completed';
               return (
-                <div key={sub.id} className={`progress-pill ${isDone ? 'completed' : ''}`}>
+                <div
+                  key={sub.id}
+                  className={`progress-pill ${isDone ? 'completed' : ''}`}
+                >
                   <div className="progress-pill-dot" />
-                  <span className="progress-pill-text">{sub.description.toUpperCase()}</span>
+                  <span className="progress-pill-text">
+                    {sub.description.toUpperCase()}
+                  </span>
                 </div>
               );
             })}
