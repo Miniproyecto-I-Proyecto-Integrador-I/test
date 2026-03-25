@@ -333,6 +333,11 @@
   align-items: center;
 }
 
+.progress-summary-banner--overdue {
+  border-color: #fecaca;
+  border-left-color: var(--error-color);
+}
+
 .progress-summary-left {
   display: flex;
   flex-direction: column;
@@ -346,6 +351,10 @@
   font-weight: 600;
   color: var(--primary-hover);
   font-size: var(--font-size-h3);
+}
+
+.progress-summary-banner--overdue .progress-summary-left-title {
+  color: #b91c1c;
 }
 
 .progress-summary-left p {
@@ -365,6 +374,11 @@
   padding: 0.85rem 1.25rem;
 }
 
+.progress-summary-right--overdue {
+  border-color: #fecaca;
+  background-color: #fef2f2;
+}
+
 .progress-summary-stat {
   display: flex;
   flex-direction: column;
@@ -380,6 +394,10 @@
   line-height: 1;
 }
 
+.progress-summary-banner--overdue .progress-summary-stat h2 {
+  color: #b91c1c;
+}
+
 .progress-summary-stat span {
   font-size: var(--font-size-small);
   font-weight: 500;
@@ -392,6 +410,10 @@
   width: 1px;
   height: 48px;
   background-color: var(--primary-light);
+}
+
+.progress-summary-banner--overdue .progress-summary-divider {
+  background-color: #fecaca;
 }
 
 /* --- Estados de Vacío y Error --- */

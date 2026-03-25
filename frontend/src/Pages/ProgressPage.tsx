@@ -2,7 +2,10 @@ import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingScreen from '../shared/Components/LoadingScreen';
 import { useProgressTasks } from '../Feature/ManageProgressPage/Hooks/useProgressTasks';
-import { filterTasks, getProjectSummary } from '../Feature/ManageProgressPage/Utils/progressUtils';
+import {
+  filterTasks,
+  getProjectSummary,
+} from '../Feature/ManageProgressPage/Utils/progressUtils';
 import TaskCard from '../Feature/ManageProgressPage/Components/TaskCard';
 import SummaryBanner from '../Feature/ManageProgressPage/Components/SummaryBanner';
 import EmptyState from '../Feature/ManageProgressPage/Components/EmptyState';
@@ -11,11 +14,12 @@ import '../Feature/ManageProgressPage/Styles/ProgressPage.css';
 
 const ProgressPage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [statusFilter, setStatusFilter] = useState('active'); 
+  const [statusFilter, setStatusFilter] = useState('active');
 
   const { tasks, loading, hasError } = useProgressTasks();
 
   const filteredTasks = filterTasks(tasks, statusFilter);
+  const overdueCount = filterTasks(tasks, 'overdue').length;
   const { totalCompleted, totalPending } = getProjectSummary(tasks);
 
   const getThemeClass = () => {
@@ -29,7 +33,10 @@ const ProgressPage = () => {
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === 'left' ? scrollLeft - clientWidth / 2 : scrollLeft + clientWidth / 2;
+      const scrollTo =
+        direction === 'left'
+          ? scrollLeft - clientWidth / 2
+          : scrollLeft + clientWidth / 2;
       scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
     }
   };
@@ -48,10 +55,12 @@ const ProgressPage = () => {
         <div className="progress-title-wrapper">
           <h1>Progreso de las tareas</h1>
         </div>
-        
+
         <div className="progress-filter-wrapper">
-          <label htmlFor="status-filter" className="progress-filter-label">Filtrar por:</label>
-          <select 
+          <label htmlFor="status-filter" className="progress-filter-label">
+            Filtrar por:
+          </label>
+          <select
             id="status-filter"
             className="progress-dropdown"
             value={statusFilter}
@@ -70,27 +79,55 @@ const ProgressPage = () => {
         <>
           <div className="progress-section-header">
             <h2 className="progress-section-title">
-              {statusFilter === 'active' ? 'EN PROGRESO' : statusFilter === 'completed' ? 'COMPLETADAS' : 'VENCIDAS'}
+              {statusFilter === 'active'
+                ? 'EN PROGRESO'
+                : statusFilter === 'completed'
+                  ? 'COMPLETADAS'
+                  : 'VENCIDAS'}
             </h2>
             <div className="progress-carousel-nav">
-              <button aria-label="Ver anteriores" onClick={() => scroll('left')}><ChevronLeft size={20} strokeWidth={3} /></button>
-              <button aria-label="Ver siguientes" onClick={() => scroll('right')}><ChevronRight size={20} strokeWidth={3} /></button>
+              <button
+                aria-label="Ver anteriores"
+                onClick={() => scroll('left')}
+              >
+                <ChevronLeft size={20} strokeWidth={3} />
+              </button>
+              <button
+                aria-label="Ver siguientes"
+                onClick={() => scroll('right')}
+              >
+                <ChevronRight size={20} strokeWidth={3} />
+              </button>
             </div>
           </div>
 
           <div className="progress-cards-container" ref={scrollRef}>
             {filteredTasks.length === 0 ? (
-               <div style={{ width: '100%', padding: '4rem', textAlign: 'center', color: '#9ca3af', border: '1px dashed #e5e7eb', borderRadius: '12px' }}>
-                 No se encontraron tareas con estos filtros.
-               </div>
+              <div
+                style={{
+                  width: '100%',
+                  padding: '4rem',
+                  textAlign: 'center',
+                  color: '#9ca3af',
+                  border: '1px dashed #e5e7eb',
+                  borderRadius: '12px',
+                }}
+              >
+                No se encontraron tareas con estos filtros.
+              </div>
             ) : (
-               filteredTasks.map(task => (
-                 <TaskCard key={task.id} task={task} />
-               ))
+              filteredTasks.map((task) => (
+                <TaskCard key={task.id} task={task} />
+              ))
             )}
           </div>
 
-          <SummaryBanner totalPending={totalPending} totalCompleted={totalCompleted} />
+          <SummaryBanner
+            totalPending={totalPending}
+            totalCompleted={totalCompleted}
+            overdueCount={overdueCount}
+            statusFilter={statusFilter}
+          />
         </>
       )}
     </div>
