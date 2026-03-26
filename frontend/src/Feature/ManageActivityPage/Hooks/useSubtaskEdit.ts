@@ -87,13 +87,15 @@ export function useSubtaskEdit({
     });
   }, []);
 
-  const saveEditedSubtask = useCallback(() => {
+  const saveEditedSubtask = useCallback((skipValidation = false) => {
     if (editingId === null) return;
 
-    const validationErrors = validateSubtaskForm(editData);
-    if (hasValidationErrors(validationErrors)) {
-      setErrors(validationErrors);
-      return;
+    if (!skipValidation) {
+      const validationErrors = validateSubtaskForm(editData);
+      if (hasValidationErrors(validationErrors)) {
+        setErrors(validationErrors);
+        return;
+      }
     }
 
     const newSubtasks = subtasks.map((item) =>

@@ -210,6 +210,52 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
       return;
     }
 
+    const trimmedDescription = String(editData.description ?? '').trim();
+    if (!trimmedDescription) {
+      setDescriptionError('La descripción de la actividad es obligatoria.');
+      toastError(
+        'Datos incompletos',
+        'Por favor, completa el nombre de la actividad.',
+      );
+      return;
+    }
+
+    const dateChanged =
+      !!original && original.planification_date !== editData.planification_date;
+    const hoursChanged =
+      !!original &&
+      Number(original.needed_hours) !== Number(editData.needed_hours);
+    const shouldValidateSchedule = dateChanged || hoursChanged;
+
+    if (!shouldValidateSchedule) {
+      const loadId = toastLoading('Guardando actividad…', 'Aplicando cambios');
+      try {
+        if (onSaveIndividualSubtask && original) {
+          await onSaveIndividualSubtask({
+            ...original,
+            description: trimmedDescription,
+          });
+        }
+
+        saveEditedSubtask(true);
+
+        toastSuccess(
+          '¡Cambios guardados!',
+          'La actividad se ha actualizado correctamente.',
+          undefined,
+          loadId,
+        );
+      } catch {
+        toastError(
+          'Error al guardar',
+          'No se pudo actualizar la actividad.',
+          undefined,
+          loadId,
+        );
+      }
+      return;
+    }
+
     // Validar antes de procesar
     const validationErrors = validateSubtaskForm(editData);
     if (hasValidationErrors(validationErrors) || hourLimitError) {
