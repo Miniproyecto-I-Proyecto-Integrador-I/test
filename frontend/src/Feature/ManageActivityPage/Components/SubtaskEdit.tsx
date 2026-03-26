@@ -225,6 +225,15 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
     const hoursChanged =
       !!original &&
       Number(original.needed_hours) !== Number(editData.needed_hours);
+
+    if (hoursChanged && isDateBeforeToday(editData.planification_date)) {
+      toastError(
+        'Reprogramación requerida',
+        'Debes reprogramar la subtarea antes de poder cambiar las horas.',
+      );
+      return;
+    }
+
     const shouldValidateSchedule = dateChanged || hoursChanged;
 
     if (!shouldValidateSchedule) {
