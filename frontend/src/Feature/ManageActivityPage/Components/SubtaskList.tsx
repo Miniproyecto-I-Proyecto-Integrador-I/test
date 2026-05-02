@@ -39,6 +39,7 @@ interface SubtaskListProps {
   onResolveConflict: () => void;
   onResolveConflictNew: (data: SubtaskFormData) => void;
   onHoursChange: (value: number) => void;
+  onToggleComplete: (subtask: EditableSubtask) => void;
 }
 
 const SubtaskList: React.FC<SubtaskListProps> = ({
@@ -61,6 +62,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
   onResolveConflict,
   onResolveConflictNew,
   onHoursChange,
+  onToggleComplete,
 }) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const {
@@ -78,15 +80,15 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
     );
     try {
       await onCreateSubtask(data);
-      dismiss(loadId);
       toastSuccess(
         '¡Actividad creada!',
         'El nuevo paso se ha agregado correctamente.',
+        undefined,
+        loadId
       );
       setIsAddingNew(false);
     } catch {
-      dismiss(loadId);
-      toastError('Error al crear', 'No se pudo guardar la nueva actividad.');
+      toastError('Error al crear', 'No se pudo guardar la nueva actividad.', undefined, loadId);
     }
   };
 
@@ -104,7 +106,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 strokeWidth={1.5}
               />
               <p className="subtask-edit-empty-text">
-                No hay subtareas creadas
+                Aún no tienes subtareas...
               </p>
               <p className="subtask-edit-empty-hint">
                 Agrega un nuevo paso para comenzar a organizar tu tarea
@@ -129,6 +131,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 onSave={onSaveSubtask}
                 onResolveConflict={onResolveConflict}
                 onHoursChange={onHoursChange}
+                onToggleComplete={() => onToggleComplete(subtask)}
               />
             ))
           )}

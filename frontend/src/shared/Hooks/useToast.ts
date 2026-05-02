@@ -9,6 +9,8 @@ export interface ToastState {
   duration: number;
   showProgress: boolean;
   loading: boolean;
+  actionLabel?: string;
+  onAction?: () => void | Promise<void>;
 }
 
 /** Min time a toast is visible before it can be auto-dismissed (ms) */
@@ -29,6 +31,8 @@ export function useToast() {
       duration = 4000,
       showProgress = true,
       loading = false,
+      actionLabel,
+      onAction,
       id: customId,
     }: Omit<ToastState, 'id'> & { id?: number }): number => {
       const id = customId ?? nextId();
@@ -37,10 +41,33 @@ export function useToast() {
         const index = prev.findIndex((t) => t.id === id);
         if (index >= 0) {
           const next = [...prev];
-          next[index] = { id, title, subtitle, variant, duration, showProgress, loading };
+          next[index] = {
+            id,
+            title,
+            subtitle,
+            variant,
+            duration,
+            showProgress,
+            loading,
+            actionLabel,
+            onAction,
+          };
           return next;
         }
-        return [...prev, { id, title, subtitle, variant, duration, showProgress, loading }];
+        return [
+          ...prev,
+          {
+            id,
+            title,
+            subtitle,
+            variant,
+            duration,
+            showProgress,
+            loading,
+            actionLabel,
+            onAction,
+          },
+        ];
       });
       return id;
     },
@@ -57,28 +84,27 @@ export function useToast() {
     }, remaining);
   }, []);
 
-  /** Convenience helpers */
   const success = useCallback(
-    (title: string, subtitle?: string, duration?: number) =>
-      show({ title, subtitle, variant: 'success', duration: duration ?? 4000, showProgress: true, loading: false }),
+    (title: string, subtitle?: string, duration?: number, id?: number) =>
+      show({ title, subtitle, variant: 'success', duration: duration ?? 4000, showProgress: true, loading: false, id }),
     [show],
   );
 
   const error = useCallback(
-    (title: string, subtitle?: string, duration?: number) =>
-      show({ title, subtitle, variant: 'error', duration: duration ?? 5000, showProgress: true, loading: false }),
+    (title: string, subtitle?: string, duration?: number, id?: number) =>
+      show({ title, subtitle, variant: 'error', duration: duration ?? 5000, showProgress: true, loading: false, id }),
     [show],
   );
 
   const loading = useCallback(
-    (title: string, subtitle?: string): number =>
-      show({ title, subtitle, variant: 'loading', duration: 0, showProgress: false, loading: true }),
+    (title: string, subtitle?: string, id?: number): number =>
+      show({ title, subtitle, variant: 'loading', duration: 0, showProgress: false, loading: true, id }),
     [show],
   );
 
   const warning = useCallback(
-    (title: string, subtitle?: string, duration?: number) =>
-      show({ title, subtitle, variant: 'warning', duration: duration ?? 4500, showProgress: true, loading: false }),
+    (title: string, subtitle?: string, duration?: number, id?: number) =>
+      show({ title, subtitle, variant: 'warning', duration: duration ?? 4500, showProgress: true, loading: false, id }),
     [show],
   );
 

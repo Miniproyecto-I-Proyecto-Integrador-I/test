@@ -15,9 +15,13 @@ import TodaySummaryCard from '@/Feature/ManageTodayPage/Components/TodaySummaryC
 import { ArrowLeft } from 'lucide-react';
 import LoadingScreen from '../shared/Components/LoadingScreen';
 import EmptyState from '@/Feature/ManageTodayPage/Components/EmptyState';
+import ErrorState from '@/Feature/ManageTodayPage/Components/ErrorState';
+import { useToast } from '../shared/Hooks/useToast';
+import ToastHost from '../shared/Components/ToastHost';
 
 const TodayPage: React.FC = () => {
   const navigate = useNavigate();
+  const toast = useToast();
 
   /** Filters driven by SelectedFilter; passed down to CardsGrid → useGroupedSubtasks */
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -27,6 +31,11 @@ const TodayPage: React.FC = () => {
     today: true,
     upcoming: false,
   });
+  const [previousViewOptions, setPreviousViewOptions] = useState<{
+    overdue: boolean;
+    today: boolean;
+    upcoming: boolean;
+  } | null>(null);
   const [showViewMenu, setShowViewMenu] = useState(false);
 
   const { user } = useAuth();
@@ -38,11 +47,17 @@ const TodayPage: React.FC = () => {
     rawToday,
     rawUpcoming,
     loading,
+    hasError,
     allCourses,
+    reloadSubtasks,
   } = useGroupedSubtasks(filters);
 
   const hasAnyTasks =
     rawOverdue.length > 0 || rawToday.length > 0 || rawUpcoming.length > 0;
+
+  const summaryTodaySubtasks = rawToday.filter(
+    (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
+  );
 
   const allThreeSelected =
     viewOptions.overdue &&
@@ -89,7 +104,12 @@ const TodayPage: React.FC = () => {
   };
 
   if (loading) {
-    return <LoadingScreen message="Cargando tus actividades del día..." />;
+    return (
+      <>
+        <LoadingScreen message="Cargando tus actividades del día..." />
+        <ToastHost toasts={toast.toasts} onDismiss={toast.dismiss} />
+      </>
+    );
   }
 
   return (
@@ -126,7 +146,20 @@ const TodayPage: React.FC = () => {
         </div>
       </header>
 
-      {isGridEmpty && !isFiltered ? (
+      {hasError ? (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            padding: '60px 20px',
+            flexGrow: 1,
+          }}
+        >
+          <ErrorState />
+        </div>
+      ) : isGridEmpty && !isFiltered ? (
         <div
           style={{
             display: 'flex',
@@ -155,9 +188,9 @@ const TodayPage: React.FC = () => {
           {/* Main Column */}
           <div className="today-main-column">
             <StatusCardGrid
-              defeatedSubTask={rawOverdue[0]}
-              todaySubTask={rawToday[0]}
-              nextSubTask={rawUpcoming[0]}
+              defeatedSubTask={overdue[0]}
+              todaySubTask={today[0]}
+              nextSubTask={upcoming[0]}
               viewOptions={viewOptions}
               onSubtaskClick={handleSubtaskClick}
             />
@@ -165,11 +198,13 @@ const TodayPage: React.FC = () => {
             <CardsGrid
               onSubtaskClick={handleSubtaskClick}
               onRescheduleSubtask={handleRescheduleSubtask}
+              onSubtaskUpdated={reloadSubtasks}
               overdue={overdue}
               today={today}
               upcoming={upcoming}
               filters={filters}
               viewOptions={viewOptions}
+              toast={toast}
             />
           </div>
 
@@ -178,13 +213,14 @@ const TodayPage: React.FC = () => {
             {!viewOptions.overdue && rawOverdue.length > 0 && (
               <OverdueTasksAlert
                 count={rawOverdue.length}
-                onSolve={() =>
+                onSolve={() => {
+                  setPreviousViewOptions(viewOptions);
                   setViewOptions({
                     overdue: true,
                     today: false,
                     upcoming: false,
-                  })
-                }
+                  });
+                }}
               />
             )}
 
@@ -207,13 +243,18 @@ const TodayPage: React.FC = () => {
                   </div>
                   <button
                     className="overdue-return-button"
-                    onClick={() =>
-                      setViewOptions({
-                        overdue: false,
-                        today: true,
-                        upcoming: true,
-                      })
-                    }
+                    onClick={() => {
+                      if (previousViewOptions) {
+                        setViewOptions(previousViewOptions);
+                        setPreviousViewOptions(null);
+                      } else {
+                        setViewOptions({
+                          overdue: false,
+                          today: true,
+                          upcoming: true,
+                        });
+                      }
+                    }}
                   >
                     <ArrowLeft size={16} />
                     Volver a mi día
@@ -221,10 +262,10 @@ const TodayPage: React.FC = () => {
                 </div>
               )}
 
-            {rawToday.length > 0 && (
+            {summaryTodaySubtasks.length > 0 && (
               <TodaySummaryCard
-                pendingCount={rawToday.length}
-                totalNeededHours={rawToday.reduce(
+                pendingCount={summaryTodaySubtasks.length}
+                totalNeededHours={summaryTodaySubtasks.reduce(
                   (acc, curr) => acc + (curr.needed_hours || 0),
                   0,
                 )}
@@ -242,6 +283,8 @@ const TodayPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ToastHost toasts={toast.toasts} onDismiss={toast.dismiss} />
     </div>
   );
 };

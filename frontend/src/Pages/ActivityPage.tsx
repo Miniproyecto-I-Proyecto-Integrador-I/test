@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import SubtaskEdit from '../Feature/ManageActivityPage/Components/SubtaskEdit';
 import {
@@ -79,7 +79,9 @@ const ActivityPage = () => {
           description: item.description,
           planification_date: item.planification_date,
           needed_hours: Number(item.needed_hours) || 0,
+          status: item.status,
           is_completed: item.is_completed,
+          note: item.note ?? null,
         }),
       );
       setTask((prev) =>
@@ -154,6 +156,10 @@ const ActivityPage = () => {
     }
   };
 
+  const handleSubtasksChange = useCallback((newSubtasks: EditableSubtask[]) => {
+    setTask((prev) => (prev ? { ...prev, subtasks: newSubtasks } : prev));
+  }, []);
+
   if (loading) {
     return <LoadingScreen message="Cargando detalles de la actividad..." />;
   }
@@ -169,6 +175,7 @@ const ActivityPage = () => {
             taskTitle={task.title}
             taskDueDate={task.due_date ?? undefined}
             task={task}
+            onSubtasksChange={handleSubtasksChange}
             onSaveIndividualSubtask={handleSaveIndividualSubtask}
             onCreateSubtask={handleCreateSubtask}
             onSaveTask={handleSaveTask}

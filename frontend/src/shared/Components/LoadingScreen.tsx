@@ -13,7 +13,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = 'Cargando infor
         <div className="loading-spinner-ring" />
         <img src={Logo} alt="Loading TaskMaster" className="loading-logo-img" />
       </div>
-      <p className="loading-message">{message}</p>
+      {message && <p className="loading-message">{message}</p>}
     </div>
   );
 };

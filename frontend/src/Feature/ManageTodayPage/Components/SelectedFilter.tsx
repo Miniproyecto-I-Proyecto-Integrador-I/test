@@ -64,9 +64,7 @@ const SelectedFilter: React.FC<SelectedFilterProps> = ({
           >
             <option value="">Todos los estados</option>
             <option value="pending">Pendiente</option>
-            <option value="in_progress">En progreso</option>
             <option value="postponed">Pospuesto</option>
-            <option value="completed">Completado</option>
           </select>
         </div>
 

@@ -8,6 +8,7 @@ export interface ConflictTask {
   date: string; // ISO: 'YYYY-MM-DD'
   isNew?: boolean; // only true for the incoming task causing the conflict (case 1)
   parentDueDate?: string;
+  pendingDelete?: boolean;
 }
 
 export interface ConflictScenario {

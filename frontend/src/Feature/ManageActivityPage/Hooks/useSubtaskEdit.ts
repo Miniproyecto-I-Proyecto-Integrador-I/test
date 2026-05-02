@@ -9,7 +9,9 @@ export interface EditableSubtask {
   description: string;
   planification_date: string;
   needed_hours: number;
+  status?: string;
   is_completed?: boolean;
+  note?: string | null;
 }
 
 export type DeleteTarget = { type: 'main-task' } | { type: 'subtask'; subtask: EditableSubtask };
@@ -85,13 +87,15 @@ export function useSubtaskEdit({
     });
   }, []);
 
-  const saveEditedSubtask = useCallback(() => {
+  const saveEditedSubtask = useCallback((skipValidation = false) => {
     if (editingId === null) return;
 
-    const validationErrors = validateSubtaskForm(editData);
-    if (hasValidationErrors(validationErrors)) {
-      setErrors(validationErrors);
-      return;
+    if (!skipValidation) {
+      const validationErrors = validateSubtaskForm(editData);
+      if (hasValidationErrors(validationErrors)) {
+        setErrors(validationErrors);
+        return;
+      }
     }
 
     const newSubtasks = subtasks.map((item) =>

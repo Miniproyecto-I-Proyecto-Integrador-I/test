@@ -150,9 +150,14 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
 }
 
+.conflict-task--pending-delete {
+  opacity: 0.78;
+  border-style: dashed;
+}
+
 /* Highlighted card — new task causing the conflict */
 .conflict-task--new {
-  border-color: var(--error-color);
+  border-color: var(--border-color);
 }
 
 /* New task card when conflict is resolved */
@@ -164,7 +169,7 @@
 
 /* A task that is still in conflict on the selected day */
 .conflict-task--overflow {
-  border-color: var(--warning-color);
+  border-color: var(--border-color);
 }
 
 .conflict-task__info {
@@ -206,6 +211,13 @@
   font-size: var(--font-size-small);
   color: var(--error-color);
   margin-top: 4px;
+}
+
+.conflict-task__pending-delete-label {
+  font-size: var(--font-size-small);
+  color: var(--error-color);
+  margin: 6px 0 0;
+  font-weight: 600;
 }
 
 .conflict-task__controls {
@@ -353,6 +365,32 @@
   visibility: hidden;
 }
 
+.conflict-trash-btn {
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--font-size-small);
+  font-family: var(--font-family);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.conflict-trash-btn:hover {
+  border-color: var(--error-color);
+  color: var(--error-color);
+}
+
+.conflict-trash-btn--active {
+  border-color: var(--error-color);
+  color: var(--error-color);
+}
+
 /* ============================================================
    AUTO-RESOLVE BUTTON
    ============================================================ */
@@ -420,6 +458,13 @@
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.conflict-footer__pending-delete {
+  margin: 0 auto 0 0;
+  font-size: var(--font-size-small);
+  color: var(--error-color);
+  font-weight: 600;
 }
 
 .conflict-btn-cancel {
@@ -566,6 +611,11 @@
     width: 100%;
     justify-content: flex-end;
     gap: 12px;
+  }
+
+  .conflict-trash-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .conflict-task__title {

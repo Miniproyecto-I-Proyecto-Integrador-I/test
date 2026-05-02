@@ -12,5 +12,21 @@ export const todayService = {
         return response.data;
     },
 
+    updateSubtaskStatus: async (subtaskId: number, status: string): Promise<Subtask> => {
+        const response = await apiClient.patch<Subtask>(`/api/subtasks/${subtaskId}/`, { status });
+        return response.data;
+    },
+
+    postponeSubtask: async (subtaskId: number, note?: string): Promise<Subtask> => {
+        const normalizedNote = note?.trim();
+        const payload: { status: string; note: string | null } = {
+            status: 'postponed',
+            note: normalizedNote ? normalizedNote : null,
+        };
+
+        const response = await apiClient.patch<Subtask>(`/api/subtasks/${subtaskId}/`, payload);
+        return response.data;
+    },
+
     
 }

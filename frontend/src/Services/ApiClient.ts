@@ -3,6 +3,16 @@ import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { authStorage } from './authStorage';
 import { authService } from './authService';
 
+const isNetworkError = (error: any): boolean => {
+    return !error?.response || error?.code === 'ECONNABORTED' || error?.code === 'ERR_NETWORK';
+};
+
+const markAsNetworkError = (error: any) => {
+    error.isNetworkError = true;
+    error.userMessage = 'No se pudo comunicar con el servidor. Verifica tu conexión e intenta de nuevo.';
+    return error;
+};
+
 const apiClient: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
@@ -42,32 +52,18 @@ apiClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Función para esperar con delay exponencial
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 // Respuesta interceptor para manejar 401 y refrescar token
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config as AxiosRequestConfig & { 
             _retryCount?: number;
-            _networkRetryCount?: number;
         };
 
-        // Si es error de red (sin respuesta), reintentar infinitamente
-        if (!error.response) {
-            originalRequest._networkRetryCount = (originalRequest._networkRetryCount || 0) + 1;
-            const retryNumber = originalRequest._networkRetryCount;
-            
-            // Delay exponencial: 1s, 2s, 4s, 8s, máximo 30s
-            const delay = Math.min(1000 * Math.pow(2, retryNumber - 1), 30000);
-            
-            console.warn(`Error de red: Backend no responde. Reintento ${retryNumber} en ${delay/1000}s...`);
-            
-            await sleep(delay);
-            
-            // Reintentar la misma request
-            return apiClient(originalRequest);
+        // Si no hay respuesta del backend (incluye timeout), propaga el error
+        // para que la UI lo maneje (toast y rollback local).
+        if (isNetworkError(error)) {
+            return Promise.reject(markAsNetworkError(error));
         }
 
         // Si 401 y no hemos reintentado aún
@@ -75,16 +71,22 @@ apiClient.interceptors.response.use(
             originalRequest._retryCount = 1;
 
             // Intenta refrescar el token
-            const freshTokens = await authService.refreshAccessToken();
+            try {
+                const freshTokens = await authService.refreshAccessToken();
 
-            if (freshTokens) {
-                // Reintenta la request original con el nuevo token
-                originalRequest.headers = originalRequest.headers || {};
-                originalRequest.headers.Authorization = `Bearer ${freshTokens.access}`;
-                return apiClient(originalRequest);
-            } else {
-                // Refresh falló, redirige a login (ya manejado en authService)
+                if (freshTokens) {
+                    // Reintenta la request original con el nuevo token
+                    originalRequest.headers = originalRequest.headers || {};
+                    originalRequest.headers.Authorization = `Bearer ${freshTokens.access}`;
+                    return apiClient(originalRequest);
+                }
+
                 return Promise.reject(error);
+            } catch (refreshError: any) {
+                if (isNetworkError(refreshError)) {
+                    return Promise.reject(markAsNetworkError(refreshError));
+                }
+                return Promise.reject(refreshError);
             }
         }
 

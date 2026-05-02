@@ -19,6 +19,10 @@ export interface ToastProps {
   loading?: boolean;
   /** Callback al cerrarse */
   onClose?: () => void;
+  /** Texto del botón de acción opcional */
+  actionLabel?: string;
+  /** Acción opcional (ej: Deshacer) */
+  onAction?: () => void | Promise<void>;
 }
 
 const ICONS: Record<ToastVariant, React.ReactNode> = {
@@ -37,6 +41,8 @@ const Toast: React.FC<ToastProps> = ({
   showProgress = true,
   loading = false,
   onClose,
+  actionLabel,
+  onAction,
 }) => {
   const [visible, setVisible] = useState(false);
   const [exiting, setExiting] = useState(false);
@@ -84,6 +90,15 @@ const Toast: React.FC<ToastProps> = ({
     setTimeout(() => onClose?.(), 320);
   };
 
+  const handleAction = async () => {
+    if (!onAction) return;
+    try {
+      await onAction();
+    } finally {
+      handleClose();
+    }
+  };
+
   const cls = [
     'toast',
     `toast--${effectiveVariant}`,
@@ -102,6 +117,15 @@ const Toast: React.FC<ToastProps> = ({
       <div className="toast__body">
         <span className="toast__title">{title}</span>
         {subtitle && <span className="toast__subtitle">{subtitle}</span>}
+        {actionLabel && onAction && (
+          <button
+            className="toast__action"
+            type="button"
+            onClick={handleAction}
+          >
+            {actionLabel}
+          </button>
+        )}
       </div>
       <button
         className="toast__close"

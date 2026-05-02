@@ -10,6 +10,7 @@ import ConflictTaskRow from '../Feature/ManageConflict/Components/ConflictTaskRo
 import AutoResolveCard from '../Feature/ManageConflict/Components/AutoResolveCard';
 import { useAuth } from '../Context/AuthContext';
 import apiClient from '../Services/ApiClient';
+import LoadingScreen from '../shared/Components/LoadingScreen';
 import '../Feature/ManageConflict/Styles/ConflictPage.css';
 
 // ---------------------------------------------------------------------------
@@ -29,16 +30,24 @@ export const ConflictView: React.FC<ConflictViewProps> = ({
   onSave,
   onCancel,
 }) => {
-  const { tasks, updateTask, resolved, totalOnDay, maxHours } =
-    useConflictState(scenario);
+  const {
+    tasks,
+    activeTasks,
+    updateTask,
+    toggleTaskPendingDelete,
+    resolved,
+    totalOnDay,
+    maxHours,
+  } = useConflictState(scenario);
 
   const isNewTaskCase = scenario.case === 'new_task';
 
   const newTask = isNewTaskCase ? tasks.find((t) => t.isNew) : undefined;
   const existingTasks = isNewTaskCase ? tasks.filter((t) => !t.isNew) : tasks;
-  const tasksOnConflictDay = tasks.filter(
+  const tasksOnConflictDay = activeTasks.filter(
     (t) => t.date === scenario.conflictDate,
   );
+  const pendingDeletionCount = tasks.filter((t) => t.pendingDelete).length;
 
   return (
     <>
@@ -63,10 +72,12 @@ export const ConflictView: React.FC<ConflictViewProps> = ({
             maxHoursPerDay={maxHours}
             editableHours={true}
             editableDate={false}
+            canMarkForDelete={false}
             resolved={resolved}
             maxDate={newTask.parentDueDate}
             onChangeHours={(id, hours) => updateTask(id, { hours })}
             onChangeDate={(id, date) => updateTask(id, { date })}
+            onTogglePendingDelete={toggleTaskPendingDelete}
           />
         </div>
       )}
@@ -86,9 +97,11 @@ export const ConflictView: React.FC<ConflictViewProps> = ({
             maxHoursPerDay={maxHours}
             editableHours={true}
             editableDate={true}
+            canMarkForDelete={true}
             maxDate={task.parentDueDate}
             onChangeHours={(id, hours) => updateTask(id, { hours })}
             onChangeDate={(id, date) => updateTask(id, { date })}
+            onTogglePendingDelete={toggleTaskPendingDelete}
           />
         ))}
       </div>
@@ -105,6 +118,14 @@ export const ConflictView: React.FC<ConflictViewProps> = ({
 
       {/* ---- Footer actions ---- */}
       <div className="conflict-footer">
+        {pendingDeletionCount > 0 && (
+          <p className="conflict-footer__pending-delete">
+            {pendingDeletionCount}{' '}
+            {pendingDeletionCount === 1
+              ? 'subtarea se eliminará al guardar'
+              : 'subtareas se eliminarán al guardar'}
+          </p>
+        )}
         <button className="conflict-btn-cancel" onClick={onCancel}>
           Cancelar
         </button>
@@ -177,6 +198,9 @@ const ConflictPage: React.FC<ConflictPageProps> = ({
         const editingTaskId = 'id' in editingTask ? editingTask.id : undefined;
 
         const existingTasks = dbSubtasks
+          .filter((st) => {
+            return st.status !== 'postponed';
+          })
           .filter(
             (st) => editingTaskId === undefined || st.id !== editingTaskId,
           ) // Avoid duplicates
@@ -235,7 +259,7 @@ const ConflictPage: React.FC<ConflictPageProps> = ({
           minHeight: '300px',
         }}
       >
-        <p>Cargando detalles de conflicto...</p>
+        <LoadingScreen message="" />
       </div>
     );
   }

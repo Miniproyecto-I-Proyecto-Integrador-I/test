@@ -105,10 +105,14 @@ const UserSettingPage: React.FC = () => {
     const originals = new Map(
       (dayData?.subtasks ?? []).map((st) => [String(st.id), Number(st.horas)]),
     );
+    const tasksPendingDelete = resolvedTasks.filter(
+      (task) => task.pendingDelete,
+    );
+    const tasksToPersist = resolvedTasks.filter((task) => !task.pendingDelete);
 
     try {
       await Promise.all(
-        resolvedTasks.map((task) => {
+        tasksToPersist.map((task) => {
           const origHours = originals.get(task.id);
           const changedHours =
             origHours !== undefined && task.hours !== origHours;
@@ -121,6 +125,12 @@ const UserSettingPage: React.FC = () => {
           }
           return Promise.resolve();
         }),
+      );
+
+      await Promise.all(
+        tasksPendingDelete.map((task) =>
+          apiClient.delete(`/api/subtasks/${task.id}/`),
+        ),
       );
 
       setConflictDays((prev) => prev.filter((d) => d.fecha !== fecha));
