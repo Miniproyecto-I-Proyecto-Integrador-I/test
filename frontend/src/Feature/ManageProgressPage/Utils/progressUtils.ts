@@ -39,7 +39,30 @@ export const filterTasks = (tasks: Task[], statusFilter: string) => {
 };
 
 export const getProjectSummary = (tasks: Task[]) => {
-  const totalCompleted = tasks.filter(t => t.status === 'completed' || t.progress_percentage === 100).length;
-  const totalPending = tasks.length - totalCompleted;
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const isCompletedTask = (task: Task) =>
+    task.status === 'completed' || task.progress_percentage === 100;
+
+  const isInCurrentMonth = (task: Task) => {
+    if (!task.due_date) return false;
+    const dateString = task.due_date.includes('T')
+      ? task.due_date
+      : `${task.due_date}T00:00:00`;
+    const dueDate = new Date(dateString);
+    if (Number.isNaN(dueDate.getTime())) return false;
+    return (
+      dueDate.getMonth() === currentMonth &&
+      dueDate.getFullYear() === currentYear
+    );
+  };
+
+  const totalCompleted = tasks.filter(isCompletedTask).length;
+  const totalPending = tasks.filter(
+    (task) => !isCompletedTask(task) && isInCurrentMonth(task),
+  ).length;
+
   return { totalCompleted, totalPending };
 };

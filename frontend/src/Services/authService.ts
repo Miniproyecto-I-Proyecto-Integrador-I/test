@@ -51,6 +51,7 @@ export const authService = {
         } else if (!error.response) {
           // Error de red (sin respuesta del servidor) → NO cerrar sesión
           console.warn('Error de red al refrescar token. Manteniendo sesión...');
+          throw error;
         } else {
           // Otro error del servidor → Cerrar sesión por seguridad
           authStorage.clearTokens();

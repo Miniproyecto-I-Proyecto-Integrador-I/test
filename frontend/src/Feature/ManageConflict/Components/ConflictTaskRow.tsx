@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Trash2 } from 'lucide-react';
 import type { ConflictTask } from '../Types/conflict';
 import { formatDate, totalHours } from '../Utils/conflictUtils';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
@@ -13,10 +13,12 @@ interface ConflictTaskRowProps {
   maxHoursPerDay: number;
   editableHours: boolean;
   editableDate: boolean;
+  canMarkForDelete?: boolean;
   resolved?: boolean;
   maxDate?: string;
   onChangeHours: (id: string, hours: number) => void;
   onChangeDate: (id: string, date: string) => void;
+  onTogglePendingDelete?: (id: string) => void;
 }
 
 const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
@@ -27,15 +29,19 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
   maxHoursPerDay,
   editableHours,
   editableDate,
+  canMarkForDelete = false,
   resolved = false,
   maxDate,
   onChangeHours,
   onChangeDate,
+  onTogglePendingDelete,
 }) => {
+  const isPendingDelete = !!task.pendingDelete;
   const isOnConflictDay = task.date === conflictDate;
   const dayTotal = totalHours(allTasksOnDay);
   const dayOverflows = dayTotal > maxHoursPerDay;
-  const showWarning = isOnConflictDay && dayOverflows && !task.isNew;
+  const showWarning =
+    isOnConflictDay && dayOverflows && !task.isNew && !isPendingDelete;
 
   // Local raw string so we can handle intermediate typing states
   const [rawHours, setRawHours] = useState(String(task.hours));
@@ -118,6 +124,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
 
   const rowClass = [
     'conflict-task',
+    isPendingDelete ? 'conflict-task--pending-delete' : '',
     task.isNew
       ? resolved
         ? 'conflict-task--new-resolved'
@@ -152,6 +159,11 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
       <div className="conflict-task__info">
         <p className="conflict-task__title">{task.title}</p>
         <p className="conflict-task__parent">{task.parentTask}</p>
+        {isPendingDelete && (
+          <p className="conflict-task__pending-delete-label">
+            Se eliminará al guardar cambios.
+          </p>
+        )}
       </div>
 
       <div className="conflict-task__controls">
@@ -163,7 +175,9 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
               type="button"
               className="conflict-hour-btn"
               onClick={handleMinus}
-              disabled={!editableHours || parseFloat(rawHours) <= 1}
+              disabled={
+                !editableHours || isPendingDelete || parseFloat(rawHours) <= 1
+              }
             >
               -
             </button>
@@ -174,7 +188,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
               min={1}
               max={maxHoursPerDay}
               step={1}
-              disabled={!editableHours}
+              disabled={!editableHours || isPendingDelete}
               onChange={handleHoursChange}
               aria-label={`Horas para ${task.title}`}
             />
@@ -183,7 +197,9 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
               className="conflict-hour-btn"
               onClick={handlePlus}
               disabled={
-                !editableHours || parseFloat(rawHours) >= maxHoursPerDay
+                !editableHours ||
+                isPendingDelete ||
+                parseFloat(rawHours) >= maxHoursPerDay
               }
             >
               +
@@ -203,7 +219,7 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
           <button
             type="button"
             className="conflict-select conflict-date-btn"
-            disabled={!editableDate}
+            disabled={!editableDate || isPendingDelete}
             onClick={() => setIsDatePickerOpen(true)}
             aria-label={`Cambiar fecha para ${task.title}`}
             style={{
@@ -217,10 +233,29 @@ const ConflictTaskRow: React.FC<ConflictTaskRowProps> = ({
             <Calendar size={14} style={{ opacity: 0.6 }} />
           </button>
         </div>
+
+        {canMarkForDelete && (
+          <div className="conflict-input-wrap">
+            <label className="conflict-input-label">ELIMINAR</label>
+            <button
+              type="button"
+              className={`conflict-trash-btn ${isPendingDelete ? 'conflict-trash-btn--active' : ''}`}
+              onClick={() => onTogglePendingDelete?.(task.id)}
+              aria-label={
+                isPendingDelete
+                  ? `Deshacer eliminación para ${task.title}`
+                  : `Marcar ${task.title} para eliminar al guardar`
+              }
+            >
+              <Trash2 size={14} />
+              {isPendingDelete && <span>Deshacer</span>}
+            </button>
+          </div>
+        )}
       </div>
 
       <DatePickerModal
-        isOpen={isDatePickerOpen}
+        isOpen={isDatePickerOpen && !isPendingDelete}
         onClose={() => setIsDatePickerOpen(false)}
         onConfirm={(date) => {
           onChangeDate(task.id, date);

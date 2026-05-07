@@ -180,6 +180,35 @@
     text-align: center;
 }
 
+.today-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 540px;
+}
+
+.today-error-state__icon {
+    margin-bottom: 1.5rem;
+    color: var(--error-color);
+    filter: drop-shadow(0 10px 15px rgba(239, 68, 68, 0.2));
+}
+
+.today-error-state h2 {
+    font-size: var(--font-size-h2);
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.75rem 0;
+}
+
+.today-error-state p {
+    font-size: var(--font-size-body);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
 .empty-state-visual {
     position: relative;
     width: 240px;
