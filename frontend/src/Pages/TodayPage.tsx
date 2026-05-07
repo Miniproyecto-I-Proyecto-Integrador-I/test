@@ -89,14 +89,14 @@ const TodayPage: React.FC = () => {
 
   const handleSubtaskClick = (sub: Subtask) => {
     if (sub.task?.id) {
-      navigate(`/activity/${sub.task.id}`);
+      navigate(`/activity/${sub.task.id}`, { state: { from: '/today' } });
     }
   };
 
   const handleRescheduleSubtask = (sub: Subtask) => {
     if (sub.task?.id) {
       navigate(`/activity/${sub.task.id}`, {
-        state: { focusSubtaskId: sub.id },
+        state: { focusSubtaskId: sub.id, from: '/today' },
       });
     }
   };

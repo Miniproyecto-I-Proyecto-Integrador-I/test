@@ -30,7 +30,7 @@ const CreatePage = () => {
                   return await addTask(payload);
                 }}
                 onAddSubtasks={(task) => {
-                  navigate(`/activity/${task.id}`);
+                  navigate(`/activity/${task.id}`, { state: { from: '/create' } });
                 }}
               />
             </div>

@@ -15,7 +15,10 @@ const TaskCard = ({ task }: TaskCardProps) => {
   const pct = Math.round(task.progress_percentage || 0);
 
   return (
-    <div className="progress-card" onClick={() => navigate(`/activity/${task.id}`)}>
+    <div 
+      className="progress-card" 
+      onClick={() => navigate(`/activity/${task.id}`, { state: { from: '/progress' } })}
+    >
       <div className="progress-card-header">
         <div className="progress-card-header-left">
           <h3>{task.title}</h3>

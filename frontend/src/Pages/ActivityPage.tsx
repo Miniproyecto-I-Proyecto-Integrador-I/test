@@ -21,8 +21,10 @@ const ActivityPage = () => {
   const location = useLocation();
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
-  const focusSubtaskId = (location.state as { focusSubtaskId?: number } | null)
-    ?.focusSubtaskId;
+  
+  const state = location.state as { focusSubtaskId?: number; from?: string } | null;
+  const focusSubtaskId = state?.focusSubtaskId;
+  const from = state?.from || '/today';
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -120,7 +122,7 @@ const ActivityPage = () => {
       if (task) {
         await deleteMainTaskService(task.id);
       }
-      navigate('/today');
+      navigate(from);
     } catch (error) {
       console.error('Error al eliminar tarea principal', error);
     }
@@ -189,7 +191,7 @@ const ActivityPage = () => {
             <p>La tarea solicitada no existe o fue eliminada.</p>
             <button
               className="btn-primary"
-              onClick={() => navigate('/today')}
+              onClick={() => navigate(from)}
               style={{ marginTop: '16px' }}
             >
               Volver al inicio
