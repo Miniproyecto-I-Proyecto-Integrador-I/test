@@ -9,6 +9,7 @@ import {
   hasValidationErrors,
 } from '../../ManageCreatePage/Utils/subtaskValidator';
 import { formatShortDate } from '../Utils/subtaskEditUtils';
+import type { EditableSubtask } from '../Hooks/useSubtaskEdit';
 import apiClient from '../../../Services/ApiClient';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
 import { useToast } from '../../../shared/Hooks/useToast';
@@ -18,7 +19,7 @@ interface NewSubtaskInlineFormProps {
   taskTitle?: string;
   taskDueDate?: string;
   maxHours: number;
-  onSave: (data: SubtaskFormData) => Promise<void>;
+  onSave: (data: SubtaskFormData) => Promise<EditableSubtask[] | void>;
   onCancel: () => void;
   onResolveConflict?: (data: SubtaskFormData) => void;
 }
@@ -167,6 +168,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               placeholder="¿Qué vas a hacer?"
               value={formData.description}
               onChange={(e) => setField('description', e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               className={activeErrors.description ? 'error' : ''}
               maxLength={300}
               autoFocus
@@ -190,6 +192,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               onChange={(e) =>
                 handleHoursChange(parseFloat(e.target.value) || 0)
               }
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               className={activeErrors.needed_hours ? 'error' : ''}
             />
             {activeErrors.needed_hours && (

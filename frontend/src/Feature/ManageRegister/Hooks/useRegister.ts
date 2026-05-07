@@ -22,16 +22,23 @@ export const useRegister = () => {
       // 3. Redirigir
       window.location.href = '/today';
     } catch (err: any) {
-      if (err?.isNetworkError || !err?.response) {
-        setError('Estamos teniendo problemas técnicos. Vuelve más tarde.');
-      } else if (err.response?.data?.username) {
-        setError('Este nombre de usuario (o nombre completo) ya está en uso. Por favor, intenta usar otro.');
-      } else if (err.response?.data?.email && Array.isArray(err.response.data.email)) {
-        // Si el array de errores viene de DRF por el email (incluyendo nuestro regex)
-        setError(err.response.data.email[0]);
-      } else if (err.response?.data?.password && Array.isArray(err.response.data.password)) {
-        // Si el array de errores viene de DRF por la password (incluyendo nuestro regex)
-        setError(err.response.data.password[0]);
+      const errorData = err.response?.data;
+      // El backend parece envolver los errores en un objeto 'details'
+      const details = errorData?.details || errorData;
+      
+      if (details?.email) {
+        const emailMsg = Array.isArray(details.email) ? details.email[0] : details.email;
+        if (emailMsg.includes('already exists') || emailMsg.includes('ya existe')) {
+          setError('El correo electrónico ya existe. Por favor, intenta con otro.');
+        } else {
+          setError(emailMsg);
+        }
+      } else if (details?.password) {
+        const passwordMsg = Array.isArray(details.password) ? details.password[0] : details.password;
+        setError(passwordMsg);
+      } else if (details?.username) {
+        const usernameMsg = Array.isArray(details.username) ? details.username[0] : details.username;
+        setError(usernameMsg);
       } else {
         setError('Ocurrió un error al intentar crear tu cuenta. Por favor, revisa tus datos e inténtalo de nuevo.');
       }

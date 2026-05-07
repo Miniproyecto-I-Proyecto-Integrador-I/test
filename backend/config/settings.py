@@ -135,7 +135,7 @@ CORS_ALLOWED_ORIGINS = [
 DATABASE_URL = config("DATABASE_URL", default=None)
 USE_LOCAL_POSTGRES = config("USE_LOCAL_POSTGRES", default=False, cast=bool)
 
-if DATABASE_URL:
+if DATABASE_URL and False:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,

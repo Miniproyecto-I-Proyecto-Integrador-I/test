@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import './NavBar.css';
 import Logo from '../../assets/Logo StaskM.png';
 import { User } from 'lucide-react';
@@ -11,6 +11,7 @@ const NavBar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -23,6 +24,12 @@ const NavBar = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const getActiveState = (path: string) => {
+    if (location.pathname === path) return true;
+    if (location.pathname.startsWith('/activity/') && location.state?.from === path) return true;
+    return false;
+  };
 
   return (
     <nav className="floating-navbar">
@@ -37,36 +44,28 @@ const NavBar = () => {
           <>
             <NavLink
               to="/today"
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' is-active' : ''}`
+              className={() =>
+                `nav-item${getActiveState('/today') ? ' is-active' : ''}`
               }
             >
               Hoy
             </NavLink>
             <NavLink
               to="/progress"
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' is-active' : ''}`
+              className={() =>
+                `nav-item${getActiveState('/progress') ? ' is-active' : ''}`
               }
             >
               Progreso
             </NavLink>
             <NavLink
               to="/create"
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' is-active' : ''}`
+              className={() =>
+                `nav-item${getActiveState('/create') ? ' is-active' : ''}`
               }
             >
               Crear
             </NavLink>
-            {/* <NavLink
-              to="/activity/1"
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' is-active' : ''}`
-              }
-            >
-              Actividad
-            </NavLink> */}
           </>
         )}
         <div className="nav-auth-section">

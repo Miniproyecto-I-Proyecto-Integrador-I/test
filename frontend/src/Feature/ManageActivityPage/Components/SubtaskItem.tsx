@@ -187,6 +187,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               type="text"
               value={editData.description}
               onChange={(e) => onFieldChange('description', e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && onSave()}
               className={errors.description ? 'error' : ''}
               maxLength={300}
             />
@@ -204,6 +205,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               step="1"
               value={editData.needed_hours || ''}
               onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
+              onKeyDown={(e) => e.key === 'Enter' && onSave()}
               className={errors.needed_hours ? 'error' : ''}
             />
             {errors.needed_hours && (

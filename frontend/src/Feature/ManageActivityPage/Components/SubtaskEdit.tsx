@@ -27,7 +27,7 @@ interface SubtaskEditProps {
   initialEditingSubtaskId?: number;
   onSubtasksChange?: (subtasks: EditableSubtask[]) => void;
   onSaveIndividualSubtask?: (subtask: EditableSubtask) => Promise<void>;
-  onCreateSubtask?: (data: SubtaskFormData) => Promise<void>;
+  onCreateSubtask?: (data: SubtaskFormData) => Promise<EditableSubtask[] | void>;
   onDeleteSubtask?: (subtask: EditableSubtask) => Promise<void> | void;
   onTaskDeleted?: () => void;
   onClose?: () => void;
@@ -552,7 +552,10 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
 
           if (!isEditingMode && onCreateSubtask) {
             // Creating a brand new subtask that triggered conflict
-            await onCreateSubtask(finalSubtaskData);
+            const result = await onCreateSubtask(finalSubtaskData);
+            if (result && result.length > 0) {
+              nextSubtasks = [...nextSubtasks, ...result];
+            }
           } else if (isEditingMode && onSaveIndividualSubtask) {
             // Editing an EXISTING task that triggered conflict
             const editingIdLocal = (conflictData.taskData as EditableSubtask)
@@ -649,7 +652,7 @@ const SubtaskEdit: React.FC<SubtaskEditProps> = ({
             ? 'Volver sin editar'
             : conflictData
               ? 'Descartar cambios'
-              : 'Volver a inicio'
+              : 'Volver a atras'
         }
       />
 

@@ -30,7 +30,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
     } catch (e) {
       // ignore
     }
-    navigate(`/activity/${task.id}`);
+    navigate(`/activity/${task.id}`, { state: { from: '/progress' } });
   };
 
   return (

@@ -457,6 +457,44 @@
   color: var(--text-main);
 }
 
+/* =============================================
+   DATE DIVIDER
+   ============================================= */
+
+.date-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 12px 0 16px;
+  width: 100%;
+}
+
+.date-divider::before,
+.date-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+  opacity: 0.7;
+}
+
+.date-divider:not(:empty)::before {
+  margin-right: 16px;
+}
+
+.date-divider:not(:empty)::after {
+  margin-left: 16px;
+}
+
+.date-divider__text {
+  font-family: var(--font-family);
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .grouped-cards {
     flex-direction: column;
@@ -470,5 +508,9 @@
   .task-card__actions {
     width: 100%;
     justify-content: flex-end;
+  }
+
+  .date-divider {
+    margin: 8px 0 12px;
   }
 }
