@@ -64,6 +64,30 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   </div>
 );
 
+/* ── Date Divider ────────────────────────────────────────── */
+
+interface DateDividerProps {
+  date: string;
+}
+
+const DateDivider: React.FC<DateDividerProps> = ({ date }) => {
+  // Format: "lunes, 7 de mayo"
+  const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString(
+    'es-CO',
+    {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    },
+  );
+
+  return (
+    <div className="date-divider">
+      <span className="date-divider__text">{formattedDate}</span>
+    </div>
+  );
+};
+
 /* ── Main component ─────────────────────────────────────── */
 
 const CardsGrid: React.FC<CardsGridProps> = ({
@@ -210,18 +234,36 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               count={overdue.length}
               tooltipInfo="Organizadas desde la más antigua a la más reciente."
             />
-            {overdue.map((sub) => (
-              <CardTask
-                key={sub.id}
-                sub={sub}
-                variant="overdue"
-                onClick={() => onSubtaskClick(sub)}
-                onRescheduleClick={() => onRescheduleSubtask?.(sub)}
-                onSubtaskUpdated={onSubtaskUpdated}
-                onActionError={toast.error}
-                onMarkedCompleted={handleMarkedCompleted}
-                animateUndoPopIn={undoPopInId === sub.id}
-              />
+            {Object.entries(
+              [...overdue]
+                .sort(
+                  (a, b) =>
+                    new Date(a.planification_date).getTime() -
+                    new Date(b.planification_date).getTime(),
+                )
+                .reduce((acc: Record<string, Subtask[]>, sub) => {
+                  const date = sub.planification_date;
+                  if (!acc[date]) acc[date] = [];
+                  acc[date].push(sub);
+                  return acc;
+                }, {}),
+            ).map(([date, subs]) => (
+              <React.Fragment key={date}>
+                <DateDivider date={date} />
+                {subs.map((sub) => (
+                  <CardTask
+                    key={sub.id}
+                    sub={sub}
+                    variant="overdue"
+                    onClick={() => onSubtaskClick(sub)}
+                    onRescheduleClick={() => onRescheduleSubtask?.(sub)}
+                    onSubtaskUpdated={onSubtaskUpdated}
+                    onActionError={toast.error}
+                    onMarkedCompleted={handleMarkedCompleted}
+                    animateUndoPopIn={undoPopInId === sub.id}
+                  />
+                ))}
+              </React.Fragment>
             ))}
           </section>
         )}
@@ -259,17 +301,35 @@ const CardsGrid: React.FC<CardsGridProps> = ({
               count={upcoming.length}
               tooltipInfo="Organizadas para que la más próxima esté primero."
             />
-            {upcoming.map((sub) => (
-              <CardTask
-                key={sub.id}
-                sub={sub}
-                variant="upcoming"
-                onClick={() => onSubtaskClick(sub)}
-                onSubtaskUpdated={onSubtaskUpdated}
-                onActionError={toast.error}
-                onMarkedCompleted={handleMarkedCompleted}
-                animateUndoPopIn={undoPopInId === sub.id}
-              />
+            {Object.entries(
+              [...upcoming]
+                .sort(
+                  (a, b) =>
+                    new Date(a.planification_date).getTime() -
+                    new Date(b.planification_date).getTime(),
+                )
+                .reduce((acc: Record<string, Subtask[]>, sub) => {
+                  const date = sub.planification_date;
+                  if (!acc[date]) acc[date] = [];
+                  acc[date].push(sub);
+                  return acc;
+                }, {}),
+            ).map(([date, subs]) => (
+              <React.Fragment key={date}>
+                <DateDivider date={date} />
+                {subs.map((sub) => (
+                  <CardTask
+                    key={sub.id}
+                    sub={sub}
+                    variant="upcoming"
+                    onClick={() => onSubtaskClick(sub)}
+                    onSubtaskUpdated={onSubtaskUpdated}
+                    onActionError={toast.error}
+                    onMarkedCompleted={handleMarkedCompleted}
+                    animateUndoPopIn={undoPopInId === sub.id}
+                  />
+                ))}
+              </React.Fragment>
             ))}
           </section>
         )}

@@ -50,8 +50,16 @@ const TodayPage: React.FC = () => {
     reloadSubtasks,
   } = useGroupedSubtasks(filters);
 
+  const filteredRawOverdue = rawOverdue.filter(
+    (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
+  );
+
+  const filteredRawUpcoming = rawUpcoming.filter(
+    (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
+  );
+
   const hasAnyTasks =
-    rawOverdue.length > 0 || rawToday.length > 0 || rawUpcoming.length > 0;
+    filteredRawOverdue.length > 0 || rawToday.length > 0 || filteredRawUpcoming.length > 0;
 
   const summaryTodaySubtasks = rawToday.filter(
     (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
@@ -156,8 +164,8 @@ const TodayPage: React.FC = () => {
           }}
         >
           <EmptyState
-            hiddenOverdueCount={!viewOptions.overdue ? rawOverdue.length : 0}
-            hiddenUpcomingCount={!viewOptions.upcoming ? rawUpcoming.length : 0}
+            hiddenOverdueCount={!viewOptions.overdue ? filteredRawOverdue.length : 0}
+            hiddenUpcomingCount={!viewOptions.upcoming ? filteredRawUpcoming.length : 0}
             onViewOverdue={() =>
               setViewOptions({ overdue: true, today: false, upcoming: false })
             }
@@ -195,9 +203,9 @@ const TodayPage: React.FC = () => {
 
           {/* Sidebar Column */}
           <div className="today-side-column">
-            {!viewOptions.overdue && rawOverdue.length > 0 && (
+            {!viewOptions.overdue && filteredRawOverdue.length > 0 && (
               <OverdueTasksAlert
-                count={rawOverdue.length}
+                count={filteredRawOverdue.length}
                 onSolve={() => {
                   setPreviousViewOptions(viewOptions);
                   setViewOptions({
