@@ -39,6 +39,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
           type="text"
           value={taskEditData.title}
           onChange={(e) => onFieldChange('title', e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && onSave()}
           maxLength={200}
         />
       </div>
@@ -59,6 +60,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
           type="text"
           value={taskEditData.subject}
           onChange={(e) => onFieldChange('subject', e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && onSave()}
           maxLength={100}
         />
       </div>
@@ -85,6 +87,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
           min={getTodayDateStr()}
           value={taskEditData.due_date}
           onChange={(e) => onFieldChange('due_date', e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && onSave()}
         />
       </div>
 

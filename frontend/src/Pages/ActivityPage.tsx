@@ -89,6 +89,7 @@ const ActivityPage = () => {
           ? { ...prev, subtasks: [...(prev.subtasks ?? []), ...normalized] }
           : prev,
       );
+      return normalized;
     } catch (error) {
       console.error('Error al crear subtarea:', error);
       throw error;

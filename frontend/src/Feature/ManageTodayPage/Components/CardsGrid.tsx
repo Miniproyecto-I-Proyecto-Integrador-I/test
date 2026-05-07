@@ -112,7 +112,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
             await todayService.updateSubtaskStatus(subtaskId, 'pending');
             triggerUndoPopIn(subtaskId);
             await onSubtaskUpdated?.();
-            toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.');
+           /*  toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.'); */
           } catch (error) {
             console.error('Error al deshacer completado:', error);
             toast.error(

@@ -29,7 +29,7 @@ interface SubtaskListProps {
   isCheckingConflict: boolean;
   maxHours: number;
   taskDueDate?: string;
-  onCreateSubtask: (data: SubtaskFormData) => Promise<void>;
+  onCreateSubtask: (data: SubtaskFormData) => Promise<EditableSubtask[] | void>;
   onStartEditing: (subtask: EditableSubtask) => void;
   onDeleteClick: (subtask: EditableSubtask) => void;
   onFieldChange: (field: keyof SubtaskFormData, value: string | number) => void;
