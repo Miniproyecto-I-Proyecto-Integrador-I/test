@@ -30,14 +30,11 @@ const TaskCard = ({ task }: TaskCardProps) => {
     } catch (e) {
       // ignore
     }
-    navigate(`/activity/${task.id}`);
+    navigate(`/activity/${task.id}`, { state: { from: '/progress' } });
   };
 
   return (
-    <div 
-      className="progress-card" 
-      onClick={() => navigate(`/activity/${task.id}`, { state: { from: '/progress' } })}
-    >
+    <div className="progress-card" onClick={handleClick}>
       <div className="progress-card-header">
         <div className="progress-card-header-left">
           <h3>{task.title}</h3>
