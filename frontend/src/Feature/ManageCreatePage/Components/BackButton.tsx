@@ -9,7 +9,11 @@ interface BackButtonProps {
   onClick?: () => void;
 }
 
-const BackButton: React.FC<BackButtonProps> = ({ to, label = 'Volver', onClick }) => {
+const BackButton: React.FC<BackButtonProps> = ({
+  to,
+  label = 'Volver',
+  onClick,
+}) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -24,7 +28,7 @@ const BackButton: React.FC<BackButtonProps> = ({ to, label = 'Volver', onClick }
 
   return (
     <button className="back-btn-minimal" onClick={handleBack} type="button">
-      <ArrowLeft size={18} />
+      <ArrowLeft size={18} aria-hidden="true" />
       <span>{label}</span>
     </button>
   );

@@ -36,6 +36,9 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [createdTask, setCreatedTask] = useState<Task | null>(null);
 
+  const titleErrorId = 'create-task-title-error';
+  const dueDateErrorId = 'create-task-due-date-error';
+
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: { [key: string]: string } = {};
@@ -93,161 +96,212 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
   const content = (
     <>
-      <div 
-        className={inline ? "modal-card inline-form-card" : "modal-card"} 
+      <div
+        className={inline ? 'modal-card inline-form-card' : 'modal-card'}
         onClick={!inline ? (e) => e.stopPropagation() : undefined}
       >
         <div className="modal-header">
-              <h2>Crear Nueva Tarea</h2>
-              <p>Organiza tus objetivos académicos con facilidad.</p>
-            </div>
+          <h2>Crear Nueva Tarea</h2>
+          <p>Organiza tus objetivos académicos con facilidad.</p>
+        </div>
 
-            {errorCount > 0 && (
-              <div className="error-banner" style={{ margin: '24px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <span className="error-icon" style={{ display: 'flex', alignItems: 'center', marginTop: '2px' }}>
-                    <AlertCircle size={18} />
-                  </span>
-                  <div>
-                    <p style={{ margin: '0 0 4px 0', fontWeight: 500 }}>
-                      Hay {errorCount} {errorCount === 1 ? 'error' : 'errores'} en el formulario:
-                    </p>
-                    <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9em' }}>
-                      {Object.entries(errors).map(
-                        ([key, msg]) => key !== 'general' && <li key={key}>{msg}</li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-            {errors.general && (
-              <div className="error-banner">
-                <span className="error-icon" style={{ display: 'flex', alignItems: 'center' }}>
-                  <AlertTriangle size={18} />
-                </span> 
-                {errors.general}
-              </div>
-            )}
-
-            <form onSubmit={handleCreateTask} className="task-form" noValidate>
-              <h3 className="section-title">Información General de la Tarea</h3>
-
-              <div className="form-group">
-                <label>Nombre descriptivo de la tarea</label>
-                <input
-                  type="text"
-                  placeholder="Ej. Ensayo sobre la Revolución Francesa"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className={errors.title ? 'has-error' : ''}
-                />
-                {errors.title && (
-                  <span className="error-text">{errors.title}</span>
-                )}
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Materia o Asignatura</label>
-                  <input
-                    type="text"
-                    placeholder="Ej. Historia Universal"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Tipo de evaluación</label>
-                  <select
-                    value={evaluationType}
-                    onChange={(e) => setEvaluationType(e.target.value)}
-                  >
-                    <option value="">Seleccionar tipo</option>
-                    <option value="ensayo">Ensayo</option>
-                    <option value="examen">Examen</option>
-                    <option value="proyecto">Proyecto</option>
-                    <option value="tarea">Tarea</option>
-                    <option value="lectura">Lectura</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Descripción detallada</label>
-                <textarea
-                  className="form-textarea"
-                  placeholder="Añade detalles, instrucciones o notas importantes sobre esta tarea..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  style={{
-                    width: '100%',
-                    boxSizing: 'border-box',
-                    padding: 'var(--padding-input)',
-                    border: '1px solid var(--border-secondary)',
-                    borderRadius: 'var(--border-radius-base)',
-                    fontSize: '0.95rem',
-                    color: 'var(--text-main)',
-                    transition: 'all 0.2s ease',
-                    backgroundColor: 'var(--surface)',
-                    fontFamily: 'var(--font-family)',
-                    resize: 'none',
-                    minHeight: '80px',
-                  }}
-                />
-              </div>
-
-              <h3 className="section-title">Planificación y Tiempos</h3>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha límite de entrega</label>
-                  <input
-                    type="date"
-                    min={getTodayDateStr()}
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    placeholder="mm/dd/yyyy"
-                    className={errors.dueDate ? 'has-error' : ''}
-                  />
-                  {errors.dueDate && (
-                    <span className="error-text">{errors.dueDate}</span>
+        {errorCount > 0 && (
+          <div
+            className="error-banner"
+            style={{ margin: '24px 0' }}
+            role="alert"
+            aria-live="assertive"
+          >
+            <div
+              style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}
+            >
+              <span
+                className="error-icon"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginTop: '2px',
+                }}
+              >
+                <AlertCircle size={18} aria-hidden="true" />
+              </span>
+              <div>
+                <p style={{ margin: '0 0 4px 0', fontWeight: 500 }}>
+                  Hay {errorCount} {errorCount === 1 ? 'error' : 'errores'} en
+                  el formulario:
+                </p>
+                <ul
+                  style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9em' }}
+                >
+                  {Object.entries(errors).map(
+                    ([key, msg]) =>
+                      key !== 'general' && <li key={key}>{msg}</li>,
                   )}
-                </div>
-                <div className="form-group">
-                  <label>Nivel de prioridad</label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value)}
-                  >
-                    <option value="high">Alta</option>
-                    <option value="medium">Media</option>
-                    <option value="low">Baja</option>
-                  </select>
-                </div>
+                </ul>
               </div>
+            </div>
+          </div>
+        )}
+        {errors.general && (
+          <div className="error-banner" role="alert" aria-live="assertive">
+            <span
+              className="error-icon"
+              style={{ display: 'flex', alignItems: 'center' }}
+            >
+              <AlertTriangle size={18} aria-hidden="true" />
+            </span>
+            {errors.general}
+          </div>
+        )}
 
-              <div className="modal-footer">
-                {!inline && (
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={handleCloseTaskModal}
-                  >
-                    Cancelar
-                  </button>
-                )}
-                <button type="submit" className="btn-primary">
-                  Crear Tarea Principal
-                </button>
-              </div>
-            </form>
+        <form onSubmit={handleCreateTask} className="task-form" noValidate>
+          <h3 className="section-title">Información General de la Tarea</h3>
+
+          <div className="form-group">
+            <label htmlFor="create-task-title">
+              Nombre descriptivo de la tarea
+            </label>
+            <input
+              id="create-task-title"
+              type="text"
+              placeholder="Ej. Ensayo sobre la Revolución Francesa"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={errors.title ? 'has-error' : ''}
+              aria-invalid={Boolean(errors.title)}
+              aria-describedby={errors.title ? titleErrorId : undefined}
+            />
+            {errors.title && (
+              <span className="error-text" id={titleErrorId} role="status">
+                {errors.title}
+              </span>
+            )}
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="create-task-subject">Materia o Asignatura</label>
+              <input
+                id="create-task-subject"
+                type="text"
+                placeholder="Ej. Historia Universal"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="create-task-type">Tipo de evaluación</label>
+              <select
+                id="create-task-type"
+                value={evaluationType}
+                onChange={(e) => setEvaluationType(e.target.value)}
+              >
+                <option value="">Seleccionar tipo</option>
+                <option value="ensayo">Ensayo</option>
+                <option value="examen">Examen</option>
+                <option value="proyecto">Proyecto</option>
+                <option value="tarea">Tarea</option>
+                <option value="lectura">Lectura</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <label htmlFor="create-task-description">
+              Descripción detallada
+            </label>
+            <textarea
+              id="create-task-description"
+              className="form-textarea"
+              placeholder="Añade detalles, instrucciones o notas importantes sobre esta tarea..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                padding: 'var(--padding-input)',
+                border: '1px solid var(--border-secondary)',
+                borderRadius: 'var(--border-radius-base)',
+                fontSize: '0.95rem',
+                color: 'var(--text-main)',
+                transition: 'all 0.2s ease',
+                backgroundColor: 'var(--surface)',
+                fontFamily: 'var(--font-family)',
+                resize: 'none',
+                minHeight: '80px',
+              }}
+            />
+          </div>
+
+          <h3 className="section-title">Planificación y Tiempos</h3>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="create-task-due-date">
+                Fecha límite de entrega
+              </label>
+              <input
+                id="create-task-due-date"
+                type="date"
+                min={getTodayDateStr()}
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                placeholder="mm/dd/yyyy"
+                className={errors.dueDate ? 'has-error' : ''}
+                aria-invalid={Boolean(errors.dueDate)}
+                aria-describedby={errors.dueDate ? dueDateErrorId : undefined}
+              />
+              {errors.dueDate && (
+                <span className="error-text" id={dueDateErrorId} role="status">
+                  {errors.dueDate}
+                </span>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="create-task-priority">Nivel de prioridad</label>
+              <select
+                id="create-task-priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+              >
+                <option value="high">Alta</option>
+                <option value="medium">Media</option>
+                <option value="low">Baja</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            {!inline && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCloseTaskModal}
+              >
+                Cancelar
+              </button>
+            )}
+            <button type="submit" className="btn-primary">
+              Crear Tarea Principal
+            </button>
+          </div>
+        </form>
       </div>
 
       {formStatus === 'success' && createdTask && (
-        <div className="modal-overlay" style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(248, 250, 252, 0.7)', zIndex: 1100 }}>
-          <div className="modal-card" style={{ boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)' }}>
+        <div
+          className="modal-overlay"
+          style={{
+            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(248, 250, 252, 0.7)',
+            zIndex: 1100,
+          }}
+        >
+          <div
+            className="modal-card"
+            style={{ boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)' }}
+          >
             <SuccessTaskModal
               task={createdTask}
               onNavigateToPanel={() => navigate('/create')}
