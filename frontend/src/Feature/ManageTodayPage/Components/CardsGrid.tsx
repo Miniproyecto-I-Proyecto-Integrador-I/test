@@ -55,8 +55,8 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   count,
   tooltipInfo,
 }) => (
-  <div className="task-section__header">
-    {icon}
+  <div className="task-section__header" role="heading" aria-level={2}>
+    <span aria-hidden="true">{icon}</span>
     <span>
       {label} ({count})
     </span>
@@ -102,7 +102,9 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   toast,
 }) => {
   const [undoPopInId, setUndoPopInId] = useState<number | null>(null);
-  const undoPopInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const undoPopInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
     return () => {
@@ -136,7 +138,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
             await todayService.updateSubtaskStatus(subtaskId, 'pending');
             triggerUndoPopIn(subtaskId);
             await onSubtaskUpdated?.();
-           /*  toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.'); */
+            /*  toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.'); */
           } catch (error) {
             console.error('Error al deshacer completado:', error);
             toast.error(
@@ -176,6 +178,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
             size={48}
             strokeWidth={1}
             style={{ marginBottom: '16px', opacity: 0.6 }}
+            aria-hidden="true"
           />
           <p
             style={{

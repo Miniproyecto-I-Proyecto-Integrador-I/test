@@ -7,18 +7,29 @@ interface OverdueTasksAlertProps {
   onSolve: () => void;
 }
 
-const OverdueTasksAlert: React.FC<OverdueTasksAlertProps> = ({ count, onSolve }) => {
+const OverdueTasksAlert: React.FC<OverdueTasksAlertProps> = ({
+  count,
+  onSolve,
+}) => {
   if (count <= 0) return null;
 
   return (
     <div className="overdue-alert-container">
       <div className="overdue-alert-main">
         <div className="overdue-alert-icon-wrapper">
-          <AlertTriangle size={20} className="overdue-alert-icon" />
+          <AlertTriangle
+            size={20}
+            className="overdue-alert-icon"
+            aria-hidden="true"
+          />
         </div>
         <div className="overdue-alert-content">
-          <h3 className="overdue-alert-title">Tienes {count} actividades vencidas</h3>
-          <p className="overdue-alert-subtitle">Tu progreso semanal podría verse afectado.</p>
+          <h3 className="overdue-alert-title">
+            Tienes {count} actividades vencidas
+          </h3>
+          <p className="overdue-alert-subtitle">
+            Tu progreso semanal podría verse afectado.
+          </p>
         </div>
       </div>
       <button className="overdue-alert-button" onClick={onSolve}>

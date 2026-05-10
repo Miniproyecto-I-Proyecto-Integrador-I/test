@@ -66,7 +66,9 @@ const CardTask: React.FC<CardTaskProps> = ({
     const formattedDate = new Date(
       sub.planification_date + 'T00:00:00',
     ).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-    displayTimeInfo = timeInfo ? `${timeInfo} • ${formattedDate}` : formattedDate;
+    displayTimeInfo = timeInfo
+      ? `${timeInfo} • ${formattedDate}`
+      : formattedDate;
   }
 
   useEffect(() => {
@@ -100,7 +102,9 @@ const CardTask: React.FC<CardTaskProps> = ({
     }, POP_IN_DURATION_MS);
   }, [animateUndoPopIn]);
 
-  const handleCheckChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     event.stopPropagation();
     const isChecked = event.target.checked;
     setChecked(isChecked);
@@ -135,7 +139,9 @@ const CardTask: React.FC<CardTaskProps> = ({
     }
   };
 
-  const handleOpenPostponeModal = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleOpenPostponeModal = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
     event.stopPropagation();
     setPostponeNote(noteText);
     setIsPostponeModalOpen(true);
@@ -167,11 +173,22 @@ const CardTask: React.FC<CardTaskProps> = ({
     setIsReadNoteModalOpen(true);
   };
 
+  const handleCardKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <>
       <div
         className={`task-card${checked ? ' task-card--done' : ''}${isPoppingOut ? ' task-card--pop-out' : ''}${isPoppingIn ? ' task-card--pop-in' : ''}`}
         onClick={onClick}
+        onKeyDown={handleCardKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-label={`Abrir subtarea ${sub.description}`}
       >
         {variant !== 'overdue' && (
           <input
@@ -184,7 +201,9 @@ const CardTask: React.FC<CardTaskProps> = ({
           />
         )}
 
-        <div className={`task-card__body${isPostponedCard ? ' task-card__body--postponed' : ''}`}>
+        <div
+          className={`task-card__body${isPostponedCard ? ' task-card__body--postponed' : ''}`}
+        >
           {isPostponedCard ? (
             <>
               <div className="task-card__title-row">
@@ -197,7 +216,7 @@ const CardTask: React.FC<CardTaskProps> = ({
                     title={noteText}
                     aria-label="Ver nota de subtarea"
                   >
-                    <StickyNote size={16} />
+                    <StickyNote size={16} aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -208,13 +227,13 @@ const CardTask: React.FC<CardTaskProps> = ({
           ) : variant === 'overdue' ? (
             <>
               <p className="task-card__title">{sub.description}</p>
-            <div className="task-card__info-col">
-              <p className="task-card__parent-task">{parentTaskTitle}</p>
-              <span className="task-card__badge">
-                <Clock size={13} />
-                {displayTimeInfo || badgeLabel}
-              </span>
-            </div>
+              <div className="task-card__info-col">
+                <p className="task-card__parent-task">{parentTaskTitle}</p>
+                <span className="task-card__badge">
+                  <Clock size={13} aria-hidden="true" />
+                  {displayTimeInfo || badgeLabel}
+                </span>
+              </div>
             </>
           ) : isActivePostponeCard ? (
             <>
@@ -229,7 +248,11 @@ const CardTask: React.FC<CardTaskProps> = ({
               <div className="task-card__info-row">
                 <p className="task-card__parent-task">{parentTaskTitle}</p>
                 <span className="task-card__badge">
-                  {variant === 'upcoming' ? <Calendar size={13} /> : <Clock size={13} />}
+                  {variant === 'upcoming' ? (
+                    <Calendar size={13} aria-hidden="true" />
+                  ) : (
+                    <Clock size={13} aria-hidden="true" />
+                  )}
                   {timeInfo || badgeLabel}
                 </span>
               </div>
@@ -245,25 +268,27 @@ const CardTask: React.FC<CardTaskProps> = ({
             title={noteText}
             aria-label="Ver nota de subtarea"
           >
-            <StickyNote size={16} />
+            <StickyNote size={16} aria-hidden="true" />
           </button>
         )}
 
         {isPostponedCard && (
           <span className="task-card__badge task-card__badge--postponed-right">
-            <Clock size={13} />
+            <Clock size={13} aria-hidden="true" />
             {timeInfo || badgeLabel}
           </span>
         )}
 
         {isActivePostponeCard && (
           <span className="task-card__badge task-card__badge--action-aligned">
-            <Clock size={13} />
+            <Clock size={13} aria-hidden="true" />
             {timeInfo || badgeLabel}
           </span>
         )}
 
-        {(variant === 'overdue' || showPostponeAction || showPostponeStatus) && (
+        {(variant === 'overdue' ||
+          showPostponeAction ||
+          showPostponeStatus) && (
           <div
             className={`task-card__actions${showPostponeStatus ? ' task-card__actions--postponed' : ''}`}
             onClick={(event) => event.stopPropagation()}
@@ -296,7 +321,7 @@ const CardTask: React.FC<CardTaskProps> = ({
                 onClick={handleOpenPostponeModal}
                 aria-label={`Posponer "${sub.description}"`}
               >
-                <Clock3 size={14} />
+                <Clock3 size={14} aria-hidden="true" />
                 Posponer
               </button>
             ) : null}

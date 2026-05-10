@@ -16,7 +16,13 @@ const ToastHost: React.FC<ToastHostProps> = ({ toasts, onDismiss }) => {
   const container = document.body;
 
   return ReactDOM.createPortal(
-    <div className="toast-host" aria-label="Notificaciones">
+    <div
+      className="toast-host"
+      role="region"
+      aria-label="Notificaciones"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
       {toasts.map((t) => (
         <Toast
           key={t.id}
