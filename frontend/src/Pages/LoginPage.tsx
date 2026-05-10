@@ -69,15 +69,20 @@ const LoginPage = () => {
 
   return (
     <div className="login-page-container">
-      <div className="login-bg-blob"></div>
-      <div className="login-bg-blob-top"></div>
+      <div className="login-bg-blob" aria-hidden="true"></div>
+      <div className="login-bg-blob-top" aria-hidden="true"></div>
 
-      <main className="login-main">
+      <main className="login-main" aria-busy={loading}>
         <div className="login-card">
           {hasError && !loading && (
-            <div className="login-error-banner">
-              <AlertCircle size={18} />
-              <span>
+            <div
+              className="login-error-banner"
+              role="alert"
+              aria-live="assertive"
+              id="login-error"
+            >
+              <AlertCircle size={18} aria-hidden="true" />
+              <span role="status">
                 {errorMessage === 'Invalid credentials or server error'
                   ? 'Credenciales incorrectas. Por favor, inténtalo de nuevo.'
                   : errorMessage}
@@ -107,10 +112,12 @@ const LoginPage = () => {
                   </NavLink>
                 </div>
 
-                <h1 className="login-title">Iniciar sesión</h1>
-                <p className="login-subtitle">
-                  Ingresa tus datos para acceder a tu cuenta.
-                </p>
+                <header>
+                  <h1 className="login-title">Iniciar sesión</h1>
+                  <p className="login-subtitle">
+                    Ingresa tus datos para acceder a tu cuenta.
+                  </p>
+                </header>
 
                 <form onSubmit={handleSubmit} noValidate>
                   <div className="login-form-group">
@@ -125,17 +132,20 @@ const LoginPage = () => {
                         ref={emailRef}
                         type="email"
                         name="email"
+                        autoComplete="email"
                         placeholder="nombre@empresa.com"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
                         onKeyDown={handleEmailKeyDown}
                         disabled={loading}
                         className={`login-input ${hasError ? 'is-invalid' : ''}`}
+                        aria-invalid={hasError}
+                        aria-describedby={hasError ? 'login-error' : undefined}
                         required
                       />
                       {hasError && (
                         <div className="login-input-icon error-icon">
-                          <AlertTriangle size={18} />
+                          <AlertTriangle size={18} aria-hidden="true" />
                         </div>
                       )}
                     </div>
@@ -156,23 +166,33 @@ const LoginPage = () => {
                         ref={passwordRef}
                         type={showPassword ? 'text' : 'password'}
                         name="password"
+                        autoComplete="current-password"
                         placeholder="••••••••"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
                         disabled={loading}
                         className={`login-input ${hasError ? 'is-invalid' : ''}`}
+                        aria-invalid={hasError}
+                        aria-describedby={hasError ? 'login-error' : undefined}
                         required
                       />
-                      <div
+                      <button
+                        type="button"
                         className="login-input-icon"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={
+                          showPassword
+                            ? 'Ocultar contraseña'
+                            : 'Mostrar contraseña'
+                        }
+                        aria-pressed={showPassword}
                       >
                         {showPassword ? (
-                          <EyeOff size={18} />
+                          <EyeOff size={18} aria-hidden="true" />
                         ) : (
-                          <Eye size={18} />
+                          <Eye size={18} aria-hidden="true" />
                         )}
-                      </div>
+                      </button>
                     </div>
                   </div>
 
@@ -189,15 +209,27 @@ const LoginPage = () => {
           ) : (
             <div className="login-loading-container">
               <div className="login-loading-icon-wrapper">
-                <Lock size={28} className="login-loading-icon" />
+                <Lock
+                  size={28}
+                  className="login-loading-icon"
+                  aria-hidden="true"
+                />
               </div>
               <h2 className="login-loading-title">Entrando a tu sesión</h2>
               <p className="login-loading-subtitle">
                 Por favor espera un momento
               </p>
 
-              <div className="login-loading-status">
-                <RefreshCw size={16} className="login-loading-status-icon" />
+              <div
+                className="login-loading-status"
+                role="status"
+                aria-live="polite"
+              >
+                <RefreshCw
+                  size={16}
+                  className="login-loading-status-icon"
+                  aria-hidden="true"
+                />
                 <span>Verificando tus credenciales...</span>
               </div>
             </div>
@@ -205,7 +237,7 @@ const LoginPage = () => {
 
           {loading && (
             <div className="login-secure-footer">
-              <ShieldCheck size={14} />
+              <ShieldCheck size={14} aria-hidden="true" />
               <span>STASKM SECURE LOGIN</span>
             </div>
           )}
