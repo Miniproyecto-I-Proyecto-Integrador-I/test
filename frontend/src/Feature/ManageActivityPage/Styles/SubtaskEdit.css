@@ -339,6 +339,11 @@
     color: transparent;
 }
 
+.subtask-edit-item-circle:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+}
+
 .subtask-edit-item-circle:hover {
     border-color: #10b981;
 }

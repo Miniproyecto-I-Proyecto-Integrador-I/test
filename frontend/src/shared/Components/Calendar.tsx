@@ -130,8 +130,9 @@ const Calendar = ({
           className="calendar__nav-btn"
           onClick={() => navigate(-1)}
           aria-label="Mes anterior"
+          type="button"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={16} aria-hidden="true" />
         </button>
 
         <div className="calendar__selectors">
@@ -183,8 +184,9 @@ const Calendar = ({
           className="calendar__nav-btn"
           onClick={() => navigate(1)}
           aria-label="Mes siguiente"
+          type="button"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={16} aria-hidden="true" />
         </button>
       </div>
 
@@ -221,14 +223,35 @@ const Calendar = ({
             .filter(Boolean)
             .join(' ');
 
+          const isFocusable = isCurrentMonth && !isDisabled;
+          const ariaLabel = date.toLocaleDateString('es-ES', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          });
+
           return (
             <div
               key={idx}
               className={cellClass}
+              role="button"
+              tabIndex={isFocusable ? 0 : -1}
+              aria-label={ariaLabel}
+              aria-disabled={isDisabled}
+              aria-selected={isSelected}
               onClick={() => {
                 if (isDisabled) return;
                 setSelectedDate(date);
                 onDaySelect?.(date);
+              }}
+              onKeyDown={(event) => {
+                if (isDisabled) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedDate(date);
+                  onDaySelect?.(date);
+                }
               }}
             >
               <span className="calendar__day-number">{date.getDate()}</span>

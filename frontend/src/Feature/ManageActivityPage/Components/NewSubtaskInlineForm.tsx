@@ -162,8 +162,11 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
 
           {/* Descripción */}
           <div className="subtask-edit-input-group grow">
-            <label>Descripción de actividad</label>
+            <label htmlFor="new-subtask-description">
+              Descripción de actividad
+            </label>
             <input
+              id="new-subtask-description"
               type="text"
               placeholder="¿Qué vas a hacer?"
               value={formData.description}
@@ -182,8 +185,9 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
 
           {/* Horas — ahora antes que fecha */}
           <div className="subtask-edit-input-group small">
-            <label>Tiempo a invertir</label>
+            <label htmlFor="new-subtask-hours">Tiempo a invertir</label>
             <input
+              id="new-subtask-hours"
               type="number"
               min="1"
               max={maxHours}
@@ -204,11 +208,12 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
 
           {/* Fecha */}
           <div className="subtask-edit-input-group">
-            <label>Día de realización</label>
+            <label htmlFor="new-subtask-date">Día de realización</label>
             <button
               type="button"
               className={`subtask-edit-date-btn${activeErrors.planification_date ? ' error' : ''}`}
               onClick={() => setIsDatePickerOpen(true)}
+              id="new-subtask-date"
             >
               <Calendar size={14} aria-hidden="true" />
               {formData.planification_date
@@ -236,7 +241,7 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
               }}
               aria-label="Cancelar"
             >
-              <X size={14} />
+              <X size={14} aria-hidden="true" />
             </button>
             {conflictToastId ? (
               <button
@@ -261,7 +266,11 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
                 disabled={isChecking || isSaving || !!activeErrors.needed_hours}
                 aria-label="Agregar actividad"
               >
-                {isChecking || isSaving ? '…' : <Check size={14} />}
+                {isChecking || isSaving ? (
+                  '…'
+                ) : (
+                  <Check size={14} aria-hidden="true" />
+                )}
               </button>
             )}
           </div>

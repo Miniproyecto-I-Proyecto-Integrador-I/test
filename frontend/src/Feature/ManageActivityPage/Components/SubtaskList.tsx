@@ -84,11 +84,16 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
         '¡Actividad creada!',
         'El nuevo paso se ha agregado correctamente.',
         undefined,
-        loadId
+        loadId,
       );
       setIsAddingNew(false);
     } catch {
-      toastError('Error al crear', 'No se pudo guardar la nueva actividad.', undefined, loadId);
+      toastError(
+        'Error al crear',
+        'No se pudo guardar la nueva actividad.',
+        undefined,
+        loadId,
+      );
     }
   };
 
@@ -104,6 +109,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 size={56}
                 className="subtask-edit-empty-icon"
                 strokeWidth={1.5}
+                aria-hidden="true"
               />
               <p className="subtask-edit-empty-text">
                 Aún no tienes subtareas...
@@ -157,7 +163,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
             className="subtask-edit-add-footer"
             onClick={() => setIsAddingNew(true)}
           >
-            <Plus size={16} />
+            <Plus size={16} aria-hidden="true" />
             Agregar actividad
           </button>
         </div>

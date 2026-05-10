@@ -58,7 +58,7 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({
                 className="subtask-edit-edit-main"
                 onClick={onEdit}
               >
-                <Edit2 size={16} />
+                <Edit2 size={16} aria-hidden="true" />
                 <span>Editar Tarea</span>
               </button>
               <button
@@ -66,7 +66,7 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({
                 className="subtask-edit-delete-main"
                 onClick={onDelete}
               >
-                <Trash2 size={16} />
+                <Trash2 size={16} aria-hidden="true" />
                 <span>Eliminar Tarea</span>
               </button>
             </div>
@@ -76,44 +76,67 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({
             <span
               className={`subtask-edit-meta-item ${isDueDateOverdue ? 'subtask-edit-meta-item--overdue' : ''}`}
             >
-              <Calendar size={16} />
+              <Calendar size={16} aria-hidden="true" />
               ENTREGA: {formatTaskDueDate(due_date)}
               {isDueDateOverdue ? (
                 <>
                   {' • Vencida'}
-                  <AlertTriangle size={14} />
+                  <AlertTriangle size={14} aria-hidden="true" />
                 </>
               ) : (
                 ''
               )}
             </span>
             <span className="subtask-edit-meta-item">
-              <FileText size={16} />
+              <FileText size={16} aria-hidden="true" />
               MATERIA: {subject?.trim() || '-'}
             </span>
             <span className="subtask-edit-meta-item">
-              <FileText size={16} />
+              <FileText size={16} aria-hidden="true" />
               TIPO: {type?.trim() || '-'}
             </span>
             <span className="subtask-edit-meta-item">
-              <Clock size={16} />
+              <Clock size={16} aria-hidden="true" />
               ESTIMADO: {computedTotalHours.toFixed(1)} Horas totales
             </span>
           </div>
           {/*Barra de progreso*/}
-                    {/* INICIO DE BARRA DE PROGRESO */}
+          {/* INICIO DE BARRA DE PROGRESO */}
           <div style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.85rem', color: '#6b7280', fontWeight: '500' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '0.25rem',
+                fontSize: '0.85rem',
+                color: '#6b7280',
+                fontWeight: '500',
+              }}
+            >
               <span>Progreso de la actividad</span>
               <span>{Math.round(progress_percentage)}%</span>
             </div>
-            <div style={{ width: '100%', height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
-              <div 
+            <div
+              style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: '#e5e7eb',
+                borderRadius: '4px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(progress_percentage)}
+                aria-label="Progreso de la actividad"
                 style={{
                   height: '100%',
-                  backgroundColor: progress_percentage === 100 ? '#10b981' : '#3b82f6',
+                  backgroundColor:
+                    progress_percentage === 100 ? '#10b981' : '#3b82f6',
                   width: `${progress_percentage}%`,
-                  transition: 'width 0.5s ease-in-out'
+                  transition: 'width 0.5s ease-in-out',
                 }}
               />
             </div>
