@@ -177,8 +177,19 @@ const UserSettingPage: React.FC = () => {
           <h2 className="user-setting-section-title">Nombre de usuario</h2>
           <div className="user-setting-section-content">
             <div className="input-container">
+              <label
+                className="visually-hidden"
+                htmlFor="user-setting-username"
+              >
+                Nombre de usuario
+              </label>
               <Lock size={16} className="input-icon" />
-              <input type="text" disabled value={userSetting.username} />
+              <input
+                id="user-setting-username"
+                type="text"
+                disabled
+                value={userSetting.username}
+              />
             </div>
             <span className="read-only-badge">Solo lectura</span>
           </div>
@@ -193,8 +204,16 @@ const UserSettingPage: React.FC = () => {
           <h2 className="user-setting-section-title">Correo electrónico</h2>
           <div className="user-setting-section-content">
             <div className="input-container">
+              <label className="visually-hidden" htmlFor="user-setting-email">
+                Correo electronico
+              </label>
               <Lock size={16} className="input-icon" />
-              <input type="email" disabled value={userSetting.email} />
+              <input
+                id="user-setting-email"
+                type="email"
+                disabled
+                value={userSetting.email}
+              />
             </div>
             <span className="read-only-badge">Solo lectura</span>
           </div>
@@ -215,11 +234,18 @@ const UserSettingPage: React.FC = () => {
             </div>
           </div>
           <div className="user-setting-section-content">
+            <label
+              className="visually-hidden"
+              htmlFor="user-setting-daily-limit"
+            >
+              Limite diario de horas
+            </label>
             <button className="hour-button" onClick={handleClickMinus}>
               -
             </button>
             <input
               className="hour-input"
+              id="user-setting-daily-limit"
               type="number"
               value={userSetting.dailyLimit}
               disabled

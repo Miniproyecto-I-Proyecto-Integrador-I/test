@@ -55,8 +55,8 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   count,
   tooltipInfo,
 }) => (
-  <div className="task-section__header" role="heading" aria-level={2}>
-    <span aria-hidden="true">{icon}</span>
+  <div className="task-section__header">
+    {icon}
     <span>
       {label} ({count})
     </span>
@@ -88,6 +88,18 @@ const DateDivider: React.FC<DateDividerProps> = ({ date }) => {
   );
 };
 
+/* ── Status Divider ─────────────────────────────────────── */
+
+interface StatusDividerProps {
+  label: string;
+}
+
+const StatusDivider: React.FC<StatusDividerProps> = ({ label }) => (
+  <div className="date-divider">
+    <span className="date-divider__text">{label}</span>
+  </div>
+);
+
 /* ── Main component ─────────────────────────────────────── */
 
 const CardsGrid: React.FC<CardsGridProps> = ({
@@ -102,9 +114,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
   toast,
 }) => {
   const [undoPopInId, setUndoPopInId] = useState<number | null>(null);
-  const undoPopInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const undoPopInTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
@@ -138,7 +148,7 @@ const CardsGrid: React.FC<CardsGridProps> = ({
             await todayService.updateSubtaskStatus(subtaskId, 'pending');
             triggerUndoPopIn(subtaskId);
             await onSubtaskUpdated?.();
-            /*  toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.'); */
+           /*  toast.success('Cambios revertidos', 'La subtarea volvió a tus pendientes.'); */
           } catch (error) {
             console.error('Error al deshacer completado:', error);
             toast.error(
@@ -178,7 +188,6 @@ const CardsGrid: React.FC<CardsGridProps> = ({
             size={48}
             strokeWidth={1}
             style={{ marginBottom: '16px', opacity: 0.6 }}
-            aria-hidden="true"
           />
           <p
             style={{
@@ -224,6 +233,9 @@ const CardsGrid: React.FC<CardsGridProps> = ({
       </div>
     );
   }
+
+  const todayActive = today.filter((sub) => sub.status !== 'completed');
+  const todayCompleted = today.filter((sub) => sub.status === 'completed');
 
   return (
     <>
@@ -272,15 +284,33 @@ const CardsGrid: React.FC<CardsGridProps> = ({
         )}
 
         {/* ── PARA HOY ─────────────────────────────────────── */}
-        {viewOptions.today && today.length > 0 && (
+        {viewOptions.today && (todayActive.length > 0 || todayCompleted.length > 0) && (
           <section className="task-section task-section--today">
             <SectionHeader
               icon={<CalendarCheck size={18} />}
               label="Para hoy"
-              count={today.length}
+              count={todayActive.length + todayCompleted.length}
               tooltipInfo="Organizadas por el menor esfuerzo o tiempo requerido."
             />
-            {today.map((sub) => (
+            {todayActive.length > 0 && (
+              <StatusDivider label="Pendientes" />
+            )}
+            {todayActive.map((sub) => (
+              <CardTask
+                key={sub.id}
+                sub={sub}
+                variant="today"
+                onClick={() => onSubtaskClick(sub)}
+                onSubtaskUpdated={onSubtaskUpdated}
+                onActionError={toast.error}
+                onMarkedCompleted={handleMarkedCompleted}
+                animateUndoPopIn={undoPopInId === sub.id}
+              />
+            ))}
+            {todayCompleted.length > 0 && (
+              <StatusDivider label="Completadas" />
+            )}
+            {todayCompleted.map((sub) => (
               <CardTask
                 key={sub.id}
                 sub={sub}

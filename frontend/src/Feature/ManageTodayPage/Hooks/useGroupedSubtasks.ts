@@ -179,17 +179,24 @@ export const useGroupedSubtasks = (
     const upcomingWithoutPostponed = rawUpcoming.filter(
       (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
     );
-    const todayNonPostponed = rawToday.filter(
+    const todayActive = rawToday.filter(
       (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
+    );
+    const todayCompleted = rawToday.filter(
+      (sub) => sub.status === 'completed',
     );
     const todayUnified = sortTodaySubtasks([
       ...postponedFromAll,
-      ...todayNonPostponed,
+      ...todayActive,
     ]);
+    const todayWithCompleted = [
+      ...todayUnified,
+      ...sortTodaySubtasks(todayCompleted),
+    ];
 
     return {
       overdue: applyLocalFilters(overdueWithoutPostponed),
-      today: applyLocalFilters(todayUnified),
+      today: applyLocalFilters(todayWithCompleted),
       upcoming: applyLocalFilters(upcomingWithoutPostponed),
       allCourses: uniqueCourses,
     };
