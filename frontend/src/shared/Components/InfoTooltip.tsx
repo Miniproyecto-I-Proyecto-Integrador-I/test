@@ -32,11 +32,17 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ content }) => {
   }, []);
 
   return (
-    <div 
+    <div
       className="info-tooltip-wrapper"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={() => setIsVisible(!isVisible)} // Mobile toggle bypass
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          setIsVisible((prev) => !prev);
+        }
+      }}
       aria-label={content}
       role="tooltip"
       tabIndex={0}
