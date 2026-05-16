@@ -129,6 +129,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
                 conflictWarning={conflictWarning}
                 isCheckingConflict={isCheckingConflict}
                 maxHours={maxHours}
+                taskDueDate={taskDueDate}
                 onStartEditing={onStartEditing}
                 onDeleteClick={onDeleteClick}
                 onFieldChange={onFieldChange}

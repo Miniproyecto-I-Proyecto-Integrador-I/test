@@ -39,6 +39,7 @@ interface SubtaskItemProps {
   onResolveConflict: () => void;
   onHoursChange: (value: number) => void;
   onToggleComplete?: () => void;
+  taskDueDate?: string;
 }
 
 const SubtaskItem: React.FC<SubtaskItemProps> = ({
@@ -58,6 +59,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
   onResolveConflict,
   onHoursChange,
   onToggleComplete,
+  taskDueDate,
 }) => {
   const [isReadNoteModalOpen, setIsReadNoteModalOpen] = useState(false);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
@@ -229,19 +231,22 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
 
             <div className="subtask-edit-input-group small">
               <label htmlFor={`subtask-edit-hours-${subtask.id}`}>
-                Tiempo a invertir
+                Tiempo (horas)
               </label>
-              <input
-                id={`subtask-edit-hours-${subtask.id}`}
-                type="number"
-                min="1"
-                max={maxHours}
-                step="1"
-                value={editData.needed_hours || ''}
-                onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
-                onKeyDown={(e) => e.key === 'Enter' && onSave()}
-                className={errors.needed_hours ? 'error' : ''}
-              />
+              <div className="subtask-edit-input-wrapper">
+                <input
+                  id={`subtask-edit-hours-${subtask.id}`}
+                  type="number"
+                  min="0.1"
+                  max={maxHours}
+                  step="0.5"
+                  value={editData.needed_hours || ''}
+                  onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
+                  onKeyDown={(e) => e.key === 'Enter' && onSave()}
+                  className={errors.needed_hours ? 'error' : ''}
+                />
+                <span className="subtask-edit-input-suffix">hs</span>
+              </div>
               {errors.needed_hours && (
                 <span className="subtask-edit-error">
                   {errors.needed_hours}
@@ -255,9 +260,11 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({
               </label>
               <button
                 type="button"
-                className={`subtask-edit-date-btn${errors.planification_date ? ' error' : ''}`}
-                onClick={onOpenDatePicker}
+                className={`subtask-edit-date-btn${errors.planification_date ? ' error' : ''}${isDateBeforeToday(taskDueDate) ? ' disabled' : ''}`}
+                onClick={isDateBeforeToday(taskDueDate) ? undefined : onOpenDatePicker}
                 id={`subtask-edit-date-${subtask.id}`}
+                disabled={isDateBeforeToday(taskDueDate)}
+                title={isDateBeforeToday(taskDueDate) ? "Primero debes actualizar la fecha de la tarea" : ""}
               >
                 <Calendar size={14} aria-hidden="true" />
                 {editData.planification_date
