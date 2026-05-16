@@ -133,9 +133,10 @@ CORS_ALLOWED_ORIGINS = [
 
 # Si existe DATABASE_URL (Supabase en produccion), usarla; si no, permitir Postgres local; si no, SQLite
 DATABASE_URL = config("DATABASE_URL", default=None)
+DJANGO_DEBUG = config("DJANGO_DEBUG", default=False, cast=bool)
 USE_LOCAL_POSTGRES = config("USE_LOCAL_POSTGRES", default=False, cast=bool)
 
-if DATABASE_URL and False:
+if DATABASE_URL and DJANGO_DEBUG:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,

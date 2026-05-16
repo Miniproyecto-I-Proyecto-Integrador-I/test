@@ -8,7 +8,7 @@ import {
   validateSubtaskForm,
   hasValidationErrors,
 } from '../../ManageCreatePage/Utils/subtaskValidator';
-import { formatShortDate } from '../Utils/subtaskEditUtils';
+import { formatShortDate, isDateBeforeToday } from '../Utils/subtaskEditUtils';
 import type { EditableSubtask } from '../Hooks/useSubtaskEdit';
 import apiClient from '../../../Services/ApiClient';
 import DatePickerModal from '../../ManageCalendarPage/Components/DatePickerModal';
@@ -185,20 +185,25 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
 
           {/* Horas — ahora antes que fecha */}
           <div className="subtask-edit-input-group small">
-            <label htmlFor="new-subtask-hours">Tiempo a invertir</label>
-            <input
-              id="new-subtask-hours"
-              type="number"
-              min="1"
-              max={maxHours}
-              step="1"
-              value={formData.needed_hours || ''}
-              onChange={(e) =>
-                handleHoursChange(parseFloat(e.target.value) || 0)
-              }
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-              className={activeErrors.needed_hours ? 'error' : ''}
-            />
+            <label htmlFor="new-subtask-hours">
+              Tiempo (horas)
+            </label>
+            <div className="subtask-edit-input-wrapper">
+              <input
+                id="new-subtask-hours"
+                type="number"
+                min="0.1"
+                max={maxHours}
+                step="0.5"
+                value={formData.needed_hours || ''}
+                onChange={(e) =>
+                  handleHoursChange(parseFloat(e.target.value) || 0)
+                }
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                className={activeErrors.needed_hours ? 'error' : ''}
+              />
+              <span className="subtask-edit-input-suffix">hs</span>
+            </div>
             {activeErrors.needed_hours && (
               <span className="subtask-edit-error">
                 {activeErrors.needed_hours}
@@ -211,9 +216,11 @@ const NewSubtaskInlineForm: React.FC<NewSubtaskInlineFormProps> = ({
             <label htmlFor="new-subtask-date">Día de realización</label>
             <button
               type="button"
-              className={`subtask-edit-date-btn${activeErrors.planification_date ? ' error' : ''}`}
-              onClick={() => setIsDatePickerOpen(true)}
+              className={`subtask-edit-date-btn${activeErrors.planification_date ? ' error' : ''}${isDateBeforeToday(taskDueDate) ? ' disabled' : ''}`}
+              onClick={isDateBeforeToday(taskDueDate) ? undefined : () => setIsDatePickerOpen(true)}
               id="new-subtask-date"
+              disabled={isDateBeforeToday(taskDueDate)}
+              title={isDateBeforeToday(taskDueDate) ? "Primero debes actualizar la fecha de la tarea" : ""}
             >
               <Calendar size={14} aria-hidden="true" />
               {formData.planification_date
