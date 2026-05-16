@@ -34,8 +34,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
 
     <div className="subtask-edit-task-edit-grid">
       <div className="subtask-edit-task-form-group full-width">
-        <label>Título de la tarea</label>
+        <label htmlFor="task-edit-title">Título de la tarea</label>
         <input
+          id="task-edit-title"
           type="text"
           value={taskEditData.title}
           onChange={(e) => onFieldChange('title', e.target.value)}
@@ -45,8 +46,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
       </div>
 
       <div className="subtask-edit-task-form-group full-width">
-        <label>Descripción</label>
+        <label htmlFor="task-edit-description">Descripción</label>
         <textarea
+          id="task-edit-description"
           value={taskEditData.description}
           onChange={(e) => onFieldChange('description', e.target.value)}
           maxLength={500}
@@ -55,8 +57,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
       </div>
 
       <div className="subtask-edit-task-form-group">
-        <label>Materia</label>
+        <label htmlFor="task-edit-subject">Materia</label>
         <input
+          id="task-edit-subject"
           type="text"
           value={taskEditData.subject}
           onChange={(e) => onFieldChange('subject', e.target.value)}
@@ -66,8 +69,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
       </div>
 
       <div className="subtask-edit-task-form-group">
-        <label>Tipo de evaluación</label>
+        <label htmlFor="task-edit-type">Tipo de evaluación</label>
         <select
+          id="task-edit-type"
           value={taskEditData.type}
           onChange={(e) => onFieldChange('type', e.target.value)}
         >
@@ -81,8 +85,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
       </div>
 
       <div className="subtask-edit-task-form-group">
-        <label>Fecha de entrega</label>
+        <label htmlFor="task-edit-due-date">Fecha de entrega</label>
         <input
+          id="task-edit-due-date"
           type="date"
           min={getTodayDateStr()}
           value={taskEditData.due_date}
@@ -92,8 +97,9 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
       </div>
 
       <div className="subtask-edit-task-form-group">
-        <label>Nivel de prioridad</label>
+        <label htmlFor="task-edit-priority">Nivel de prioridad</label>
         <select
+          id="task-edit-priority"
           value={taskEditData.priority}
           onChange={(e) => onFieldChange('priority', e.target.value)}
         >
@@ -105,11 +111,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({
     </div>
 
     <footer className="subtask-edit-footer">
-      <button
-        type="button"
-        className="subtask-edit-cancel"
-        onClick={onCancel}
-      >
+      <button type="button" className="subtask-edit-cancel" onClick={onCancel}>
         Cancelar
       </button>
       <button

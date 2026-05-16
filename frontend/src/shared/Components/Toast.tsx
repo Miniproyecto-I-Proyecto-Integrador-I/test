@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, XCircle, AlertTriangle, Info, X, Loader2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Info,
+  X,
+  Loader2,
+} from 'lucide-react';
 import '../Styles/Toast.css';
 
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info' | 'loading';
@@ -26,11 +33,18 @@ export interface ToastProps {
 }
 
 const ICONS: Record<ToastVariant, React.ReactNode> = {
-  success: <CheckCircle2 size={22} strokeWidth={2.2} />,
-  error: <XCircle size={22} strokeWidth={2.2} />,
-  warning: <AlertTriangle size={22} strokeWidth={2.2} />,
-  info: <Info size={22} strokeWidth={2.2} />,
-  loading: <Loader2 size={22} strokeWidth={2.2} className="toast-spin" />,
+  success: <CheckCircle2 size={22} strokeWidth={2.2} aria-hidden="true" />,
+  error: <XCircle size={22} strokeWidth={2.2} aria-hidden="true" />,
+  warning: <AlertTriangle size={22} strokeWidth={2.2} aria-hidden="true" />,
+  info: <Info size={22} strokeWidth={2.2} aria-hidden="true" />,
+  loading: (
+    <Loader2
+      size={22}
+      strokeWidth={2.2}
+      className="toast-spin"
+      aria-hidden="true"
+    />
+  ),
 };
 
 const Toast: React.FC<ToastProps> = ({

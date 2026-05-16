@@ -88,6 +88,18 @@ const DateDivider: React.FC<DateDividerProps> = ({ date }) => {
   );
 };
 
+/* ── Status Divider ─────────────────────────────────────── */
+
+interface StatusDividerProps {
+  label: string;
+}
+
+const StatusDivider: React.FC<StatusDividerProps> = ({ label }) => (
+  <div className="date-divider">
+    <span className="date-divider__text">{label}</span>
+  </div>
+);
+
 /* ── Main component ─────────────────────────────────────── */
 
 const CardsGrid: React.FC<CardsGridProps> = ({
@@ -222,6 +234,9 @@ const CardsGrid: React.FC<CardsGridProps> = ({
     );
   }
 
+  const todayActive = today.filter((sub) => sub.status !== 'completed');
+  const todayCompleted = today.filter((sub) => sub.status === 'completed');
+
   return (
     <>
       <div className="grouped-cards">
@@ -269,15 +284,33 @@ const CardsGrid: React.FC<CardsGridProps> = ({
         )}
 
         {/* ── PARA HOY ─────────────────────────────────────── */}
-        {viewOptions.today && today.length > 0 && (
+        {viewOptions.today && (todayActive.length > 0 || todayCompleted.length > 0) && (
           <section className="task-section task-section--today">
             <SectionHeader
               icon={<CalendarCheck size={18} />}
               label="Para hoy"
-              count={today.length}
+              count={todayActive.length + todayCompleted.length}
               tooltipInfo="Organizadas por el menor esfuerzo o tiempo requerido."
             />
-            {today.map((sub) => (
+            {todayActive.length > 0 && (
+              <StatusDivider label="Pendientes" />
+            )}
+            {todayActive.map((sub) => (
+              <CardTask
+                key={sub.id}
+                sub={sub}
+                variant="today"
+                onClick={() => onSubtaskClick(sub)}
+                onSubtaskUpdated={onSubtaskUpdated}
+                onActionError={toast.error}
+                onMarkedCompleted={handleMarkedCompleted}
+                animateUndoPopIn={undoPopInId === sub.id}
+              />
+            ))}
+            {todayCompleted.length > 0 && (
+              <StatusDivider label="Completadas" />
+            )}
+            {todayCompleted.map((sub) => (
               <CardTask
                 key={sub.id}
                 sub={sub}

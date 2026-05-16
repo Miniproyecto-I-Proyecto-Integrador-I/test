@@ -33,8 +33,22 @@ const TaskCard = ({ task }: TaskCardProps) => {
     navigate(`/activity/${task.id}`, { state: { from: '/progress' } });
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
-    <div className="progress-card" onClick={handleClick}>
+    <div
+      className="progress-card"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`Abrir tarea ${task.title}`}
+    >
       <div className="progress-card-header">
         <div className="progress-card-header-left">
           <h3>{task.title}</h3>
@@ -42,7 +56,11 @@ const TaskCard = ({ task }: TaskCardProps) => {
             VENCE: {formatDateLabel(task.due_date)}
           </p>
         </div>
-        <ChevronRight size={20} className="progress-card-hint-icon" />
+        <ChevronRight
+          size={20}
+          className="progress-card-hint-icon"
+          aria-hidden="true"
+        />
       </div>
 
       <div className="progress-card-bar-info">
@@ -50,7 +68,15 @@ const TaskCard = ({ task }: TaskCardProps) => {
         <span>{pct}%</span>
       </div>
       <div className="progress-card-bar-bg">
-        <div className="progress-card-bar-fill" style={{ width: `${pct}%` }} />
+        <div
+          className="progress-card-bar-fill"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={pct}
+          aria-label="Progreso de la tarea"
+          style={{ width: `${pct}%` }}
+        />
       </div>
 
       <div className="progress-card-subtasks-wrapper">
@@ -59,7 +85,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
         </p>
         {subs.length === 0 ? (
           <div className="progress-empty-subtasks">
-            <PlusCircle size={14} />
+            <PlusCircle size={14} aria-hidden="true" />
             <span>Haz click para añadir actividades</span>
           </div>
         ) : (

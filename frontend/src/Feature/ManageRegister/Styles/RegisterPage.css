@@ -11,6 +11,17 @@
   box-sizing: border-box;
 }
 
+.register-page-container {
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.register-page-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .register-title {
   font-size: 1.5rem;
   color: var(--text-main);
@@ -75,7 +86,7 @@
 
 .nl-input-name { width: 165px; }
 .nl-input-email { width: 220px; }
-.nl-input-password { width: 140px; padding-right: 32px; }
+.nl-input-password { width: 140px; padding-right: 44px; }
 
 .nl-password-wrapper {
   position: relative;
@@ -94,6 +105,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 6px;
 }
 
 .nl-eye-btn:hover {

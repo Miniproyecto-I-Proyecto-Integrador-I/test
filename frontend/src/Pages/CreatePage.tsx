@@ -13,7 +13,11 @@ const CreatePage = () => {
   return (
     <div className="create-page">
       {notification && (
-        <div className={`custom-toast toast-${notification.type}`}>
+        <div
+          className={`custom-toast toast-${notification.type}`}
+          role="status"
+          aria-live="polite"
+        >
           {notification.message}
         </div>
       )}
@@ -30,7 +34,9 @@ const CreatePage = () => {
                   return await addTask(payload);
                 }}
                 onAddSubtasks={(task) => {
-                  navigate(`/activity/${task.id}`, { state: { from: '/create' } });
+                  navigate(`/activity/${task.id}`, {
+                    state: { from: '/create' },
+                  });
                 }}
               />
             </div>

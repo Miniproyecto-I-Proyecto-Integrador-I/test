@@ -61,7 +61,9 @@ const TodayPage: React.FC = () => {
   );
 
   const hasAnyTasks =
-    filteredRawOverdue.length > 0 || rawToday.length > 0 || filteredRawUpcoming.length > 0;
+    filteredRawOverdue.length > 0 ||
+    rawToday.length > 0 ||
+    filteredRawUpcoming.length > 0;
 
   const summaryTodaySubtasks = rawToday.filter(
     (sub) => sub.status !== 'postponed' && sub.status !== 'completed',
@@ -179,8 +181,12 @@ const TodayPage: React.FC = () => {
           }}
         >
           <EmptyState
-            hiddenOverdueCount={!viewOptions.overdue ? filteredRawOverdue.length : 0}
-            hiddenUpcomingCount={!viewOptions.upcoming ? filteredRawUpcoming.length : 0}
+            hiddenOverdueCount={
+              !viewOptions.overdue ? filteredRawOverdue.length : 0
+            }
+            hiddenUpcomingCount={
+              !viewOptions.upcoming ? filteredRawUpcoming.length : 0
+            }
             onViewOverdue={() =>
               setViewOptions({ overdue: true, today: false, upcoming: false })
             }
@@ -238,7 +244,11 @@ const TodayPage: React.FC = () => {
                 <div className="overdue-return-banner">
                   <div className="overdue-return-main">
                     <div className="overdue-return-icon-wrapper">
-                      <ArrowLeft size={20} color="var(--primary-color)" />
+                      <ArrowLeft
+                        size={20}
+                        color="var(--primary-color)"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div className="overdue-return-content">
                       <span className="overdue-return-title">
@@ -264,7 +274,7 @@ const TodayPage: React.FC = () => {
                       }
                     }}
                   >
-                    <ArrowLeft size={16} />
+                    <ArrowLeft size={16} aria-hidden="true" />
                     Volver a mi día
                   </button>
                 </div>

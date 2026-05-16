@@ -128,16 +128,18 @@ const ProgressPage = () => {
             </h2>
             <div className="progress-carousel-nav">
               <button
+                type="button"
                 aria-label="Ver anteriores"
                 onClick={() => scroll('left')}
               >
-                <ChevronLeft size={20} strokeWidth={3} />
+                <ChevronLeft size={20} strokeWidth={3} aria-hidden="true" />
               </button>
               <button
+                type="button"
                 aria-label="Ver siguientes"
                 onClick={() => scroll('right')}
               >
-                <ChevronRight size={20} strokeWidth={3} />
+                <ChevronRight size={20} strokeWidth={3} aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -146,6 +148,8 @@ const ProgressPage = () => {
             className="progress-cards-container"
             ref={scrollRef}
             onScroll={handleScroll}
+            role="region"
+            aria-label="Lista de tareas filtradas"
           >
             {filteredTasks.length === 0 ? (
               <div

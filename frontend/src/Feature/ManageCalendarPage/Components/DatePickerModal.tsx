@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, CalendarDays, AlertTriangle } from 'lucide-react';
 import Calendar from '../../../shared/Components/Calendar';
 import { useCalendarData } from '../Hooks/useCalendarData';
@@ -56,6 +56,7 @@ const DatePickerModal = ({
     () => new Date(today.getFullYear(), today.getMonth(), 1),
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   const { dayMap, subtasksByDate, isLoading } = useCalendarData(
     activeMonth,
@@ -94,8 +95,6 @@ const DatePickerModal = ({
       return () => clearTimeout(t);
     }
   }, [isLoading]);
-
-  if (!isOpen) return null;
 
   // Augment dayMap with pending (locally added) subtasks for calendar cell badges
   const augmentedDayMap = { ...dayMap };
@@ -146,6 +145,17 @@ const DatePickerModal = ({
     onConfirm(selectedISO);
     setSelectedDate(null);
   };
+
+  useEffect(() => {
+    if (!selectedDate) return;
+    if (isSameAsOriginal || (isOver && blockConflict)) return;
+    const focusTimer = setTimeout(() => {
+      confirmButtonRef.current?.focus();
+    }, 0);
+    return () => clearTimeout(focusTimer);
+  }, [selectedDate, isSameAsOriginal, isOver, blockConflict]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="dpm__overlay" onClick={onClose}>
@@ -321,12 +331,14 @@ const DatePickerModal = ({
                   )}
                   <button
                     className={`dpm__confirm-btn${isSameAsOriginal ? ' dpm__confirm-btn--disabled' : isOver ? ' dpm__confirm-btn--conflict' : ''}`}
+                    ref={confirmButtonRef}
                     onClick={
                       isSameAsOriginal || (isOver && blockConflict)
                         ? undefined
                         : handleConfirm
                     }
                     disabled={isSameAsOriginal || (isOver && blockConflict)}
+                    type="button"
                   >
                     {isSameAsOriginal
                       ? 'Ya está en este día'
