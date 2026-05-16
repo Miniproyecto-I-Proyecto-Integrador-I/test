@@ -197,6 +197,13 @@ const CardTask: React.FC<CardTaskProps> = ({
             checked={checked}
             onChange={handleCheckChange}
             onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => {
+              event.stopPropagation();
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                event.currentTarget.click();
+              }
+            }}
             aria-label={`Marcar "${sub.description}" como completada`}
           />
         )}
@@ -213,6 +220,13 @@ const CardTask: React.FC<CardTaskProps> = ({
                     type="button"
                     className={`task-card__note-icon-btn task-card__note-icon-btn--inline ${noteToneClass}`}
                     onClick={openReadNoteModal}
+                    onKeyDown={(event) => {
+                      event.stopPropagation();
+                      if (event.key === 'Enter') {
+                        event.preventDefault();
+                        event.currentTarget.click();
+                      }
+                    }}
                     title={noteText}
                     aria-label="Ver nota de subtarea"
                   >
@@ -265,6 +279,13 @@ const CardTask: React.FC<CardTaskProps> = ({
             type="button"
             className={`task-card__note-icon-btn ${noteToneClass}`}
             onClick={openReadNoteModal}
+            onKeyDown={(event) => {
+              event.stopPropagation();
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                event.currentTarget.click();
+              }
+            }}
             title={noteText}
             aria-label="Ver nota de subtarea"
           >
@@ -319,6 +340,13 @@ const CardTask: React.FC<CardTaskProps> = ({
               <button
                 className="task-card__action-btn postpone-btn"
                 onClick={handleOpenPostponeModal}
+                onKeyDown={(event) => {
+                  event.stopPropagation();
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    event.currentTarget.click();
+                  }
+                }}
                 aria-label={`Posponer "${sub.description}"`}
               >
                 <Clock3 size={14} aria-hidden="true" />
